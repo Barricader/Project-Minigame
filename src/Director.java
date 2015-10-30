@@ -5,10 +5,11 @@
  *
  */
 public class Director {
-	int blah = 0;
+	int state = 0;
 	
 	public Director (int x) {
-		this.blah = x;
-		int kdjf;
+		this.state = x;
+		//int kdjf;
+		//dsafdsa;lkg;jgdsld
 	}
 }
