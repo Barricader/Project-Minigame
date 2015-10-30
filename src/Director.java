@@ -1,7 +1,7 @@
 /**
  * 
- * @author JoJones
  * Main class that will keep track of the game
+ * @author JoJones
  *
  */
 public class Director {
