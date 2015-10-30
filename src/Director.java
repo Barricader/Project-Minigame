@@ -1,3 +1,5 @@
+import mini.*;
+
 /**
  * 
  * Main class that will keep track of the game
@@ -23,7 +25,7 @@ public class Director {
 		curPlayer = 1;
 		
 		for (byte i = 0; i < MAX_GAMES; i++) {
-			minigames[i]= new Minigame(i);
+			minigames[i]= new Test(i);
 			minigameWeight[i] = 0;
 		}
 	}
