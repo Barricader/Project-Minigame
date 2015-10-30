@@ -5,11 +5,12 @@
  *
  */
 public class Director {
-	int state = 0;
+	private final byte START = 0, BOARD = 1, MINIGAME = 2, END = 3;
+	private int state = 0;
+	private int turn = 0;
 	
 	public Director (int x) {
-		this.state = x;
-		//int kdjf;
-		//dsafdsa;lkg;jgdsld
+		state = START;
+		turn = 0;
 	}
 }
