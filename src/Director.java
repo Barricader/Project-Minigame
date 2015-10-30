@@ -5,12 +5,20 @@
  *
  */
 public class Director {
+	// States of the board
 	private final byte START = 0, BOARD = 1, MINIGAME = 2, END = 3;
-	private int state = 0;
-	private int turn = 0;
+	private final byte MAX_WEIGHT = 100;
+	private byte curPlayer;
+	private byte state;
+	private int turn;
+	private int maxTurns;
+	private MiniGame[][] minigames;
 	
-	public Director (int x) {
+	public Director (int maxTurns) {
+		this.maxTurns = maxTurns;
 		state = START;
-		turn = 0;
+		turn = 1;
+		curPlayer = 1;
+		
 	}
 }
