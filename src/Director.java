@@ -6,4 +6,8 @@
  */
 public class Director {
 	int blah = 0;
+	
+	public Director (int x) {
+		this.blah = x;
+	}
 }
