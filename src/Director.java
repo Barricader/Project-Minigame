@@ -3,6 +3,7 @@ import mini.*;
 /**
  * 
  * Main class that will keep track of the game
+ * You should create this after the player registration is done
  * @author JoJones
  *
  */
@@ -18,6 +19,10 @@ public class Director {
 	private Minigame[] minigames;
 	private byte[] minigameWeight;
 	
+	/**
+	 * 
+	 * @param maxTurns - Set the max turns for the game before game over
+	 */
 	public Director (int maxTurns) {
 		this.maxTurns = maxTurns;
 		state = START;
@@ -28,5 +33,9 @@ public class Director {
 			minigames[i]= new Test(i);
 			minigameWeight[i] = 0;
 		}
+	}
+	
+	public void loop() {
+		
 	}
 }
