@@ -10,5 +10,6 @@ public class Director {
 	public Director (int x) {
 		this.state = x;
 		//int kdjf;
+		//dsafdsa;lkg;jgdsld
 	}
 }
