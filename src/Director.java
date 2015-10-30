@@ -9,5 +9,6 @@ public class Director {
 	
 	public Director (int x) {
 		this.blah = x;
+		int kdjf;
 	}
 }
