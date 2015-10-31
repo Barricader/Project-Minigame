@@ -11,6 +11,7 @@ public class Board {
 	 */
 	public Board() {
 		// Init tiles
+		tiles = new Tile[MAX_TILES];
 		for (int i = 0; i < MAX_TILES; i++) {
 			tiles[i] = new Tile();
 		}
