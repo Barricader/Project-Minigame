@@ -130,8 +130,8 @@ public class StartPanel extends JPanel {
 				turns = 20;
 			}
 			// load board
-			main.getDirector().setPlayer(players);
-			main.getDirector().setTurns();
+			main.getDirector().setPlayers(players);
+			main.getDirector().setTurns(turns);
 		}
 	}
 	
