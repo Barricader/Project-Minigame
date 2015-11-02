@@ -17,7 +17,7 @@ import mini.Test;
 public class Director {
 	// States of the board
 	// I made them bytes to optimize memory usage
-	public final byte START = 0, BOARD = 1, MINIGAME = 2, END = 3;
+	public static final byte START = 0, BOARD = 1, MINIGAME = 2, END = 3;
 	private final byte MAX_WEIGHT = 100;
 	private final byte MAX_GAMES = 20;
 	private byte curPlayer;
