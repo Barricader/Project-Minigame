@@ -1,5 +1,8 @@
 package main;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 import mini.Minigame;
@@ -14,11 +17,12 @@ import mini.Test;
 public class Director {
 	// States of the board
 	// I made them bytes to optimize memory usage
-	private final byte START = 0, BOARD = 1, MINIGAME = 2, END = 3;
+	public static final byte START = 0, BOARD = 1, MINIGAME = 2, END = 3;
 	private final byte MAX_WEIGHT = 100;
 	private final byte MAX_GAMES = 20;
 	private byte curPlayer;
 	private ArrayList<Player> players;
+	private ArrayList<Player> rank;
 	private byte state;
 	private int turn;
 	private int maxTurns;
@@ -66,66 +70,88 @@ public class Director {
 		if (state == START) {
 			// Start stuff
 		}
-		while (state != END) {
-			// Main game loop here
-			
-			// Check what state we are in
-			if (state == BOARD) {
-				boolean isTurn = true;
-				while (isTurn) {
-					// Player does stuff on board like move
-					isTurn = false;
-				}
+		else {
+			while (state != END) {
+				// Main game loop here
 				
-				// Other stuff
-			}
-			else if (state == MINIGAME) {
-				// Check if minigame has been played recently
-				boolean picked = false;
-				byte curMinigame = -1;
-				while (!picked) {
-					curMinigame = (byte)r.nextInt(MAX_GAMES);
-					// Weight check
-					if (minigameWeight[curMinigame] <= 50) {
-						double defaultChance = 100 / MAX_GAMES;
-						// Change this is max games changes
-						// REDO this so that everything has an equal chance disregarding weight
-						defaultChance -= 0.1 * minigameWeight[curMinigame];
-						if ((double)r.nextInt(100) < defaultChance) {
-							picked = true;
+				// Check what state we are in
+				if (state == BOARD) {
+					boolean isTurn = true;
+					while (isTurn) {
+						// Player does stuff on board like move
+						isTurn = false;
+					}
+					
+					// Other stuff
+				}
+				else if (state == MINIGAME) {
+					// Check if minigame has been played recently
+					boolean picked = false;
+					byte curMinigame = -1;
+					while (!picked) {
+						curMinigame = (byte)r.nextInt(MAX_GAMES);
+						// Weight check
+						if (minigameWeight[curMinigame] <= 50) {
+							double defaultChance = 100 / MAX_GAMES;
+							// Change this is max games changes
+							// REDO this so that everything has an equal chance disregarding weight
+							defaultChance -= 0.1 * minigameWeight[curMinigame];
+							if ((double)r.nextInt(100) < defaultChance) {
+								picked = true;
+							}
 						}
 					}
+					
+					System.out.println(curMinigame);
+					
+					// Play minigame here
+					
+					
+					
+					// Update weights after minigame has been played
+					for (int i = 0; i < MAX_GAMES; i++) {
+						minigameWeight[i] -= 10;
+					}
+					minigameWeight[curMinigame] = MAX_WEIGHT;
 				}
 				
-				System.out.println(curMinigame);
-				
-				// Play minigame here
-				
-				// Update weights after minigame has been played
-				for (int i = 0; i < MAX_GAMES; i++) {
-					minigameWeight[i] -= 10;
+				// Update game
+				if (curPlayer == players.size() - 1) {
+					curPlayer = 0;
 				}
-				minigameWeight[curMinigame] = MAX_WEIGHT;
+				curPlayer++;
+				
+				if (state == BOARD) {
+					state = MINIGAME;
+				}
+				else {
+					state = BOARD;
+					turn++;
+				}
+				
+				// Check turn, if it is over max turns, the game is over
+				if (turn > maxTurns) {
+					state = END;
+				}
 			}
+		}
+		while (state == END) {
 			
-			// Update game
-			if (curPlayer == players.size() - 1) {
-				curPlayer = 0;
-			}
-			curPlayer++;
+		}
+	}
+	
+	public void sortRank() {
+		ArrayList<Integer> t = new ArrayList<Integer>();
+		for (int i = 0; i < players.size(); i++) {
+			t.add(players.get(i).getScore1());
+		}
+//		Collections.sort(t);
+//		for (int i = 0; i < players.size(); i++) {
+			players.sort((Comparator<? super Player>) t);
+		//}
 			
-			if (state == BOARD) {
-				state = MINIGAME;
-			}
-			else {
-				state = BOARD;
-				turn++;
-			}
-			
-			// Check turn, if it is over max turns, the game is over
-			if (turn > maxTurns) {
-				state = END;
-			}
+		for (int i = 0; i < players.size(); i++) {
+			System.out.println(players.get(i).getScore1());
 		}
 	}
 	
@@ -135,10 +161,7 @@ public class Director {
 	
 	public void setPlayers(ArrayList<Player> players) {
 		this.players = players;
-		for (byte i = 0; i < players.size(); i++) {		
-			this.players.add(new Player());
-			this.players.set(i, players.get(i));
-		}
+		this.rank = players;
 	}
 	
 	public void setTurns(int turns) {
