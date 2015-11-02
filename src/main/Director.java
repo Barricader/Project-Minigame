@@ -1,4 +1,5 @@
 package main;
+import java.util.ArrayList;
 import java.util.Random;
 
 import mini.Minigame;
@@ -17,7 +18,7 @@ public class Director {
 	private final byte MAX_WEIGHT = 100;
 	private final byte MAX_GAMES = 20;
 	private byte curPlayer;
-	private Player[] players;
+	private ArrayList<Player> players;
 	private byte state;
 	private int turn;
 	private int maxTurns;
@@ -32,7 +33,6 @@ public class Director {
 	 * @param players - Players to play in the game
 	 */
 	public Director (Main m) {
-		this.maxTurns = maxTurns;
 		this.state = START;
 		this.turn = 1;
 		this.curPlayer = 0;
@@ -40,14 +40,13 @@ public class Director {
 		board = new Board();
 		r = new Random();
 		
-		// Change me
-		byte players = 4;
+		this.players = new ArrayList<Player>();
 		
 		// Init players here
-		this.players = new Player[players];
-		for (byte i = 0; i < players; i++) {
-			this.players[i] = new Player();
-		}
+//		this.players = new Player[players];
+//		for (byte i = 0; i < players; i++) {
+//			this.players[i] = new Player();
+//		}
 		
 		// Init minigames here
 		this.minigames = new Minigame[MAX_GAMES];
@@ -110,7 +109,7 @@ public class Director {
 			}
 			
 			// Update game
-			if (curPlayer == players.length - 1) {
+			if (curPlayer == players.size() - 1) {
 				curPlayer = 0;
 			}
 			curPlayer++;
@@ -128,5 +127,21 @@ public class Director {
 				state = END;
 			}
 		}
+	}
+	
+	public void setState(byte state) {
+		this.state = state;
+	}
+	
+	public void setPlayers(ArrayList<Player> players) {
+		this.players = players;
+		for (byte i = 0; i < players.size(); i++) {		
+			this.players.add(new Player());
+			this.players.set(i, players.get(i));
+		}
+	}
+	
+	public void setTurns(int turns) {
+		maxTurns = turns;
 	}
 }
