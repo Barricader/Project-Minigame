@@ -11,15 +11,21 @@ import screen.StartPanel;
  * @author David Kramer
  *
  */
-public class Main extends JFrame {
+public class Main extends JFrame implements Runnable {
 	public static final String TITLE = "Project MiniGame by Jo, Jack, and David";
 	public static final Dimension SIZE = new Dimension(1280, 720);
-	public static Director dir;
 	
 	private StartPanel startPanel;	// initial start panel
+	private Director dir;
+	
+	// thread stuff
+	private Thread thread;
+	private boolean running = false;
 
 	public Main() {
-		startPanel = new StartPanel();
+		startPanel = new StartPanel(this);
+		dir = new Director(this);
+		thread = new Thread(this);
 		add(startPanel);
 		
 		setTitle(TITLE);
@@ -27,10 +33,22 @@ public class Main extends JFrame {
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
+		thread.start();
+	}
+	
+	public void run() {
+		running = true;
+		
+		while (running) {
+			dir.loop();
+		}
+	}
+	
+	public Director getDirector() {
+		return dir;
 	}
 	
 	public static void main(String[] args) {
 		Main testScreen = new Main();
-		dir = new Director(testScreen);
 	}
 }
