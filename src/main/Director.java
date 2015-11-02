@@ -8,6 +8,9 @@ import java.util.Random;
 import mini.Minigame;
 import mini.Test;
 
+// TODO: Make it output the player list sorting to test
+// TODO: Make it go back and forth between the board and minigames
+
 /**
  * 
  * Main class that will keep track of the game
@@ -69,6 +72,9 @@ public class Director {
 	public void loop() {
 		if (state == START) {
 			// Start stuff
+			@SuppressWarnings("unused")
+			int bleh = 0;
+			bleh += 5;
 		}
 		else {
 			while (state != END) {
@@ -76,12 +82,12 @@ public class Director {
 				
 				// Check what state we are in
 				if (state == BOARD) {
-					boolean isTurn = true;
-					while (isTurn) {
-						// Player does stuff on board like move
-						isTurn = false;
-					}
-					
+//					boolean isTurn = true;
+//					while (isTurn) {
+//						// Player does stuff on board like move
+//						isTurn = false;
+//					}
+//					
 					// Other stuff
 				}
 				else if (state == MINIGAME) {
@@ -136,7 +142,7 @@ public class Director {
 			}
 		}
 		while (state == END) {
-			
+			System.out.println("END");
 		}
 	}
 	
