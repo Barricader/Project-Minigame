@@ -31,7 +31,7 @@ public class Director {
 	 * @param maxTurns - Amount of max turns in the current game
 	 * @param players - Players to play in the game
 	 */
-	public Director (int maxTurns, byte players) {
+	public Director () {
 		this.maxTurns = maxTurns;
 		this.state = START;
 		this.turn = 1;
@@ -41,10 +41,10 @@ public class Director {
 		r = new Random();
 		
 		// Init players here
-		this.players = new Player[players];
-		for (byte i = 0; i < players; i++) {
-			this.players[i] = new Player();
-		}
+//		this.players = new Player[players];
+//		for (byte i = 0; i < players; i++) {
+//			this.players[i] = new Player();
+//		}
 		
 		// Init minigames here
 		this.minigames = new Minigame[MAX_GAMES];
