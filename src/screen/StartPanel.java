@@ -132,6 +132,7 @@ public class StartPanel extends JPanel {
 			// load board
 			main.getDirector().setPlayers(players);
 			main.getDirector().setTurns(turns);
+			main.getDirector().setState(Director.BOARD);
 		}
 	}
 	
@@ -162,7 +163,6 @@ public class StartPanel extends JPanel {
 		btmPanel.add(customTurnField);
 		add(btmPanel, BorderLayout.SOUTH);
 		
-
 	}
 	
 	/**
