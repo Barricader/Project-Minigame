@@ -1,3 +1,5 @@
+package screen;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,6 +18,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import main.Player;
 
 /**
  * The starting panel of the game. This provides controls for allowing the user to
