@@ -40,6 +40,7 @@ public class Director {
 		board = new Board();
 		r = new Random();
 		
+		// Change me
 		byte players = 4;
 		
 		// Init players here
@@ -56,7 +57,7 @@ public class Director {
 			this.minigameWeight[i] = 0;
 		}
 		
-		loop();
+		//loop();
 	}
 	
 	/**
