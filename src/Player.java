@@ -1,9 +1,6 @@
-
-import javax.swing.*;
 import java.awt.*;
 
-public class Player 
-{
+public class Player {
 	private String name = "";
 	private Color col;
 	private int score1 = 0;
