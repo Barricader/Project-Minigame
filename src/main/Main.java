@@ -14,6 +14,7 @@ import screen.StartPanel;
 public class Main extends JFrame {
 	public static final String TITLE = "Project MiniGame by Jo, Jack, and David";
 	public static final Dimension SIZE = new Dimension(1280, 720);
+	public static Director dir;
 	
 	private StartPanel startPanel;	// initial start panel
 
@@ -30,5 +31,6 @@ public class Main extends JFrame {
 	
 	public static void main(String[] args) {
 		Main testScreen = new Main();
+		dir = new Director(testScreen);
 	}
 }
