@@ -149,6 +149,10 @@ public class Director {
 //		for (int i = 0; i < players.size(); i++) {
 			players.sort((Comparator<? super Player>) t);
 		//}
+			
+		for (int i = 0; i < players.size(); i++) {
+			System.out.println(players.get(i).getScore1());
+		}
 	}
 	
 	public void setState(byte state) {
