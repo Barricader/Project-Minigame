@@ -32,7 +32,7 @@ public class Director {
 	 */
 	public Director (int maxTurns, byte players) {
 		this.maxTurns = maxTurns;
-		this.state = BOARD;
+		this.state = START;
 		this.turn = 1;
 		this.curPlayer = 0;
 		
