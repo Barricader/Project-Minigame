@@ -10,15 +10,18 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import main.Main;
 import main.Player;
 
 /**
@@ -30,14 +33,22 @@ import main.Player;
 public class StartPanel extends JPanel {
 	public static final int MAX_PLAYERS = 4;
 	
+	private Main main;
 	private ArrayList<Player> players;	// players we create
 	private DefaultListModel<Player> playerListModel; // list model for players
+	private ButtonGroup buttonGroup;	// button group for radio buttons
+	private JLabel turnLabel;
+	private JRadioButton turnCount10Btn;	// 10 turns
+	private JRadioButton turnCount20Btn;	// 20 turns
+	private JRadioButton turnCountCustomBtn;	// for having a custom value
+	private JTextField customTurnField;	// field for entering numeric value for turn count
 	private JList playerList;	// list of players displayed
 	private JLabel titleLabel;	// title label at top of screen
 	private JButton addPlayerBtn;
 	private JButton doneBtn;	
 
-	public StartPanel() {
+	public StartPanel(Main main) {
+		this.main = main;
 		init();
 	}
 	
@@ -67,6 +78,7 @@ public class StartPanel extends JPanel {
 	 * completed.
 	 */
 	private void createButtons() {
+		createRadioButtons();
 		addPlayerBtn = new JButton("+ Add Player");
 		addPlayerBtn.setPreferredSize(new Dimension(150, 50));
 		addPlayerBtn.setFocusPainted(false);
@@ -85,18 +97,41 @@ public class StartPanel extends JPanel {
 		
 	}
 	
+	private void createRadioButtons() {
+		buttonGroup = new ButtonGroup();
+		turnCount10Btn = new JRadioButton("10");
+		turnCount20Btn = new JRadioButton("20");
+		turnCountCustomBtn = new JRadioButton("Custom: ");
+		customTurnField = new JTextField(5);
+		
+		buttonGroup.add(turnCount10Btn);
+		buttonGroup.add(turnCount20Btn);
+		buttonGroup.add(turnCountCustomBtn);
+	}
+	
 	/**
 	 * Creates the instruction labels for this panel.
 	 */
 	private void createLabels() {
 		titleLabel = new JLabel("Add Players");
 		titleLabel.setFont(new Font("Courier New", Font.BOLD, 60));
+		turnLabel = new JLabel("Turn Count: ");
 	}
 	
 	private void loadBoard() {
 		if (players.size() >= 1 && players.size() <= MAX_PLAYERS) {
+			int turns = 0;
+		
+			if (buttonGroup.getSelection() == turnCountCustomBtn) {	// TODO try to fix this so it gets value of button itself
+				turns = Integer.parseInt(customTurnField.getText());
+			} else if (buttonGroup.getSelection() == turnCount10Btn) {
+				turns = 10;
+			} else if (buttonGroup.getSelection() == turnCount20Btn) {
+				turns = 20;
+			}
 			// load board
-			System.out.println("Change View To Board View!");
+//			main.getDirector().setPlayer(players);
+//			main.getDirector().setTurns();
 		}
 	}
 	
@@ -118,7 +153,15 @@ public class StartPanel extends JPanel {
 		btmPanel.add(Box.createHorizontalStrut(20));
 		btmPanel.add(doneBtn);
 		btmPanel.add(Box.createHorizontalStrut(20));
+		
+		// turn controls
+		btmPanel.add(turnLabel);
+		btmPanel.add(turnCount10Btn);
+		btmPanel.add(turnCount20Btn);
+		btmPanel.add(turnCountCustomBtn);
+		btmPanel.add(customTurnField);
 		add(btmPanel, BorderLayout.SOUTH);
+		
 
 	}
 	
