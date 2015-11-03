@@ -21,6 +21,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import main.Director;
 import main.Main;
 import main.Player;
 
