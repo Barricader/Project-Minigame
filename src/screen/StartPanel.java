@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
@@ -235,22 +236,37 @@ public class StartPanel extends JPanel {
 	private void loadBoard() {
 		if (players.size() >= 1 && players.size() <= MAX_PLAYERS) {
 			int turns = 0;
-		
-			if (buttonGroup.getSelection() == customTurnBtn) {
-				// TODO right now, text field is NOT filtered to only allow for numeric values!
-				turns = Integer.parseInt(customTurnField.getText());
-			} else if (buttonGroup.getSelection() == turn10Btn) {
-				turns = 10;
-			} else if (buttonGroup.getSelection() == turn20Btn) {
+			
+			// Jo: Moved this stuff around, am testing stuff
+//			if (buttonGroup.getSelection() == turn10Btn) {
+//				turns = 10;
+//			} else if (buttonGroup.getSelection() == turn20Btn) {
+//				turns = 20;
+//			}
+//			else if (buttonGroup.getSelection() == customTurnBtn) {
+//				// TODO right now, text field is NOT filtered to only allow for numeric values!
+//				turns = Integer.parseInt(customTurnField.getText());
+//			}
+			
+			if (buttonGroup.isSelected(turn10Btn.getModel())) {
 				turns = 20;
 			}
+			else if (buttonGroup.isSelected(turn20Btn.getModel())) {
+				turns = 20;
+			}
+			else if (buttonGroup.isSelected(customTurnBtn.getModel())) {
+				turns = Integer.parseInt(customTurnField.getText());
+			}
 			
+			
+			System.out.println(turns);
 			// load board
 			Director director = main.getDirector();
 			director.setPlayers(players);
 			director.setTurns(turns);
 			director.setState(Director.BOARD);
-			setVisible(false);
+			setVisible(false);	// Setting the intro screen to invis
+			// Maybe make another panel visible??????
 		}
 	}
 	

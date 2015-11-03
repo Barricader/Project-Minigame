@@ -93,7 +93,7 @@ public class Director {
 //					}
 //					
 					// Other stuff
-					System.out.println("Turn " + turn + " | Player " + curPlayer);
+					System.out.println("Turn " + turn + " | Player " + curPlayer+1);
 					sc.nextLine();
 					
 				}
