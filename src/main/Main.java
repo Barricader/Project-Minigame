@@ -38,10 +38,20 @@ public class Main extends JFrame implements Runnable {
 	}
 	
 	public void run() {
+		// Creating a limit on updates to 60 times a second
 		running = true;
-		
+		long lastTime = System.nanoTime();
+		final double ns = 1000000000.0 / 60.0;
+		double delta = 0;
+		requestFocus();
 		while (running) {
-			dir.loop();
+			long now = System.nanoTime();
+			delta += (now - lastTime) / ns;
+			lastTime = now;
+			while (delta >= 1) {
+				dir.loop();
+				delta--;
+			}
 		}
 	}
 	

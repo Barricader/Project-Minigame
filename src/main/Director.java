@@ -34,6 +34,8 @@ public class Director {
 	private Random r;
 	private Main m;
 	
+	private static boolean test = false, test2 = false, test3 = false;
+	
 	// DELETE ME
 	Scanner sc;
 	
@@ -125,7 +127,10 @@ public class Director {
 				}
 			}
 			else {		// If the game is in the over state
+				if (!test) {
 				System.out.println("OH");
+				test = true;
+				}
 			}
 		}
 	}
