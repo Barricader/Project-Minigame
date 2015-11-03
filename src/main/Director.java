@@ -34,11 +34,6 @@ public class Director {
 	private Random r;
 	private Main m;
 	
-	private static boolean test = false, test2 = false, test3 = false;
-	
-	// DELETE ME
-	Scanner sc;
-	
 	/**
 	 * Create a Director object
 	 * @param maxTurns - Amount of max turns in the current game
@@ -86,9 +81,7 @@ public class Director {
 					}
 		
 					// Other stuff
-					System.out.println("Turn " + turn + " | Player " + (curPlayer+1));
-					//sc.nextLine();
-					
+					System.out.println("Turn " + turn + " | Player " + (curPlayer+1));	
 				}
 				else if (state == MINIGAME) {
 					// Get a random minigame
@@ -127,10 +120,7 @@ public class Director {
 				}
 			}
 			else {		// If the game is in the over state
-				if (!test) {
-				System.out.println("OH");
-				test = true;
-				}
+
 			}
 		}
 	}
@@ -139,7 +129,7 @@ public class Director {
 	 * Gets a random minigame. The randomness is based on a weight
 	 * depending on when the minigame was last played.
 	 */
-	public int getRandomMinigame() {
+	private int getRandomMinigame() {
 		boolean picked = false;
 		byte curMinigame = -1;
 		while (!picked) {
@@ -159,14 +149,14 @@ public class Director {
 		return curMinigame;
 	}
 	
-	public void sortPlayerOrder() {
+	private void sortPlayerOrder() {
 		// Sort  the player array based on turn order
 	}
 	
 	/**
 	 * Sorts the rank array by comparing player scores
 	 */
-	public void sortRank() {
+	private void sortRank() {
 		ArrayList<Integer> t = new ArrayList<Integer>();
 		for (int i = 0; i < players.size(); i++) {
 			t.add(players.get(i).getScore1());
