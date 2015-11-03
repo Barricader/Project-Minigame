@@ -2,13 +2,11 @@ package main;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Random;
-import java.util.Scanner;
 
 import mini.Minigame;
 import mini.Test;
 
 // TODO: Make it output the player list sorting to test
-// TODO: Make it go back and forth between the board and minigames
 
 /**
  * 
