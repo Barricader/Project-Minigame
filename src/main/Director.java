@@ -32,6 +32,7 @@ public class Director {
 	private byte[] minigameWeight;
 	private Board board;
 	private Random r;
+	private Main m;
 	
 	// DELETE ME
 	Scanner sc;
@@ -45,6 +46,7 @@ public class Director {
 		this.state = START;
 		this.turn = 1;
 		this.curPlayer = 0;
+		this.m = m;
 		
 		board = new Board();
 		r = new Random();
@@ -52,12 +54,6 @@ public class Director {
 		sc = new Scanner(System.in);
 		
 		this.players = new ArrayList<Player>();
-		
-		// Init players here
-//		this.players = new Player[players];
-//		for (byte i = 0; i < players; i++) {
-//			this.players[i] = new Player();
-//		}
 		
 		// Init minigames here
 		this.minigames = new Minigame[MAX_GAMES];
@@ -75,47 +71,28 @@ public class Director {
 	 * Main game loop
 	 */
 	public void loop() {
-		//System.out.println(state);
 		if (state == START) {
 			// Start stuff
 		}
 		else {
-			System.out.println("uh");
-			if (state != END) {		// If the game is not in the over state
-				// Main game loop here
-				System.out.println("First step of loop");
+			System.out.println(state);	// TESTING STATEMENT
+			if (state != END) {		// If the game is not in the over state AKA ingame
 				// Check what state we are in
 				if (state == BOARD) {
-//					boolean isTurn = true;
-//					while (isTurn) {
-//						// Player does stuff on board like move
-//						isTurn = false;
-//					}
-//					
+					for (int i = 0; i < players.size(); i++) {
+						// do player stuff here
+					}
+		
 					// Other stuff
 					System.out.println("Turn " + turn + " | Player " + (curPlayer+1));
 					//sc.nextLine();
 					
 				}
 				else if (state == MINIGAME) {
-					// Check if minigame has been played recently
-					boolean picked = false;
-					byte curMinigame = -1;
-					while (!picked) {
-						curMinigame = (byte)r.nextInt(MAX_GAMES);
-						// Weight check
-						if (minigameWeight[curMinigame] <= 50) {
-							double defaultChance = 100 / MAX_GAMES;
-							// Change this is max games changes
-							// REDO this so that everything has an equal chance disregarding weight
-							defaultChance -= 0.1 * minigameWeight[curMinigame];
-							if ((double)r.nextInt(100) < defaultChance) {
-								picked = true;
-							}
-						}
-					}
+					// Get a random minigame
+					int minigameNum = getRandomMinigame();
 					
-					System.out.println("Playing minigame: " + curMinigame);
+					System.out.println("Playing minigame: " + minigameNum);
 					
 					// Play minigame here
 					
@@ -125,12 +102,7 @@ public class Director {
 					for (int i = 0; i < MAX_GAMES; i++) {
 						minigameWeight[i] -= 10;
 					}
-					minigameWeight[curMinigame] = MAX_WEIGHT;
-					
-					if (curPlayer == players.size() - 1) {
-						curPlayer = 0;
-					}
-					curPlayer++;
+					minigameWeight[minigameNum] = MAX_WEIGHT;
 				}
 				
 				// Update game
@@ -153,20 +125,50 @@ public class Director {
 				}
 			}
 			else {		// If the game is in the over state
-				//System.out.println("T");
+				System.out.println("OH");
 			}
 		}
 	}
 	
+	/**
+	 * Gets a random minigame. The randomness is based on a weight
+	 * depending on when the minigame was last played.
+	 */
+	public int getRandomMinigame() {
+		boolean picked = false;
+		byte curMinigame = -1;
+		while (!picked) {
+			curMinigame = (byte)r.nextInt(MAX_GAMES);
+			// Weight check
+			if (minigameWeight[curMinigame] <= 50) {
+				double defaultChance = 100 / MAX_GAMES;
+				// Change this is max games changes
+				// REDO this so that everything has an equal chance disregarding weight
+				defaultChance -= 0.1 * minigameWeight[curMinigame];
+				if ((double)r.nextInt(100) < defaultChance) {
+					picked = true;
+				}
+			}
+		}
+		
+		return curMinigame;
+	}
+	
+	public void sortPlayerOrder() {
+		// Sort  the player array based on turn order
+	}
+	
+	/**
+	 * Sorts the rank array by comparing player scores
+	 */
 	public void sortRank() {
 		ArrayList<Integer> t = new ArrayList<Integer>();
 		for (int i = 0; i < players.size(); i++) {
 			t.add(players.get(i).getScore1());
 		}
-//		Collections.sort(t);
-//		for (int i = 0; i < players.size(); i++) {
-			players.sort((Comparator<? super Player>) t);
-		//}
+
+		// get sorting to work
+		players.sort((Comparator<? super Player>) t);
 			
 		for (int i = 0; i < players.size(); i++) {
 			System.out.println(players.get(i).getScore1());
