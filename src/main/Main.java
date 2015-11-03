@@ -12,8 +12,9 @@ import screen.StartPanel;
  *
  */
 public class Main extends JFrame implements Runnable {
-	public static final String TITLE = "Project MiniGame by Jo, Jack, and David";
-	public static final Dimension SIZE = new Dimension(1280, 720);
+	private static final long serialVersionUID = 1L;
+	private static final String TITLE = "Project MiniGame by Jo, Jack, and David";
+	private static final Dimension SIZE = new Dimension(1280, 720);
 	
 	private StartPanel startPanel;	// initial start panel
 	private Director dir;
