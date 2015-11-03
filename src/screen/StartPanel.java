@@ -142,7 +142,7 @@ public class StartPanel extends JPanel {
 			addPlayer();
 		});	
 		
-		removePlayerBtn = new JButton("Ã— Remove Player");
+		removePlayerBtn = new JButton("— Remove Player");
 		removePlayerBtn.setEnabled(false);
 		removePlayerBtn.setPreferredSize(new Dimension(150, 50));
 		removePlayerBtn.setFocusPainted(false);
@@ -234,7 +234,7 @@ public class StartPanel extends JPanel {
 	 * the game to board.
 	 */
 	private void loadBoard() {
-		if (players.size() >= 1 && players.size() <= MAX_PLAYERS) {
+		if (players.size() >= 2 && players.size() <= MAX_PLAYERS) {
 			int turns = 0;
 			
 			// Jo: Moved this stuff around, am testing stuff
@@ -249,7 +249,7 @@ public class StartPanel extends JPanel {
 //			}
 			
 			if (buttonGroup.isSelected(turn10Btn.getModel())) {
-				turns = 20;
+				turns = 10;
 			}
 			else if (buttonGroup.isSelected(turn20Btn.getModel())) {
 				turns = 20;
@@ -259,7 +259,7 @@ public class StartPanel extends JPanel {
 			}
 			
 			
-			System.out.println(turns);
+			System.out.println("Max turns sent: " + turns);
 			// load board
 			Director director = main.getDirector();
 			director.setPlayers(players);
