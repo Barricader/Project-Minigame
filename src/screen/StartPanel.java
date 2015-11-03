@@ -237,17 +237,6 @@ public class StartPanel extends JPanel {
 		if (players.size() >= 2 && players.size() <= MAX_PLAYERS) {
 			int turns = 0;
 			
-			// Jo: Moved this stuff around, am testing stuff
-//			if (buttonGroup.getSelection() == turn10Btn) {
-//				turns = 10;
-//			} else if (buttonGroup.getSelection() == turn20Btn) {
-//				turns = 20;
-//			}
-//			else if (buttonGroup.getSelection() == customTurnBtn) {
-//				// TODO right now, text field is NOT filtered to only allow for numeric values!
-//				turns = Integer.parseInt(customTurnField.getText());
-//			}
-			
 			if (buttonGroup.isSelected(turn10Btn.getModel())) {
 				turns = 10;
 			}
@@ -265,7 +254,9 @@ public class StartPanel extends JPanel {
 			director.setPlayers(players);
 			director.setTurns(turns);
 			director.setState(Director.BOARD);
-			setVisible(false);	// Setting the intro screen to invis
+			setVisible(false);
+			main.getContentPane().remove(this);
+			main.validate();
 			// Maybe make another panel visible??????
 		}
 	}
@@ -439,7 +430,7 @@ public class StartPanel extends JPanel {
 		private void createAndShowDialog() {
 			addComponents();
 			setTitle("Add New Player");
-			setSize(new Dimension(400, 300));
+			setSize(new Dimension(350, 85));
 			setLocationRelativeTo(startPanel);
 			setVisible(true);
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
