@@ -250,6 +250,7 @@ public class StartPanel extends JPanel {
 			director.setPlayers(players);
 			director.setTurns(turns);
 			director.setState(Director.BOARD);
+			setVisible(false);
 		}
 	}
 	

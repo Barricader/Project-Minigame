@@ -2,6 +2,7 @@ package main;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Random;
+import java.util.Scanner;
 
 import mini.Minigame;
 import mini.Test;
@@ -32,6 +33,9 @@ public class Director {
 	private Board board;
 	private Random r;
 	
+	// DELETE ME
+	Scanner sc;
+	
 	/**
 	 * Create a Director object
 	 * @param maxTurns - Amount of max turns in the current game
@@ -44,6 +48,8 @@ public class Director {
 		
 		board = new Board();
 		r = new Random();
+		
+		sc = new Scanner(System.in);
 		
 		this.players = new ArrayList<Player>();
 		
@@ -75,7 +81,7 @@ public class Director {
 			bleh += 5;
 		}
 		else {
-			while (state != END) {
+			if (state != END) {		// If the game is not in the over state
 				// Main game loop here
 				
 				// Check what state we are in
@@ -87,6 +93,9 @@ public class Director {
 //					}
 //					
 					// Other stuff
+					System.out.println("Turn " + turn + " | Player " + curPlayer);
+					sc.nextLine();
+					
 				}
 				else if (state == MINIGAME) {
 					// Check if minigame has been played recently
@@ -138,9 +147,9 @@ public class Director {
 					state = END;
 				}
 			}
-		}
-		while (state == END) {
-			System.out.println("END");
+			else {		// If the game is in the over state
+				//System.out.println("T");
+			}
 		}
 	}
 	
