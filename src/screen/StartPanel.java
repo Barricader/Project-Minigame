@@ -142,7 +142,7 @@ public class StartPanel extends JPanel {
 			addPlayer();
 		});	
 		
-		removePlayerBtn = new JButton("— Remove Player");
+		removePlayerBtn = new JButton("ï¿½ Remove Player");
 		removePlayerBtn.setEnabled(false);
 		removePlayerBtn.setPreferredSize(new Dimension(150, 50));
 		removePlayerBtn.setFocusPainted(false);
@@ -256,6 +256,7 @@ public class StartPanel extends JPanel {
 			director.setState(Director.BOARD);
 			setVisible(false);
 			main.getContentPane().remove(this);
+			main.getContentPane().add(new Board());
 			main.validate();
 			// Maybe make another panel visible??????
 		}
