@@ -32,6 +32,7 @@ public class Director {
 	private byte[] minigameWeight;
 	private Board board;
 	private Random r;
+	private Main m;
 	
 	// DELETE ME
 	Scanner sc;
@@ -45,6 +46,7 @@ public class Director {
 		this.state = START;
 		this.turn = 1;
 		this.curPlayer = 0;
+		this.m = m;
 		
 		board = new Board();
 		r = new Random();
@@ -52,12 +54,6 @@ public class Director {
 		sc = new Scanner(System.in);
 		
 		this.players = new ArrayList<Player>();
-		
-		// Init players here
-//		this.players = new Player[players];
-//		for (byte i = 0; i < players; i++) {
-//			this.players[i] = new Player();
-//		}
 		
 		// Init minigames here
 		this.minigames = new Minigame[MAX_GAMES];
@@ -79,16 +75,14 @@ public class Director {
 			// Start stuff
 		}
 		else {
-			if (state != END) {		// If the game is not in the over state
-
-				System.out.println(state);
-				// Actual game loop here
+			System.out.println(state);	// TESTING STATEMENT
+			if (state != END) {		// If the game is not in the over state AKA ingame
 				// Check what state we are in
 				if (state == BOARD) {
 					for (int i = 0; i < players.size(); i++) {
 						// do player stuff here
 					}
-//					
+		
 					// Other stuff
 					System.out.println("Turn " + turn + " | Player " + (curPlayer+1));
 					//sc.nextLine();
@@ -172,10 +166,9 @@ public class Director {
 		for (int i = 0; i < players.size(); i++) {
 			t.add(players.get(i).getScore1());
 		}
-//		Collections.sort(t);
-//		for (int i = 0; i < players.size(); i++) {
-			players.sort((Comparator<? super Player>) t);
-		//}
+
+		// get sorting to work
+		players.sort((Comparator<? super Player>) t);
 			
 		for (int i = 0; i < players.size(); i++) {
 			System.out.println(players.get(i).getScore1());
