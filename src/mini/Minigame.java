@@ -10,6 +10,7 @@ public abstract class Minigame {
 	private String name;
 	private String inst;
 	private int[] rankValues;
+	private boolean running;
 	
 	/**
 	 * Constructs the minigame
@@ -17,6 +18,23 @@ public abstract class Minigame {
 	 */
 	public Minigame(byte id) {
 		this.ID = id;
+		isRunning = false;
+	}
+	
+	public void update() {
+		
+	}
+	
+	public void render() {
+		
+	}
+	
+	public void setRunning(boolean r) {
+		running = r;
+	}
+	
+	public boolean getRunning() {
+		return running;
 	}
 	
 	/**

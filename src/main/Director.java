@@ -86,8 +86,12 @@ public class Director {
 					System.out.println("Playing minigame: " + minigameNum);
 					
 					// Play minigame here
-					
-					
+					minigames[minigameNum].setRunning(true);
+					while (minigames[minigameNum].getRunning()) {
+						// minigame loop
+						// FIx this, this might break the loop maybe dunno
+						
+					}
 					
 					// Update weights after minigame has been played
 					for (int i = 0; i < MAX_GAMES; i++) {
