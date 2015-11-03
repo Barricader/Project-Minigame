@@ -7,19 +7,27 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import main.Director;
 import main.Main;
@@ -35,24 +43,29 @@ public class StartPanel extends JPanel {
 	public static final int MAX_PLAYERS = 4;
 	
 	private Main main;
+	
 	private ArrayList<Player> players;	// players we create
 	private DefaultListModel<Player> playerListModel; // list model for players
-	private ButtonGroup buttonGroup;	// button group for radio buttons
-	private JLabel turnLabel;
-	private JRadioButton turnCount10Btn;	// 10 turns
-	private JRadioButton turnCount20Btn;	// 20 turns
-	private JRadioButton turnCountCustomBtn;	// for having a custom value
-	private JTextField customTurnField;	// field for entering numeric value for turn count
 	private JList playerList;	// list of players displayed
-	private JLabel titleLabel;	// title label at top of screen
+	private ButtonGroup buttonGroup;	// button group for radio buttons
+	private JRadioButton turn10Btn;	// 10 turns
+	private JRadioButton turn20Btn;	// 20 turns
+	private JRadioButton customTurnBtn;	// for having a custom value
+	private JTextField customTurnField;	// field for entering numeric value for turn count
 	private JButton addPlayerBtn;
+	private JButton removePlayerBtn;
 	private JButton doneBtn;	
+	private JLabel turnLabel;
+	private JLabel titleLabel;	// title label at top of screen	
 
 	public StartPanel(Main main) {
 		this.main = main;
 		init();
 	}
 	
+	/**
+	 * Initialize everything.
+	 */
 	private void init() {
 		createList();
 		createButtons();
@@ -67,6 +80,47 @@ public class StartPanel extends JPanel {
 		players = new ArrayList<>();
 		playerListModel = new DefaultListModel<>();
 		playerList = new JList<>(playerListModel);
+		
+		// Allow user to select and deselect users to edit or remove them
+		playerList.setSelectionModel(new DefaultListSelectionModel() {
+			
+			public void setSelectionInterval(int index0, int index1) {
+				if (index0 == index1) {
+					if (playerList.isSelectedIndex(index0)) {
+						removeSelectionInterval(index0, index0);
+						return;
+					}
+				}
+				super.setSelectionInterval(index0, index1);
+			}
+			
+			public void addSelectionInterval(int index0, int index1) {
+				if (index0 == index1) {
+					if (isSelectedIndex(index0)) {
+						removeSelectionInterval(index0, index0);
+						return;
+					}
+				}
+				super.addSelectionInterval(index0, index1);
+			}
+		});
+		
+		// enables or disables buttons based on players present in list
+		playerList.addListSelectionListener(e -> {
+			if (playerList.getSelectedValuesList().size() > 0) { // selected players
+				removePlayerBtn.setEnabled(true);
+			} else {
+				removePlayerBtn.setEnabled(false);
+			}
+			
+			if (players.size() > 0) {
+				doneBtn.setEnabled(true);
+			} else {
+				doneBtn.setEnabled(false);
+			}
+		});
+		
+		// decorate
 		playerList.setFont(new Font("Courier New", Font.BOLD, 50));
 		playerList.setForeground(Color.CYAN);
 		playerList.setBackground(Color.BLACK);
@@ -85,7 +139,15 @@ public class StartPanel extends JPanel {
 		addPlayerBtn.setFocusPainted(false);
 		addPlayerBtn.addActionListener(e -> {
 			addPlayer();
-		});		
+		});	
+		
+		removePlayerBtn = new JButton("× Remove Player");
+		removePlayerBtn.setEnabled(false);
+		removePlayerBtn.setPreferredSize(new Dimension(150, 50));
+		removePlayerBtn.setFocusPainted(false);
+		removePlayerBtn.addActionListener(e -> {
+			removePlayer();
+		});
 		
 		doneBtn = new JButton("Done!");
 		doneBtn.setEnabled(false);	// disabled by default until we add players
@@ -98,16 +160,32 @@ public class StartPanel extends JPanel {
 		
 	}
 	
+	/**
+	 * Creates radio buttons and text field for controlling the amount of turns
+	 * that the game will have.
+	 */
 	private void createRadioButtons() {
 		buttonGroup = new ButtonGroup();
-		turnCount10Btn = new JRadioButton("10");
-		turnCount20Btn = new JRadioButton("20");
-		turnCountCustomBtn = new JRadioButton("Custom: ");
-		customTurnField = new JTextField(5);
+		turn10Btn = new JRadioButton("10");
+		turn10Btn.setSelected(true);	// enable 10 turns by default
 		
-		buttonGroup.add(turnCount10Btn);
-		buttonGroup.add(turnCount20Btn);
-		buttonGroup.add(turnCountCustomBtn);
+		turn20Btn = new JRadioButton("20");
+		
+		customTurnBtn = new JRadioButton("Custom: ");
+		customTurnBtn.addChangeListener(e -> {
+			if (customTurnBtn.isSelected()) {	// enable or disable custom turn field
+				customTurnField.setEnabled(true);
+			} else {
+				customTurnField.setEnabled(false);	
+			}
+		});
+		
+		customTurnField = new JTextField(5);
+		customTurnField.setEnabled(false);	// disable unless radio button is checked!
+		
+		buttonGroup.add(turn10Btn);
+		buttonGroup.add(turn20Btn);
+		buttonGroup.add(customTurnBtn);
 	}
 	
 	/**
@@ -117,24 +195,6 @@ public class StartPanel extends JPanel {
 		titleLabel = new JLabel("Add Players");
 		titleLabel.setFont(new Font("Courier New", Font.BOLD, 60));
 		turnLabel = new JLabel("Turn Count: ");
-	}
-	
-	private void loadBoard() {
-		if (players.size() >= 1 && players.size() <= MAX_PLAYERS) {
-			int turns = 0;
-		
-			if (buttonGroup.getSelection() == turnCountCustomBtn) {	// TODO try to fix this so it gets value of button itself
-				turns = Integer.parseInt(customTurnField.getText());
-			} else if (buttonGroup.getSelection() == turnCount10Btn) {
-				turns = 10;
-			} else if (buttonGroup.getSelection() == turnCount20Btn) {
-				turns = 20;
-			}
-			// load board
-			main.getDirector().setPlayers(players);
-			main.getDirector().setTurns(turns);
-			main.getDirector().setState(Director.BOARD);
-		}
 	}
 	
 	
@@ -150,20 +210,47 @@ public class StartPanel extends JPanel {
 		add(playerList, BorderLayout.CENTER);
 		
 		// bottom buttons
-		JPanel btmPanel = new JPanel();
+		JPanel btmPanel = new JPanel();	// holding panel for button controls
 		btmPanel.add(addPlayerBtn);
 		btmPanel.add(Box.createHorizontalStrut(20));
-		btmPanel.add(doneBtn);
+		btmPanel.add(removePlayerBtn);
 		btmPanel.add(Box.createHorizontalStrut(20));
 		
 		// turn controls
 		btmPanel.add(turnLabel);
-		btmPanel.add(turnCount10Btn);
-		btmPanel.add(turnCount20Btn);
-		btmPanel.add(turnCountCustomBtn);
+		btmPanel.add(turn10Btn);
+		btmPanel.add(turn20Btn);
+		btmPanel.add(customTurnBtn);
 		btmPanel.add(customTurnField);
+		btmPanel.add(Box.createHorizontalStrut(20));
+		btmPanel.add(doneBtn);
 		add(btmPanel, BorderLayout.SOUTH);
 		
+	}
+	
+	/**
+	 * Updates the director with player and turn information and sets the state of
+	 * the game to board.
+	 */
+	private void loadBoard() {
+		if (players.size() >= 1 && players.size() <= MAX_PLAYERS) {
+			int turns = 0;
+		
+			if (buttonGroup.getSelection() == customTurnBtn) {
+				// TODO right now, text field is NOT filtered to only allow for numeric values!
+				turns = Integer.parseInt(customTurnField.getText());
+			} else if (buttonGroup.getSelection() == turn10Btn) {
+				turns = 10;
+			} else if (buttonGroup.getSelection() == turn20Btn) {
+				turns = 20;
+			}
+			
+			// load board
+			Director director = main.getDirector();
+			director.setPlayers(players);
+			director.setTurns(turns);
+			director.setState(Director.BOARD);
+		}
 	}
 	
 	/**
@@ -181,16 +268,53 @@ public class StartPanel extends JPanel {
 	}
 	
 	/**
-	 * Adds a player to the players array with a name and a color
+	 * Adds a player to the players array with a name and a color. If a player already exists
+	 * with the same name, an error message dialog will show up.
 	 * @param name Name of the player
 	 * @param color Color of the player
+	 * @return true - if player was added successfully, false if duplicate name found
 	 */
-	public void addPlayer(String name, Color color) {
+	public boolean addPlayer(String name, Color color) {
 		Player player = new Player(name, color);
+		
+		for (int i = 0; i < players.size(); i++) {
+			if (players.get(i).getName().equals(name)) {	// show warning about duplicate player names
+				JOptionPane.showMessageDialog(null, "Duplicate names are not allowed!",
+							"Notice", JOptionPane.INFORMATION_MESSAGE);
+				return false;
+			}
+		}
+		
 		players.add(player);
 		playerListModel.addElement(player);	// update list of players
+		
 		if (playerListModel.getSize() > 0) {
 			doneBtn.setEnabled(true);
+		}
+		
+		if (players.size() >= MAX_PLAYERS) {	// disable add player button if we reach max limit
+			addPlayerBtn.setEnabled(false);
+		}
+		
+		playerList.repaint();
+		return true;
+	}
+	
+	/**
+	 * Removes player(s), based on selection in the player list.
+	 */
+	public void removePlayer() {
+		List<Player> selectedPlayers = playerList.getSelectedValuesList();
+		
+		for (Player p : selectedPlayers) {
+			playerListModel.removeElement(p);
+			players.remove(p);
+		}
+		
+		if (players.size() <= 0) {	// disable done btn if we have no players
+			doneBtn.setEnabled(false);
+		} else if (players.size() <= MAX_PLAYERS) { // only enable if within limits
+			addPlayerBtn.setEnabled(true);
 		}
 		playerList.repaint();
 	}
@@ -200,6 +324,7 @@ public class StartPanel extends JPanel {
 	public ArrayList<Player> getPlayers() {
 		return players;
 	}
+	
 	
 	/**
 	 * Dialog that is created to add a new player. This allows the user to enter the name
@@ -242,14 +367,14 @@ public class StartPanel extends JPanel {
 		 */
 		private void createButtons() {
 			okBtn = new JButton("Ok");
-			okBtn.setEnabled(false);	// enable by default until name has been entered
+			okBtn.setEnabled(false);	// disable by default until name has been entered
 			okBtn.addActionListener(e -> {
 				if (!nameField.getText().isEmpty()) {
 					String name = nameField.getText();
-					startPanel.addPlayer(name, GameUtils.getRandomColor());	// Random color for now.
-					dispose();
-				} else {
-					
+					// TODO player color is random right now, add functionality to choose custom color later.
+					if (startPanel.addPlayer(name, GameUtils.getRandomColor())) {
+						dispose();	
+					}
 				}
 			});
 			
