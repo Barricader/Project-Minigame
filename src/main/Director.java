@@ -48,8 +48,6 @@ public class Director {
 		board = new Board();
 		r = new Random();
 		
-		sc = new Scanner(System.in);
-		
 		this.players = new ArrayList<Player>();
 		
 		// Init minigames here
