@@ -2,13 +2,11 @@ package main;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Random;
-import java.util.Scanner;
 
 import mini.Minigame;
 import mini.Test;
 
 // TODO: Make it output the player list sorting to test
-// TODO: Make it go back and forth between the board and minigames
 
 /**
  * 
@@ -34,11 +32,6 @@ public class Director {
 	private Random r;
 	private Main m;
 	
-	private static boolean test = false, test2 = false, test3 = false;
-	
-	// DELETE ME
-	Scanner sc;
-	
 	/**
 	 * Create a Director object
 	 * @param maxTurns - Amount of max turns in the current game
@@ -52,8 +45,6 @@ public class Director {
 		
 		board = new Board();
 		r = new Random();
-		
-		sc = new Scanner(System.in);
 		
 		this.players = new ArrayList<Player>();
 		
@@ -86,9 +77,7 @@ public class Director {
 					}
 		
 					// Other stuff
-					System.out.println("Turn " + turn + " | Player " + (curPlayer+1));
-					//sc.nextLine();
-					
+					System.out.println("Turn " + turn + " | Player " + (curPlayer+1));	
 				}
 				else if (state == MINIGAME) {
 					// Get a random minigame
@@ -97,8 +86,12 @@ public class Director {
 					System.out.println("Playing minigame: " + minigameNum);
 					
 					// Play minigame here
-					
-					
+					minigames[minigameNum].setRunning(true);
+					while (minigames[minigameNum].getRunning()) {
+						// minigame loop
+						// FIx this, this might break the loop maybe dunno
+						
+					}
 					
 					// Update weights after minigame has been played
 					for (int i = 0; i < MAX_GAMES; i++) {
@@ -127,10 +120,7 @@ public class Director {
 				}
 			}
 			else {		// If the game is in the over state
-				if (!test) {
-				System.out.println("OH");
-				test = true;
-				}
+
 			}
 		}
 	}
@@ -139,7 +129,7 @@ public class Director {
 	 * Gets a random minigame. The randomness is based on a weight
 	 * depending on when the minigame was last played.
 	 */
-	public int getRandomMinigame() {
+	private int getRandomMinigame() {
 		boolean picked = false;
 		byte curMinigame = -1;
 		while (!picked) {
@@ -159,14 +149,14 @@ public class Director {
 		return curMinigame;
 	}
 	
-	public void sortPlayerOrder() {
+	private void sortPlayerOrder() {
 		// Sort  the player array based on turn order
 	}
 	
 	/**
 	 * Sorts the rank array by comparing player scores
 	 */
-	public void sortRank() {
+	private void sortRank() {
 		ArrayList<Integer> t = new ArrayList<Integer>();
 		for (int i = 0; i < players.size(); i++) {
 			t.add(players.get(i).getScore1());

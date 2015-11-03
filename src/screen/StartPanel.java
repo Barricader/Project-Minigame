@@ -7,14 +7,11 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
@@ -25,10 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import main.Director;
 import main.Main;
@@ -41,6 +35,8 @@ import main.Player;
  *
  */
 public class StartPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
+
 	public static final int MAX_PLAYERS = 4;
 	
 	private Main main;
@@ -84,7 +80,8 @@ public class StartPanel extends JPanel {
 		
 		// Allow user to select and deselect users to edit or remove them
 		playerList.setSelectionModel(new DefaultListSelectionModel() {
-			
+			private static final long serialVersionUID = 1L;
+
 			public void setSelectionInterval(int index0, int index1) {
 				if (index0 == index1) {
 					if (playerList.isSelectedIndex(index0)) {
@@ -342,6 +339,7 @@ public class StartPanel extends JPanel {
 	 *
 	 */
 	class AddPlayerDialog extends JDialog {
+		private static final long serialVersionUID = 1L;
 		private JTextField nameField;
 		private JLabel colorLabel;
 		private JLabel nameLabel;
