@@ -70,20 +70,20 @@ public class Director {
 		//loop();
 	}
 	
+	// TODO: Split up the states into separate functions for more clarity
 	/**
 	 * Main game loop
 	 */
 	public void loop() {
+		//System.out.println(state);
 		if (state == START) {
 			// Start stuff
-			@SuppressWarnings("unused")
-			int bleh = 0;
-			bleh += 5;
 		}
 		else {
+			System.out.println("uh");
 			if (state != END) {		// If the game is not in the over state
 				// Main game loop here
-				
+				System.out.println("First step of loop");
 				// Check what state we are in
 				if (state == BOARD) {
 //					boolean isTurn = true;
@@ -93,8 +93,8 @@ public class Director {
 //					}
 //					
 					// Other stuff
-					System.out.println("Turn " + turn + " | Player " + curPlayer+1);
-					sc.nextLine();
+					System.out.println("Turn " + turn + " | Player " + (curPlayer+1));
+					//sc.nextLine();
 					
 				}
 				else if (state == MINIGAME) {
@@ -115,7 +115,7 @@ public class Director {
 						}
 					}
 					
-					System.out.println(curMinigame);
+					System.out.println("Playing minigame: " + curMinigame);
 					
 					// Play minigame here
 					
@@ -126,13 +126,18 @@ public class Director {
 						minigameWeight[i] -= 10;
 					}
 					minigameWeight[curMinigame] = MAX_WEIGHT;
+					
+					if (curPlayer == players.size() - 1) {
+						curPlayer = 0;
+					}
+					curPlayer++;
 				}
 				
 				// Update game
-				if (curPlayer == players.size() - 1) {
-					curPlayer = 0;
-				}
-				curPlayer++;
+//				if (curPlayer == players.size() - 1) {
+//					curPlayer = 0;
+//				}
+//				curPlayer++;
 				
 				if (state == BOARD) {
 					state = MINIGAME;
