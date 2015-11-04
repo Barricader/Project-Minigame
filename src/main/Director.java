@@ -179,6 +179,10 @@ public class Director {
 		this.rank = players;
 	}
 	
+	public ArrayList<Player> getPlayers() {
+		return players;
+	}
+	
 	public void setTurns(int turns) {
 		maxTurns = turns;
 	}
