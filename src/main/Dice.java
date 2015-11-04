@@ -10,7 +10,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 public class Dice {
-	private final static int SIZE = 6;
+	public final static int SIZE = 6;
 	private Image[] imgs;
 	private int x, y;
 	private int value;
@@ -20,7 +20,7 @@ public class Dice {
 		this.x = x;
 		this.y = y;
 		this.value = 1;
-		this.imgs = new Image[] {null, null, null, null, null, null};
+		this.imgs = new Image[] {null, null, null, null, null, null, null};
 		try {
 			load();
 		} catch (IOException e) {

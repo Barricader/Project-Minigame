@@ -79,6 +79,8 @@ public class Director {
 					for (int i = 0; i < players.size(); i++) {
 						// do player stuff here
 					}
+					die.roll(Dice.SIZE);
+					//die.draw(g);
 		
 					// Other stuff
 					System.out.println("Turn " + turn);	
