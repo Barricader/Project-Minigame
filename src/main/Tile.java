@@ -5,51 +5,72 @@ import java.awt.Graphics;
 import javax.swing.*;
 
 public class Tile {
-	private Color tColor;
+	public static final int ACTION_ADDSCORE1 = 0;
+	public static final int ACTION_SUBTRACT = 1;
+	public static final int ACTION_ADDSCORE2 = 2;
+	
+	private Color color;
 	private int action;
-	private int TID;
-	private final int ACTION_ADDSCORE1 = 0;
-	private final int ACTION_SUBTRACT = 1;
-	private final int ACTION_ADDSCORE2 = 2;
+	private int ID;
 	private int xPos;
 	private int yPos;
 	private int width;
 	private int height;
 	//private final int ACTION_MINIGAME = 3;
 	
-	public Tile(Color tCol, int act, int tid, int x, int y, int w, int h){//creates tile on the screen on the game board
-		tColor = tCol;
+	public Tile(Color color, int action, int ID, int xPos, int yPos, int width, int height) {
+		this.action = action;
+		this.ID = ID;
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.width = width;
+		this.height = height;
+	}
+	
+	
+	public void setTileID(int id) {
+		ID = id;
+	}
+	
+	public int getTileID() {
+		return ID;
+	}
+	public void setAction(int act) {
 		action = act;
-		TID = tid;
-		xPos = x;
-		yPos = y;
-		width = w;
-		height = h;
 	}
 	
-	public void setTileID(int tid){//Sets the tile ID(specifies what tile it is on the screen
-		TID = tid;
-	}
-	
-	public int getTileID(){//Returns the tile ID 
-		return TID;
-	}
-	public void setAction(int act){//Sets the action that the tile will run if the player lands on it
-		action = act;
-	}
-	
-	public int getAction(){//returns the action of the tile
+	public int getAction() {
 		return action;
 	}
 	
-	public void Action(Player p){//The action a tile will compute if the player lands on it
+	public int getXPos() {
+		return xPos;
+	}
+	
+	public int getYPos() {
+		return yPos;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public Color getColor() {
+		return color;
+	}
+	
+	public void action(Player p) {//The action a tile will compute if the player lands on it
 		if(action == ACTION_ADDSCORE1){
 			p.addScore1();
 		}
-		else if(action == ACTION_SUBTRACT){
+		else if(action == ACTION_SUBTRACT) {
 			p.minusScore1();
 		}
-		else if(action == ACTION_ADDSCORE2){
+		else if(action == ACTION_ADDSCORE2) {
 			if(p.getScore1() >= 10){
 				p.buyScore2();
 			}
@@ -57,11 +78,12 @@ public class Tile {
 		}
 	}
 	
-	public void draw(Graphics g){//draws the tile
-		g.drawRect(xPos, yPos, width, height);
+	public void draw(Graphics g) {
+		g.setColor(Color.BLACK);
+		g.drawRect(xPos, yPos, width, height);	// draw outline
+		g.setColor(color);
+		g.fillRect(xPos, yPos, width, height);
 	}
-	
-	
 	
 }
 
