@@ -5,6 +5,7 @@ import java.util.Random;
 
 import mini.Minigame;
 import mini.Test;
+import screen.Board;
 
 // TODO: Make it output the player list sorting to test
 
@@ -31,6 +32,7 @@ public class Director {
 	private Board board;
 	private Random r;
 	private Main m;
+	private Dice die;
 	
 	/**
 	 * Create a Director object
@@ -43,6 +45,7 @@ public class Director {
 		this.curPlayer = 0;
 		this.m = m;
 		
+		die = new Dice(m.getWidth() / 2 + 32, m.getHeight() / 2 + 32);
 		board = new Board();
 		r = new Random();
 		
@@ -68,7 +71,7 @@ public class Director {
 			// Start stuff
 		}
 		else {
-			System.out.println(state);	// TESTING STATEMENT
+			System.out.println("State: " + (state==1?"BOARD":state==2?"MINIGAME":"END"));	// TESTING STATEMENT
 			if (state != END) {		// If the game is not in the over state AKA ingame
 				// Check what state we are in
 				if (state == BOARD) {
@@ -77,7 +80,7 @@ public class Director {
 					}
 		
 					// Other stuff
-					System.out.println("Turn " + turn + " | Player " + (curPlayer+1));	
+					System.out.println("Turn " + turn);	
 				}
 				else if (state == MINIGAME) {
 					// Get a random minigame
@@ -90,7 +93,7 @@ public class Director {
 					while (minigames[minigameNum].getRunning()) {
 						// minigame loop
 						// FIx this, this might break the loop maybe dunno
-						
+						minigames[minigameNum].setRunning(false);
 					}
 					
 					// Update weights after minigame has been played
