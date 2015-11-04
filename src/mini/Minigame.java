@@ -18,7 +18,7 @@ public abstract class Minigame {
 	 */
 	public Minigame(byte id) {
 		this.ID = id;
-		isRunning = false;
+		running = false;
 	}
 	
 	public void update() {
