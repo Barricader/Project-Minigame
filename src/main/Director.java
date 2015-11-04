@@ -18,11 +18,12 @@ import screen.Board;
 public class Director {
 	// States of the board
 	// I made them bytes to optimize memory usage
-	public static final byte START = 0, BOARD = 1, MINIGAME = 2, END = 3;
+	public static final byte START = 0, BOARD = 1, MINIGAME = 2, END = 3, INIT = 4;
 	private final byte MAX_WEIGHT = 100;
 	private final byte MAX_GAMES = 20;
 	private byte curPlayer;
 	private ArrayList<Player> players;
+	private ArrayList<Player> finalPlayers;
 	private ArrayList<Player> rank;
 	private byte state;
 	private int turn;
@@ -51,6 +52,8 @@ public class Director {
 		r = new Random();
 		
 		this.players = new ArrayList<Player>();
+		this.finalPlayers = new ArrayList<Player>();
+		this.rank = new ArrayList<Player>();
 		
 		// Init minigames here
 		this.minigames = new Minigame[MAX_GAMES];
@@ -68,8 +71,31 @@ public class Director {
 	 * Main game loop
 	 */
 	public void loop() {
-		if (state == START) {
+		if (state == INIT) {
 			// Start stuff
+			ArrayList<Integer> lastRoll = new ArrayList<Integer>();
+			ArrayList<Integer> temp = new ArrayList<Integer>();
+			
+			for (int i = 0; i < players.size(); i++) {
+				// Listen to spacebar
+				
+				lastRoll.add(roll());
+				temp.add(0);
+			}
+			
+			for (int i = 0; i < lastRoll.size(); i++) {
+				for (int j = 0; j < lastRoll.size(); j++) {
+					if (lastRoll.get(i) > lastRoll.get(j)) {
+						temp.set(i, temp.get(i) + 1);
+					}
+				}
+			}
+			
+			temp.sort(null);
+			
+			for (int i: temp) {
+				System.out.println(i);
+			}
 		}
 		else {
 //			System.out.println("State: " + (state==1?"BOARD":state==2?"MINIGAME":"END"));	// TESTING STATEMENT
@@ -79,6 +105,8 @@ public class Director {
 					for (int i = 0; i < players.size(); i++) {
 						// do player stuff here
 					}
+					die.roll(Dice.SIZE);
+					//die.draw(g);
 		
 					// Other stuff
 					System.out.println("Turn " + turn);	
@@ -127,6 +155,10 @@ public class Director {
 
 			}
 		}
+	}
+	
+	private int roll() {
+		return die.roll(Dice.SIZE);
 	}
 	
 	/**
