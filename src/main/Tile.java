@@ -19,6 +19,7 @@ public class Tile {
 	//private final int ACTION_MINIGAME = 3;
 	
 	public Tile(Color color, int action, int ID, int xPos, int yPos, int width, int height) {
+		this.color = color;
 		this.action = action;
 		this.ID = ID;
 		this.xPos = xPos;
