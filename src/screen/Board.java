@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import main.Dice;
 import main.Director;
 import main.Player;
 import main.Tile;
@@ -22,11 +23,15 @@ public class Board extends JPanel {
 	public static final byte TILE_COUNT = 10;
 	private static final long serialVersionUID = 1L;	
 	private Director director;
+	private Rectangle midRect;
+	private Dice dice;
 	private ArrayList<Tile> tiles;	// tiles of the board
 
 	public Board(Director director) {
 		this.director = director;
 		tiles = new ArrayList<>();
+		midRect = createMidRect();
+		dice = new Dice(500, 500);
 		createTiles();
 	}
 	
@@ -59,13 +64,30 @@ public class Board extends JPanel {
 	 * all the players, turn count indicator, and dice.
 	 * @return
 	 */
-	private Rectangle getMidRect() {
+	private Rectangle createMidRect() {
 		int width = 500;
 		int height = 350;
 		int x = (1280 - width) / 2;	// center (x,y) on screen
 		int y = (720 - height) / 2;
 		
 		return new Rectangle(x, y, width, height);
+	}
+	
+	private void drawPlayers(Graphics g) {
+		int gap = 100;	// 80 px gap between each player
+		ArrayList<Player> players = director.getPlayers();
+		
+		//TODO fix player offsets
+		for (int i = 0; i < players.size(); i++) {
+			Player p = players.get(i);
+			p.setXPos(50 + midRect.x + gap * i);
+			p.setYPos(50 + midRect.y + 200);
+			p.draw(g);
+		}
+	}
+	
+	private void drawTurnIndicator(Graphics g) {
+		
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -76,23 +98,17 @@ public class Board extends JPanel {
 		}
 		
 		// draw middle box container for players, dice, and turn indicator
-		Rectangle midRect = getMidRect();
 		g.setColor(Color.RED);
 		g.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
 		
 		// draw players evenly spaced
-		int gap = 100;	// 80 px gap between each player
+		drawPlayers(g);
 		
-		ArrayList<Player> players = director.getPlayers();
+		// draw turn count from director
+		drawTurnIndicator(g);
 		
-		//TODO fix player offsets
-		for (int i = 0; i < players.size(); i++) {
-			Player p = players.get(i);
-			p.setXPos(50 + midRect.x + gap * i);
-			p.setYPos(50 + midRect.y + 200);
-			p.draw(g);
-		}
-		
-		//TODO draw dice stuff here, contained inside the midRect!!
+		//TODO draw dice stuff here
+		dice.roll(4);
+		dice.draw(g);
 	}
 }

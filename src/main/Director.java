@@ -98,7 +98,7 @@ public class Director {
 			}
 		}
 		else {
-			System.out.println("State: " + (state==1?"BOARD":state==2?"MINIGAME":"END"));	// TESTING STATEMENT
+//			System.out.println("State: " + (state==1?"BOARD":state==2?"MINIGAME":"END"));	// TESTING STATEMENT
 			if (state != END) {		// If the game is not in the over state AKA ingame
 				// Check what state we are in
 				if (state == BOARD) {
@@ -208,6 +208,10 @@ public class Director {
 	
 	public void setState(byte state) {
 		this.state = state;
+	}
+	
+	public Board getBoard() {
+		return board;
 	}
 	
 	public void setPlayers(ArrayList<Player> players) {
