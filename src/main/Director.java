@@ -178,6 +178,10 @@ public class Director {
 		this.state = state;
 	}
 	
+	public Board getBoard() {
+		return board;
+	}
+	
 	public void setPlayers(ArrayList<Player> players) {
 		this.players = players;
 		this.rank = players;
