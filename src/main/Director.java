@@ -72,7 +72,7 @@ public class Director {
 			// Start stuff
 		}
 		else {
-			System.out.println("State: " + (state==1?"BOARD":state==2?"MINIGAME":"END"));	// TESTING STATEMENT
+//			System.out.println("State: " + (state==1?"BOARD":state==2?"MINIGAME":"END"));	// TESTING STATEMENT
 			if (state != END) {		// If the game is not in the over state AKA ingame
 				// Check what state we are in
 				if (state == BOARD) {

@@ -20,7 +20,8 @@ public class Dice {
 		this.x = x;
 		this.y = y;
 		this.value = 1;
-		this.imgs = new Image[] {null, null, null, null, null, null};
+		this.imgs = new Image[] {null, null, null, null, null, null, null};
+		r = new Random();
 		try {
 			load();
 		} catch (IOException e) {
@@ -63,6 +64,7 @@ public class Dice {
 	}
 	
 	public void draw(Graphics g) {
+		g.drawRect(x, y, 64, 64);
 		g.drawImage(imgs[value], x, y, 64, 64, null);
 	}
 }
