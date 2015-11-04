@@ -253,7 +253,7 @@ public class StartPanel extends JPanel {
 			director.setState(Director.BOARD);
 			setVisible(false);
 			main.getContentPane().remove(this);
-			main.getContentPane().add(new Board());
+			main.getContentPane().add(new Board(director));
 			main.validate();
 			// Maybe make another panel visible??????
 		}
