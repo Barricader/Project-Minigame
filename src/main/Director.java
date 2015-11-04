@@ -5,6 +5,7 @@ import java.util.Random;
 
 import mini.Minigame;
 import mini.Test;
+import screen.Board;
 
 // TODO: Make it output the player list sorting to test
 
@@ -43,7 +44,7 @@ public class Director {
 		this.curPlayer = 0;
 		this.m = m;
 		
-		board = new Board();
+		board = new Board(this);
 		r = new Random();
 		
 		this.players = new ArrayList<Player>();
