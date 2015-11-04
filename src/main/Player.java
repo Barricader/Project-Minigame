@@ -3,8 +3,10 @@ package main;
 import java.awt.Color;
 import java.awt.Graphics;
 
-public class Player 
-{
+public class Player {
+	public static final int WIDTH = 40;
+	public static final int HEIGHT = 30;
+	
 	private String name = "";
 	private Color color;
 	private int score1 = 0;
@@ -13,8 +15,6 @@ public class Player
 	private byte tileID = 0;
 	private int xPos;
 	private int yPos;
-	private int width;
-	private int height;
 	
 	public Player(){
 		
@@ -65,22 +65,6 @@ public class Player
 		return yPos;
 	}
 	
-	public void setHeight(int h) {
-		height = h;
-	}
-	
-	public int getHeight() {
-		return height;
-	}
-	
-	public void setWidth(int w) {
-		width = w;
-	}
-	
-	public int getWidth() {
-		return width;
-	}
-	
 	public byte getPlayerID() {
 		return playerID;
 	}
@@ -98,6 +82,9 @@ public class Player
 	}
 	
 	public void draw(Graphics g) {
-		g.drawRect(xPos, yPos, width, height);	
+		g.setColor(color);
+		g.fillOval(xPos, yPos, WIDTH, HEIGHT);	
+		g.setColor(Color.BLACK);
+		g.drawString(name, xPos, yPos + 50);	// draw name of player
 	}
 }

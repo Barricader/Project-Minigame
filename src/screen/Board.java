@@ -2,11 +2,13 @@ package screen;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Random;
 
 import javax.swing.JPanel;
 
+import main.Director;
+import main.Player;
 import main.Tile;
 
 /**
@@ -19,9 +21,11 @@ import main.Tile;
 public class Board extends JPanel {
 	public static final byte TILE_COUNT = 10;
 	private static final long serialVersionUID = 1L;	
+	private Director director;
 	private ArrayList<Tile> tiles;	// tiles of the board
 
-	public Board() {
+	public Board(Director director) {
+		this.director = director;
 		tiles = new ArrayList<>();
 		createTiles();
 	}
@@ -50,11 +54,45 @@ public class Board extends JPanel {
 		repaint();
 	}
 	
+	/**
+	 * Creates a 500 x 300 rectangle in the center of the screen that will contain
+	 * all the players, turn count indicator, and dice.
+	 * @return
+	 */
+	private Rectangle getMidRect() {
+		int width = 500;
+		int height = 350;
+		int x = (1280 - width) / 2;	// center (x,y) on screen
+		int y = (720 - height) / 2;
+		
+		return new Rectangle(x, y, width, height);
+	}
+	
 	public void paintComponent(Graphics g) {
 		g.clearRect(0, 0, getWidth(), getHeight());
-		for (int i = 0; i < tiles.size(); i++) {
+		for (int i = 0; i < tiles.size(); i++) {	// draws all tiles
 			Tile t = tiles.get(i);
 			t.draw(g);
 		}
+		
+		// draw middle box container for players, dice, and turn indicator
+		Rectangle midRect = getMidRect();
+		g.setColor(Color.RED);
+		g.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
+		
+		// draw players evenly spaced
+		int gap = 100;	// 80 px gap between each player
+		
+		ArrayList<Player> players = director.getPlayers();
+		
+		//TODO fix player offsets
+		for (int i = 0; i < players.size(); i++) {
+			Player p = players.get(i);
+			p.setXPos(50 + midRect.x + gap * i);
+			p.setYPos(50 + midRect.y + 200);
+			p.draw(g);
+		}
+		
+		//TODO draw dice stuff here, contained inside the midRect!!
 	}
 }

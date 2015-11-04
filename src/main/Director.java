@@ -46,7 +46,8 @@ public class Director {
 		this.m = m;
 		
 		die = new Dice(m.getWidth() / 2 + 32, m.getHeight() / 2 + 32);
-		board = new Board();
+		
+		board = new Board(this);
 		r = new Random();
 		
 		this.players = new ArrayList<Player>();
@@ -180,6 +181,10 @@ public class Director {
 	public void setPlayers(ArrayList<Player> players) {
 		this.players = players;
 		this.rank = players;
+	}
+	
+	public ArrayList<Player> getPlayers() {
+		return players;
 	}
 	
 	public void setTurns(int turns) {
