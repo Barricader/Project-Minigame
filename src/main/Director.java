@@ -72,30 +72,22 @@ public class Director {
 	 */
 	public void loop() {
 		if (state == INIT) {
-			// Start stuff
-			ArrayList<Integer> lastRoll = new ArrayList<Integer>();
-			ArrayList<Integer> temp = new ArrayList<Integer>();
+			// Who goes first
 			
 			for (int i = 0; i < players.size(); i++) {
 				// Listen to spacebar
 				
-				lastRoll.add(roll());
-				temp.add(0);
+				players.get(i).setLastRoll(roll());
 			}
 			
-			for (int i = 0; i < lastRoll.size(); i++) {
-				for (int j = 0; j < lastRoll.size(); j++) {
-					if (lastRoll.get(i) > lastRoll.get(j)) {
-						temp.set(i, temp.get(i) + 1);
-					}
-				}
+			players.sort(null);
+			
+			// DEBUG
+			for (Player p: players) {
+				System.out.println(p.getLastRoll());
 			}
 			
-			temp.sort(null);
-			
-			for (int i: temp) {
-				System.out.println(i);
-			}
+			state = BOARD;
 		}
 		else {
 //			System.out.println("State: " + (state==1?"BOARD":state==2?"MINIGAME":"END"));	// TESTING STATEMENT

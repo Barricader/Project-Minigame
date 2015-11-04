@@ -250,7 +250,7 @@ public class StartPanel extends JPanel {
 			Director director = main.getDirector();
 			director.setPlayers(players);
 			director.setTurns(turns);
-			director.setState(Director.BOARD);
+			director.setState(Director.INIT);
 			setVisible(false);
 			main.getContentPane().remove(this);
 			main.getContentPane().add(director.getBoard());
