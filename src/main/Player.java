@@ -1,7 +1,7 @@
 package main;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 
 public class Player {
 	public static final int WIDTH = 40;
