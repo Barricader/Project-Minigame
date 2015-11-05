@@ -84,8 +84,10 @@ public class Director {
 			
 			// DEBUG
 			for (Player p: players) {
-				System.out.println(p.getLastRoll());
+				System.out.println(p.getPlayerID() + " | " + p.getLastRoll());
 			}
+			
+			validateRolls();
 			
 			state = BOARD;
 		}
@@ -146,6 +148,118 @@ public class Director {
 			else {		// If the game is in the over state
 
 			}
+		}
+	}
+	
+	/**
+	 * Tests for duplicate rolls and handles them.
+	 * May need fixing.
+	 */
+	private void validateRolls() {
+		ArrayList<Player> temp = new ArrayList<Player>();
+		
+		for (int i = 0; i < players.size(); i++) {
+			Player p = players.get(i);
+			temp.add(p);
+		}
+		
+		int[] t = {0, 0, 0, 0};
+
+		ArrayList<Player> temp2 = new ArrayList<Player>();
+		ArrayList<Player> temp3 = new ArrayList<Player>();
+		players.clear();
+		
+		for (int i = 0; i < temp.size()-1; i++) {
+			int roll1 = temp.get(i).getLastRoll();
+			int roll2 = temp.get(i+1).getLastRoll();
+			if (roll1 == roll2) {
+				System.out.println("Player " + i + " roll equals Player " + (i+1) + " roll");
+				if (i > 0) {
+					if (temp.get(i-1).getLastRoll() == temp.get(i).getLastRoll()) {
+						Player p1 = temp.get(i+1);
+						temp2.add(p1);
+						t[2] = i+1;
+					}
+					else {
+						if (temp2.isEmpty()) {
+							Player p1 = temp.get(i);
+							Player p2 = temp.get(i+1);
+							
+							temp2.add(p1);
+							temp2.add(p2);
+							t[0] = i;
+							t[1] = i+1;
+						}
+						else {
+							Player p1 = temp.get(i);
+							Player p2 = temp.get(i+1);
+							
+							temp3.add(p1);
+							temp3.add(p2);
+							t[2] = i;
+							t[3] = i+1;
+						}
+					}
+				}
+				else {
+					Player p1 = temp.get(i);
+					Player p2 = temp.get(i+1);
+					
+					temp2.add(p1);
+					temp2.add(p2);
+					t[0] = i;
+					t[1] = i+1;
+				}
+			}
+		}
+		
+		// DO rerolls and resorting here!
+		for (int i = 0; i < temp2.size(); i++) {
+			// Tell players to reroll
+			// Listen to spacebar
+			
+			temp2.get(i).setLastRoll(roll());
+		}
+		for (int i = 0; i < temp3.size(); i++) {
+			// Tell players to reroll
+			// Listen to spacebar
+			
+			temp3.get(i).setLastRoll(roll());
+		}
+		
+		temp2.sort(null);
+		temp3.sort(null);
+		
+		for (Player p: temp) {
+			System.out.println("REROLLS | " + p.getLastRoll());
+		}
+		
+		for (Player p: temp2) {
+			System.out.println("Temp2 | " + p.getLastRoll());
+		}
+		for (Player p: temp3) {
+			System.out.println("Temp3 | " + p.getLastRoll());
+		}
+		
+		for (int i = 0; i < 4; i++) {
+			System.out.println("TI: " + t[i]);
+			if (t[i] != 0 && temp2.size() > i) {
+				Player p = temp2.get(i);
+				temp.set(t[i], p);
+			}
+		}
+		
+		for (int i = 2; i < 4; i++) {
+			if (t[i] != 0 && !temp3.isEmpty()) {
+				Player p = temp3.get(i-2);
+				temp.set(t[i], p);
+			}
+		}
+		
+		players.addAll(temp);
+		
+		for (Player p: players) {
+			System.out.println("2 | " + p.getPlayerID() + " | " + p.getLastRoll());
 		}
 	}
 	
