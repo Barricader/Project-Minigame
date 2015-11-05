@@ -26,6 +26,7 @@ import javax.swing.SwingConstants;
 
 import main.Director;
 import main.Main;
+import main.NewDirector;
 import main.Player;
 
 /**
@@ -247,13 +248,13 @@ public class StartPanel extends JPanel {
 			
 			System.out.println("Max turns sent: " + turns);
 			// load board
-			Director director = main.getDirector();
+			NewDirector director = main.getDirector();
 			director.setPlayers(players);
 			director.setTurns(turns);
-			director.setState(Director.INIT);
+			//director.setState();
 			setVisible(false);
 			main.getContentPane().remove(this);
-			main.getContentPane().add(director.getBoard());
+			main.getContentPane().add(director.getState());
 			main.validate();
 			// Maybe make another panel visible??????
 		}
