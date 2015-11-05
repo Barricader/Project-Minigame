@@ -22,7 +22,7 @@ public class Main extends JFrame {
 	public Main() {
 		startPanel = new StartPanel(this);
 		dir = new NewDirector(this);
-		dir.start();
+		//dir.start();
 		add(startPanel);
 		
 		setTitle(TITLE);

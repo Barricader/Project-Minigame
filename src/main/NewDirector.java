@@ -33,6 +33,7 @@ public class NewDirector implements Runnable {
 		this.m = m;
 		
 		this.players = new ArrayList<Player>();
+		start();
 	}
 	
 	/**
@@ -73,28 +74,38 @@ public class NewDirector implements Runnable {
 	 * Runs the render method as much as possible.
 	 */
 	public void run() {
+		// For precision
 		long lastTime = System.nanoTime();
 		long timer = System.currentTimeMillis();
 		final double ns = 1000000000.0 / 60.0;
+		
+		// Init some stuff
 		double delta = 0;
 		int frames = 0;
+		
+		// Main loop
 		while (running) {
+			//System.out.println("MAIN LOOP"); // DEBUG
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
 			lastTime = now;
+			// Runs the update method every 60th of a second
 			while (delta >= 1) {
 				update();
 				delta--;
 			}
+			
 			render();
 			frames++;
 			
+			// TESTING STUFF | DELETE ME, (this if, timer var, and frames var) IF NOT IN USE
 			if (System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;
 				m.setTitle("Thing | " + frames + " fps");
 				frames = 0;
 			}
 		}
+		
 		stop();
 	}
 
