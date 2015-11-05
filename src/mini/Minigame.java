@@ -21,13 +21,8 @@ public abstract class Minigame {
 		running = false;
 	}
 	
-	public void update() {
-		
-	}
+	public abstract void loop();
 	
-	public void render() {
-		
-	}
 	
 	public void setRunning(boolean r) {
 		running = r;

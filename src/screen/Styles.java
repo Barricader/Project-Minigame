@@ -1,6 +1,5 @@
 package screen;
 
-import java.awt.Font;
 import java.awt.GradientPaint;
 
 

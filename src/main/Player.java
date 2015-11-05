@@ -10,12 +10,11 @@ public class Player implements Comparable<Player>{
 	private String name = "";
 	private Color color;
 	private int score1 = 0;
-	private int score2 = 0;
+	//private int score2 = 0;	// Not implemented currently
 	private byte playerID = 0;
 	private byte tileID = 0;
 	private int xPos;
 	private int yPos;
-	private int goes;
 	private int lastRoll;
 	
 	public Player(){
@@ -25,7 +24,6 @@ public class Player implements Comparable<Player>{
 	public Player(String name, Color color) {
 		this.name = name;
 		this.color = color;
-		this.goes = 0;
 		this.lastRoll = 0;
 	}
 	
@@ -34,7 +32,6 @@ public class Player implements Comparable<Player>{
 		this.color = color;
 		this.playerID = playerID;
 		this.tileID = tileID;
-		this.goes = 0;
 		this.lastRoll = 0;
 	}
 	
@@ -64,11 +61,6 @@ public class Player implements Comparable<Player>{
 	
 	public int getScore1() {
 		return score1;
-	}
-	
-	public void buyScore2() {
-		score1 = score1 - 10;
-		score2++;
 	}
 	
 	public void setXPos(int x) {
