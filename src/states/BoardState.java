@@ -5,10 +5,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
-
 import main.Dice;
-import main.Director;
 import main.NewDirector;
 import main.Player;
 import main.Tile;

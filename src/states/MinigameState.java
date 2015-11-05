@@ -3,12 +3,11 @@ package states;
 import java.awt.Color;
 import java.util.Random;
 
-import javax.swing.JPanel;
-
 import main.NewDirector;
 import mini.Minigame;
 
 public class MinigameState extends State {
+	private static final long serialVersionUID = 1L;
 	private final byte MAX_WEIGHT = 100;
 	private final byte MAX_GAMES = 20;
 	private Minigame[] minigames;
@@ -50,8 +49,6 @@ public class MinigameState extends State {
 		
 		// DRAW STUFF HERE!
 		System.out.println("Minigame State Rendering");
-		
-		JPanel test = new JPanel();
 		
 		repaint();
 		

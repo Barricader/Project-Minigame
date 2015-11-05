@@ -60,13 +60,13 @@ public class NewDirector implements Runnable {
 	private void update() {
 		// Do state update here
 		curState.update();
-		System.out.println("updating");
+		//System.out.println("updating");
 	}
 	
 	private void render() {
 		// Do state render here
 		curState.render();
-		System.out.println("rendering");
+		//System.out.println("rendering");
 	}
 
 	/**
@@ -92,6 +92,7 @@ public class NewDirector implements Runnable {
 			// Runs the update method every 60th of a second
 			while (delta >= 1) {
 				update();
+				System.out.println("THOEITH");
 				delta--;
 			}
 			

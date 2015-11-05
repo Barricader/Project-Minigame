@@ -14,6 +14,7 @@ import main.NewDirector;
  *
  */
 public abstract class State extends JPanel {
+	private static final long serialVersionUID = 1L;
 	protected NewDirector director;	// director we will communicate too
 	protected Graphics g;	// graphics we will draw too
 	
