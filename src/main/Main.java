@@ -36,6 +36,7 @@ public class Main extends JFrame {
 		return dir;
 	}
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		Main testScreen = new Main();
 	}
