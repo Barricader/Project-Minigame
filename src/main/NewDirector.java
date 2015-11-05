@@ -60,18 +60,14 @@ public class NewDirector implements Runnable {
 	 * Updates the current state
 	 */
 	private void update() {
-		// Do state update here
 		curState.update();
-		//System.out.println("updating");
 	}
 	
 	/**
 	 * Renders the current state
 	 */
 	private void render() {
-		// Do state render here
 		curState.render();
-		//System.out.println("rendering");
 	}
 
 	/**
