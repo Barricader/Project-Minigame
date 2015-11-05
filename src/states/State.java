@@ -14,7 +14,6 @@ import main.NewDirector;
 public abstract class State {
 	protected NewDirector director;	// director we will communicate too
 	protected JPanel drawPanel;	// drawing object we will draw too
-	protected State currentState;	// what state is currently active?
 	
 	/**
 	 * Method that must be implemented to allow a state to update itself.
