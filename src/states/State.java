@@ -1,5 +1,7 @@
 package states;
 
+import java.awt.Graphics;
+
 import javax.swing.JPanel;
 
 import main.NewDirector;
@@ -11,9 +13,13 @@ import main.NewDirector;
  * @author David Kramer
  *
  */
-public abstract class State {
+public abstract class State extends JPanel {
 	protected NewDirector director;	// director we will communicate too
-	protected JPanel drawPanel;	// drawing object we will draw too
+	protected Graphics g;	// graphics we will draw too
+	
+	public State(NewDirector director) {
+		this.director = director;
+	}
 	
 	/**
 	 * Method that must be implemented to allow a state to update itself.
