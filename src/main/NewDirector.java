@@ -23,9 +23,8 @@ public class NewDirector implements Runnable {
 	private boolean running;
 	
 	/**
-	 * Create a Director object
-	 * @param maxTurns - Amount of max turns in the current game
-	 * @param players - Players to play in the game
+	 * Create a NewDirector object that will hand stats for the whole game
+	 * @param m - An instance of Main to use in NewDirector
 	 */
 	public NewDirector (Main m) {
 		this.curState = new StartState(this);
