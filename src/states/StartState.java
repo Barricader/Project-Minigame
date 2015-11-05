@@ -17,7 +17,7 @@ public class StartState extends State {
 	}
 
 	public void render() {
-		g = getGraphics();
+		//g = getGraphics();
 		g.setColor(Color.RED);
 		g.fillRect(20, 20, 100, 100);
 		

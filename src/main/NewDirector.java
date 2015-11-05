@@ -1,6 +1,9 @@
 package main;
 import java.util.ArrayList;
 
+import states.StartState;
+import states.State;
+
 // TODO: Make it output the player list sorting to test
 
 /**
@@ -11,9 +14,8 @@ import java.util.ArrayList;
  */
 public class NewDirector implements Runnable {
 	// States of the board
-	public static final byte START = 0, BOARD = 1, MINIGAME = 2, END = 3, INIT = 4;//delete?
 	private ArrayList<Player> players;
-	private byte state;// CHANGE TO State
+	private State curState;
 	private int turn;
 	private int maxTurns;
 	private Main m;
@@ -26,11 +28,9 @@ public class NewDirector implements Runnable {
 	 * @param players - Players to play in the game
 	 */
 	public NewDirector (Main m) {
-		this.state = START;
+		this.curState = new StartState(this);
 		this.turn = 1;
 		this.m = m;
-		
-		
 		
 		this.players = new ArrayList<Player>();
 	}
@@ -58,10 +58,14 @@ public class NewDirector implements Runnable {
 	
 	private void update() {
 		// Do state update here
+		curState.update();
+		System.out.println("updating");
 	}
 	
 	private void render() {
 		// Do state render here
+		curState.render();
+		System.out.println("rendering");
 	}
 
 	/**
@@ -93,10 +97,13 @@ public class NewDirector implements Runnable {
 		}
 		stop();
 	}
+
+	public State getState() {
+		return curState;
+	}
 	
-	// TODO change to State
-	public void setState(byte state) {
-		this.state = state;
+	public void setState(State state) {
+		this.curState = state;
 	}
 	
 	public void setPlayers(ArrayList<Player> players) {

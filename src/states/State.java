@@ -19,6 +19,7 @@ public abstract class State extends JPanel {
 	
 	public State(NewDirector director) {
 		this.director = director;
+		g = getGraphics();
 	}
 	
 	/**
