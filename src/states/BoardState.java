@@ -91,7 +91,7 @@ public class BoardState extends State {
 	}
 
 	public void update() {
-		
+		System.out.println("Turn " + director.getTurn());
 	}
 
 	public void render() {

@@ -128,4 +128,8 @@ public class NewDirector implements Runnable {
 	public void setTurns(int turns) {
 		maxTurns = turns;
 	}
+	
+	public int getTurn() {
+		return turn;
+	}
 }
