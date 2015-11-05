@@ -57,12 +57,18 @@ public class NewDirector implements Runnable {
 		}
 	}
 	
+	/**
+	 * Updates the current state
+	 */
 	private void update() {
 		// Do state update here
 		curState.update();
 		//System.out.println("updating");
 	}
 	
+	/**
+	 * Renders the current state
+	 */
 	private void render() {
 		// Do state render here
 		curState.render();
@@ -92,7 +98,6 @@ public class NewDirector implements Runnable {
 			// Runs the update method every 60th of a second
 			while (delta >= 1) {
 				update();
-				System.out.println("THOEITH");
 				delta--;
 			}
 			
@@ -102,7 +107,7 @@ public class NewDirector implements Runnable {
 			// TESTING STUFF | DELETE ME, (this if, timer var, and frames var) IF NOT IN USE
 			if (System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;
-				m.setTitle("Thing | " + frames + " fps");
+				m.setTitle("Project-Minigame | " + frames + " fps");
 				frames = 0;
 			}
 		}

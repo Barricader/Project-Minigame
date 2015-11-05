@@ -16,7 +16,7 @@ public class StartState extends State {
 	}
 
 	public void render() {
-		//g = getGraphics();
+		// REMOVE THESE COMMENTS AFTER g GETS FIXED
 		//g.setColor(Color.BLUE);
 		//g.fillRect(20, 20, 100, 100);
 		
