@@ -1,7 +1,7 @@
 package main;
 import java.util.ArrayList;
 
-import states.StartState;
+import states.NewStartState;
 import states.State;
 
 // TODO: Make it output the player list sorting to test
@@ -13,6 +13,8 @@ import states.State;
  *
  */
 public class NewDirector implements Runnable {
+	public static final int MAX_PLAYERS = 4;	// max players allowed
+	
 	// States of the board
 	private ArrayList<Player> players;
 	private State curState;
@@ -27,7 +29,7 @@ public class NewDirector implements Runnable {
 	 * @param m - An instance of Main to use in NewDirector
 	 */
 	public NewDirector (Main m) {
-		this.curState = new StartState(this);
+		this.curState = new NewStartState(this);
 		this.turn = 1;
 		this.m = m;
 		
@@ -116,6 +118,7 @@ public class NewDirector implements Runnable {
 	
 	public void setState(State state) {
 		this.curState = state;
+		m.updateView();	// we have to update view to main manually!
 	}
 	
 	public void setPlayers(ArrayList<Player> players) {
@@ -124,6 +127,10 @@ public class NewDirector implements Runnable {
 	
 	public ArrayList<Player> getPlayers() {
 		return players;
+	}
+	
+	public Main getMain() {
+		return m;
 	}
 	
 	public void setTurns(int turns) {
