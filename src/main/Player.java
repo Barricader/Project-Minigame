@@ -2,10 +2,11 @@ package main;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
-public class Player implements Comparable<Player>{
+public class Player extends Rectangle implements Comparable<Player> {
 	public static final int WIDTH = 40;
-	public static final int HEIGHT = 30;
+	public static final int HEIGHT = 40;
 	
 	private String name = "";
 	private Color color;
@@ -93,6 +94,14 @@ public class Player implements Comparable<Player>{
 	
 	public String toString() {
 		return name;
+	}
+	
+	public Color getColor() {
+		return color;
+	}
+	
+	public void setID(byte ID) {
+		this.playerID = ID;
 	}
 	
 	public void draw(Graphics g) {
