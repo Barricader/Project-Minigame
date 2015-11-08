@@ -1,13 +1,11 @@
 package states;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -15,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
@@ -36,30 +33,45 @@ import main.Player;
 import screen.GameButton;
 import screen.GameUtils;
 import screen.PlayerListCellRenderer;
+import screen.TurnControlPanel;
 
+/**
+ * This is the initial state of the application. The user is presented with the ability
+ * to add or remove players, as well as control how many turns there will be in the game. After
+ * all this information has been setup, the board state will be created and all newly created
+ * players will be sent to the director.
+ * @author David Kramer
+ *
+ */
 public class NewStartState extends State {
 	private static final long serialVersionUID = 1L;
 	
-	private NameField nameField;
-	private JTextField customTurnField;	// field for entering numeric value for turn count
-	private GameButton addBtn;
-	private GameButton removeBtn;
-	private GameButton startBtn;
+	private NameField nameField;	// field for entering player name
+	private GameButton addBtn;	// add player to list
+	private GameButton removeBtn;	// remove selected player
+	private GameButton startBtn;	// start the game
 	private PlayerList<Player> playerList;
-	private ButtonGroup buttonGroup;	// button group for radio buttons
-	private JRadioButton turn10Btn;	// 10 turns
-	private JRadioButton turn20Btn;	// 20 turns
-	private JRadioButton customTurnBtn;	// for having a custom value
-	private JPanel radioBtnPanel;	// panel that holds all radio buttons for turns
+	private TurnControlPanel turnCtrlPanel;	// radio button controls for turns
 	private JLabel titleLabel;
 	private JLabel gameLabel;
 	private JLabel playersLabel;
 	private JLabel remainingLabel;
-	private int playersRemaining;
+	private int playersRemaining;	
 	
 	public NewStartState(NewDirector director) {
 		super(director);
 		init();
+	}
+	
+	public void update() {
+	}
+	
+	public void paintComponent(Graphics g) {
+		g.fillRect(0, 0, getWidth(), getHeight());
+	}
+
+	public void render() {
+		//TODO we might not need to do anything for start state?
 	}
 	
 	/**
@@ -71,6 +83,7 @@ public class NewStartState extends State {
 		playersRemaining = NewDirector.MAX_PLAYERS;
 		nameField = new NameField(10);	// player name field
 		playerList = new PlayerList<>();
+		turnCtrlPanel = new TurnControlPanel();
 		createButtons();
 		createLabels();	
 		
@@ -161,7 +174,7 @@ public class NewStartState extends State {
 		c.gridheight = 3;
 		c.weighty = 0;
 		c.ipady = 0;
-		add(radioBtnPanel, c);
+		add(turnCtrlPanel, c);
 		
 		// start button
 		c.anchor = GridBagConstraints.SOUTH;
@@ -175,79 +188,6 @@ public class NewStartState extends State {
 		c.weighty = 1.0;
 		c.ipady = 10;
 		add(startBtn, c);
-	}
-	
-	/**
-	 * Creates radio button controls and text field for controlling the 
-	 * amount of turns the game will have.
-	 */
-	private void createTurnControls() {
-		buttonGroup = new ButtonGroup();
-		turn10Btn = new JRadioButton("10");
-		turn10Btn = (JRadioButton)GameUtils.customizeComp(turn10Btn, Color.BLACK, Color.CYAN, 40);
-		turn10Btn.setSelected(true);	// enable 10 turns by default
-		turn10Btn.addActionListener(e -> {
-			// TODO add updating
-		});
-		
-		turn20Btn = new JRadioButton("20");
-		turn20Btn = (JRadioButton)GameUtils.customizeComp(turn20Btn, Color.BLACK, Color.CYAN, 40);
-		turn20Btn.addActionListener(e -> {
-			//TODO add updating
-		});
-		
-		customTurnBtn = new JRadioButton("Custom");
-		customTurnBtn = (JRadioButton)GameUtils.customizeComp(customTurnBtn, Color.BLACK, Color.CYAN, 14);
-		customTurnBtn.addChangeListener(e -> {
-			if (customTurnBtn.isSelected()) {	// enable or disable custom turn field
-				customTurnField.setEnabled(true);
-			} else {
-				customTurnField.setEnabled(false);	
-			}
-		});
-		
-		customTurnField = new JTextField(3);
-		customTurnField = (JTextField)GameUtils.customizeComp(customTurnField, Color.BLACK, Color.CYAN, 20);
-		customTurnField.setEnabled(false);	// disable unless radio button is checked!
-		customTurnField.setBorder(new LineBorder(Color.CYAN));
-		customTurnField.setMaximumSize(new Dimension(100, 20));
-		customTurnField.setHorizontalAlignment(SwingConstants.CENTER);
-		
-		buttonGroup.add(turn10Btn);
-		buttonGroup.add(turn20Btn);
-		buttonGroup.add(customTurnBtn);
-		
-		// panel to hold all radio buttons
-		radioBtnPanel = new JPanel();
-		radioBtnPanel.setBorder(new TitledBorder(new LineBorder(Color.CYAN), "Game Turns:",
-				TitledBorder.CENTER, TitledBorder.BELOW_TOP,
-				new Font("Courier New", Font.BOLD, 14), Color.CYAN));
-		radioBtnPanel.setBackground(Color.BLACK);
-		radioBtnPanel.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weighty = 1.0;
-		radioBtnPanel.add(turn10Btn, c);
-		
-		c.gridx = 0;
-		c.gridy = 1;
-		radioBtnPanel.add(turn20Btn, c);
-		
-		c.gridx = 0;
-		c.gridy = 2;
-		radioBtnPanel.add(customTurnBtn, c);
-		
-		c.gridx = 1;
-		c.gridy = 2;
-		c.weighty = 0.0;
-		radioBtnPanel.add(customTurnField, c);
-		
-		c.gridx = 0;
-		c.gridy = 3;
-		c.gridwidth = 2;
-		radioBtnPanel.add(Box.createVerticalStrut(20), c);	// bottom strut
 	}
 	
 	/**
@@ -277,8 +217,6 @@ public class NewStartState extends State {
 		startBtn.addActionListener(e -> {
 			initGame();
 		});
-		
-		createTurnControls();	// now make radio button turn controls
 	}
 	
 	/**
@@ -295,21 +233,7 @@ public class NewStartState extends State {
 		
 		director.setPlayers(playerList.players);
 		director.setState(new BoardState(director));
-		
-		// figure out turn count
-		int turns = 0;
-		
-		if (buttonGroup.isSelected(turn10Btn.getModel())) {
-			turns = 10;
-		}
-		else if (buttonGroup.isSelected(turn20Btn.getModel())) {
-			turns = 20;
-		}
-		else if (buttonGroup.isSelected(customTurnBtn.getModel())) {
-			turns = Integer.parseInt(customTurnField.getText());
-		}
-		
-		director.setTurns(turns);
+		director.setTurns(turnCtrlPanel.getTurnCount());
 	}
 	
 	/**
@@ -342,18 +266,6 @@ public class NewStartState extends State {
 		remainingLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		remainingLabel.setBorder(new EmptyBorder(0, 0, 0, 20));	// right side padding
 		
-	}
-
-	public void update() {
-	}
-	
-	public void paintComponent(Graphics g) {
-		System.out.println("Repaintining!");
-		g.fillRect(0, 0, getWidth(), getHeight());
-	}
-
-	public void render() {
-		//TODO we might not need to do anything for start state?
 	}
 	
 	/**
@@ -550,13 +462,13 @@ public class NewStartState extends State {
 		}
 
 		/**
-		 * Checks and validates text field as keys are released.
+		 * Checks and validates textfield as keys are released.
 		 */
 		public void keyReleased(KeyEvent e) {
 			validateField();
 		}
 		
-		// unused
+		// unused keylistener method
 		public void keyTyped(KeyEvent e) {}
 		
 	}
