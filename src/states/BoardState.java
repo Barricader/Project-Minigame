@@ -58,7 +58,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	public BoardState(NewDirector director) {
 		super(director);
-		init();
+		//init();
 	}
 
 	public void update() {
@@ -166,7 +166,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	/**
 	 * Initializes everything and sets up the layout of the board. 
 	 */
-	private void init() {
+	public void init() {
 		statusPanel = new StatusPanel(director);
 		midRect = createMidRect();
 		dice = new Dice(600, 400);
@@ -245,8 +245,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			e.printStackTrace();
 		}
 		
-		
-		
 		tileMap = new HashMap<Byte, Tile>();
 		System.out.println(tileMap);
 		// default size 1280 x 720 for initial tile sizing
@@ -308,6 +306,11 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * @param g - Graphics to draw to
 	 */
 	private void drawTiles(Graphics g) {
+//		for (int i = 0; i < tiles.size(); i++) {	//TODO remove this
+//			Tile t = tiles.get(i);
+//			t.draw(g);
+//		}
+		
 		for (Tile t : tileMap.values()) {
 			t.draw(g);
 		}
