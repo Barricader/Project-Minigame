@@ -1,6 +1,6 @@
 package states;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
@@ -16,11 +16,10 @@ import main.NewDirector;
 public abstract class State extends JPanel {
 	private static final long serialVersionUID = 1L;
 	protected NewDirector director;	// director we will communicate too
-	protected Graphics g;	// graphics we will draw too
+	protected Graphics2D g2d;	// graphics we will draw too
 	
 	public State(NewDirector director) {
 		this.director = director;
-		g = getGraphics();
 	}
 	
 	/**
