@@ -419,6 +419,7 @@ public class NewStartState extends State {
 			
 			setBackground(Color.BLACK);
 			setForeground(Color.CYAN);
+			setCaretColor(Color.CYAN);
 			setBorder(DEFAULT_BORDER);
 			setFont(new Font("Courier New", Font.BOLD, 25));
 			addKeyListener(this);

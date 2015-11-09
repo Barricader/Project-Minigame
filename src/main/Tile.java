@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 
 import screen.GameUtils;
@@ -24,11 +25,12 @@ public class Tile extends Rectangle {
 	public static final int ACTION_ADDSCORE1 = 0;
 	public static final int ACTION_SUBTRACT = 1;
 	public static final int ACTION_ADDSCORE2 = 2;
+	public static byte TILE_ID;
 	//public static final int ACTION_MINIGAME = 3;
 	
 	private Color color;
 	private int action;
-	private int ID;
+	private byte ID;
 	
 	/**
 	 * @deprecated	- We have sub-classed Rectangle
@@ -49,11 +51,12 @@ public class Tile extends Rectangle {
 	 * @param width - width of tile
 	 * @param height - height of tile
 	 */
-	public Tile(Color color, int action, int ID, int x, int y, int width, int height) {
+	public Tile(Color color, int action, byte ID, int x, int y, int width, int height) {
 		super(x, y, width, height);
 		this.color = color;
 		this.action = action;
 		this.ID = ID;
+		TILE_ID++;
 	}
 	
 	/**
@@ -76,19 +79,38 @@ public class Tile extends Rectangle {
 	}
 	
 	/**
+	 * @return the location info of this tile so that the player will know
+	 * where to move to.
+	 */
+	public Point getLocation() {
+		Point p = new Point(x * width + (width / 2), y * height + (height / 2));
+		return p;
+	}
+	
+	public boolean contains(Point p) {
+		Rectangle r = new Rectangle(x * width, y * height, width, height);
+		return r.contains(p);
+	}
+	
+	/**
 	 * Draws a tile to the board.
 	 * @param g - graphics context to draw to
 	 */
 	public void draw(Graphics g) {
-		Graphics2D g2d = (Graphics2D)g;
-		g2d.setColor(Color.BLACK);
-		g2d.setStroke(new BasicStroke(2.0f));
-		g2d.drawRect(x * width, y * height, width, height);
-		g2d.setColor(color);
-		g2d.fillRect(x * width, y * height, width, height);
-		g2d.setColor(GameUtils.getInvertedColor(color));
-		g2d.setFont(new Font("Courier New", Font.BOLD, 20));
-		g2d.drawString("" + ID, (x * width) + 50, (y * height) + 50);
+		final Graphics2D g2d = (Graphics2D)g.create();
+		
+		try {
+			g2d.setColor(Color.BLACK);
+			g2d.setStroke(new BasicStroke(2.0f));
+			g2d.drawRect(x * width, y * height, width, height);
+			g2d.setColor(color);
+			g2d.fillRect(x * width, y * height, width, height);
+			g2d.setColor(GameUtils.getInvertedColor(color));
+			g2d.setFont(new Font("Courier New", Font.BOLD, 20));
+			g2d.drawString("" + ID, (x * width) + 50, (y * height) + 50);	
+		} finally {
+			g2d.dispose();
+		}
 	}
 	
 	// Mutator methods
@@ -97,7 +119,7 @@ public class Tile extends Rectangle {
 		action = act;
 	}
 	
-	public void setTileID(int id) {
+	public void setTileID(byte id) {
 		ID = id;
 	}
 	
@@ -107,7 +129,7 @@ public class Tile extends Rectangle {
 		return color;
 	}
 	
-	public int getTileID() {
+	public byte getTileID() {
 		return ID;
 	}
 	

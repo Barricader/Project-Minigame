@@ -6,16 +6,15 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-
-import javax.swing.JPanel;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import main.Dice;
 import main.NewDirector;
@@ -40,9 +39,17 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	
 	private StatusPanel statusPanel;	// display active player and turns remaining
 	private Rectangle midRect;	// rect in the middle that contains game objects such as dice
+	private Player activePlayer;
 	private Dice dice;
+	
+	/**
+	 * Tiles will now be mapped with their tile ID. This will make it more
+	 * efficient when we move from tile to tile based on the roll. We can know
+	 * exactly where to go, based on the tile ID. 
+	 * @deprecated
+	 */
 	private ArrayList<Tile> tiles;	// tiles of the board
-
+	private Map<Byte, Tile> tileMap;	// more efficient way to keep track of tiles on board, instead of tiles array
 	/**
 	 * Constructs a new board state.
 	 * @param director - main director control of application
@@ -62,16 +69,19 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * @param g - Graphics to draw to
 	 */
 	public void paintComponent(Graphics g) {
-		g2d = (Graphics2D)g;
-		g2d.clearRect(0, 0, getWidth(), getHeight());
-		g2d.setColor(GameUtils.colorFromHex("#2b2b2b"));
-		g2d.fillRect(0, 0, getWidth(), getHeight());
-		g2d.setColor(Color.CYAN);
-		g2d.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
-		drawTiles(g2d);
-		dice.draw(g2d);
-		drawPlayers(g2d);
-		g2d.dispose();
+		final Graphics2D g2d = (Graphics2D)g.create();
+		try {
+			g2d.setColor(GameUtils.colorFromHex("#2b2b2b"));
+			g2d.fillRect(0, 0, getWidth(), getHeight());
+			statusPanel.repaint();
+			g2d.setColor(Color.CYAN);
+			g2d.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
+			drawTiles(g2d);
+			dice.draw(g2d);
+			drawPlayers(g2d);	
+		} finally {
+			g2d.dispose();	
+		}
 	}
 
 	/**
@@ -88,7 +98,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	public void mouseClicked(MouseEvent e) {
 		if (dice.contains(e.getPoint())) {
-			dice.roll(Dice.SIZE);
+			movePlayer();
 		}
 		
 		for (Player p : director.getPlayers()) {
@@ -99,10 +109,12 @@ public class BoardState extends State implements ComponentListener, MouseListene
 					p.setSelected(true);
 				}
 			} else if (p.isSelected()) {
-				if (p.isMoving()) {
-					p.setNewLocation(e.getPoint());	// change to new destination
-				} else {
-					p.moveTo(e.getPoint());	
+				for (Tile t : tileMap.values()) {
+					if (t.contains(e.getPoint())) {
+						p.moveTo(t.getLocation());
+						activePlayer = p;
+						p.setTile(t);
+					}
 				}
 			}
 		}
@@ -154,7 +166,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	private void init() {
 		statusPanel = new StatusPanel(director);
-		tiles = new ArrayList<>();
 		midRect = createMidRect();
 		dice = new Dice(600, 400);
 		
@@ -185,12 +196,32 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	private void loadPlayers() {
 		createMidRect();
+		ArrayList<Player> players = director.getPlayers();
 		
-		for (int i = 0; i < director.getPlayers().size(); i++) {
-			Player p = director.getPlayers().get(i);
+		for (int i = 0; i < players.size(); i++) {
+			Player p = players.get(i);
 			
-			p.x = midRect.x * i;
-			p.y = 500;
+			p.x = midRect.x + (p.width * i) + 50;
+			p.y = midRect.y;
+		}
+	}
+	
+	private void movePlayer() {
+		byte roll = (byte)dice.roll(Dice.SIZE);
+		System.out.println("Rolled: " + roll);
+		
+		if (activePlayer != null) {
+			byte curTileID = activePlayer.getTileID();
+			byte newTileID = (byte)(curTileID + roll);
+			
+			if (newTileID > tileMap.size()) {
+				newTileID = 1;
+			}
+			
+			Tile newTile = tileMap.get(newTileID);
+			
+			activePlayer.moveTo(newTile.getLocation());
+			activePlayer.setTile(newTile);
 		}
 	}
 	
@@ -198,7 +229,9 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * Creates all the game tiles of the game. Currently it is 10 x 5 x 10 x 5.
 	 */
 	private void createTiles() {
-		tiles = new ArrayList<>();
+//		tiles = new ArrayList<>();
+		tileMap = new HashMap<Byte, Tile>();
+		System.out.println(tileMap);
 		// default size 1280 x 720 for initial tile sizing
 		int tileWidth = 1280 / HORIZONTAL_TILE_COUNT;
 		int tileHeight = 720 / VERTICAL_TILE_COUNT;
@@ -206,14 +239,16 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		for (int y = 0; y < 5; y++) {
 			for (int x = 0; x < 10; x++) {
 				Color color = GameUtils.getRandomColor();
-				
+				// tile ID's are being setup through a static variable in the tile class.
+				// whenever a new tile is created, the overall Tile ID is incremented.
 				if (y == 0 || y == 4) {	// top and bottom tiles
-					Tile t = new Tile(color, 0, x + y, x, y, tileWidth, tileHeight);
-					tiles.add(t);
-				} else
-				if (x == 0 || x == 9) { // side tiles
-					Tile t = new Tile(color, 0, x + y, x, y, tileWidth, tileHeight);
-					tiles.add(t);
+					Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
+					tileMap.put(t.getTileID(), t);
+//					tiles.add(t);	//TODO remove this
+				} else if (x == 0 || x == 9) { // side tiles
+					Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
+					tileMap.put(t.getTileID(), t);
+//					tiles.add(t);	//TODO remove this
 				}
 			}
 		}
@@ -249,8 +284,12 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * @param g - Graphics to draw to
 	 */
 	private void drawTiles(Graphics g) {
-		for (int i = 0; i < tiles.size(); i++) {
-			Tile t = tiles.get(i);
+//		for (int i = 0; i < tiles.size(); i++) {	//TODO remove this
+//			Tile t = tiles.get(i);
+//			t.draw(g);
+//		}
+		
+		for (Tile t : tileMap.values()) {
 			t.draw(g);
 		}
 	}
@@ -264,10 +303,20 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		int tileWidth = (getWidth() / HORIZONTAL_TILE_COUNT);
 		int tileHeight = (getHeight() / VERTICAL_TILE_COUNT);
 		
-		for (int i = 0; i < tiles.size(); i++) {
-			Tile t = tiles.get(i);
+//		for (int i = 0; i < tiles.size(); i++) {	//TODO remove this
+//			Tile t = tiles.get(i);
+//			t.width = tileWidth;
+//			t.height = tileHeight;
+//		}
+//		
+		for (Tile t : tileMap.values()) {
 			t.width = tileWidth;
 			t.height = tileHeight;
+		}
+		
+		// update player within tile bounds
+		if (activePlayer != null) {
+			activePlayer.setLocation(activePlayer.getTile().getLocation());	
 		}
 	}
 	

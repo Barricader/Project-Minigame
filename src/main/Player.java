@@ -1,8 +1,9 @@
 package main;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -28,6 +29,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	private Color color;
 	private Point newLocation;	// the new location that the player will move to
 	private Timer animationTimer;	// timer to control player movement animation
+	private Tile tile;	// what tile are we on
 	private boolean isSelected;	// have we clicked on a player?
 	private boolean isMoving;	// are we moving right now?
 	private byte playerID = 0;
@@ -85,24 +87,31 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	 * @param g Graphics context we will draw to
 	 */
 	public void draw(Graphics g) {
-		g.setColor(color);
+		final Graphics2D g2d = (Graphics2D)g.create();
 		
-		if (isSelected) {
-			g.setColor(color.brighter());
-			g.drawRect(x, y, WIDTH, HEIGHT);
-			g.fillOval(x, y, WIDTH, HEIGHT);
-		} else {
-			g.drawRect(x, y, WIDTH, HEIGHT);
-			g.drawOval(x, y, WIDTH, HEIGHT);	
+		try {
+			g2d.setStroke(new BasicStroke(1.0f));
+			g2d.setColor(color);
+			
+			if (isSelected) {
+				g2d.setColor(color.brighter());
+				g2d.drawRect(x, y, WIDTH, HEIGHT);
+				g2d.fillOval(x, y, WIDTH, HEIGHT);
+			} else {
+				g2d.drawRect(x, y, WIDTH, HEIGHT);
+				g2d.drawOval(x, y, WIDTH, HEIGHT);	
+			}
+			
+			if (isMoving) {
+				// draw crosshair
+				g2d.drawLine(newLocation.x, newLocation.y, newLocation.x + 10, newLocation.y + 10);
+				g2d.drawLine(newLocation.x + 10, newLocation.y, newLocation.x, newLocation.y + 10);
+			}
+			
+			g2d.drawString(name, x, y + 50);	// draw name of player	
+		} finally {
+			g2d.dispose();
 		}
-		
-		if (isMoving) {
-			// draw crosshair
-			g.drawLine(newLocation.x, newLocation.y, newLocation.x + 10, newLocation.y + 10);
-			g.drawLine(newLocation.x + 10, newLocation.y, newLocation.x, newLocation.y + 10);
-		}
-		
-		g.drawString(name, x, y + 50);	// draw name of player
 	}
 	
 	/**
@@ -187,6 +196,10 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 		this.playerID = ID;
 	}
 	
+	public void setTile(Tile t) {
+		this.tile = t;
+	}
+	
 	public void setLastRoll(int lr) {
 		this.lastRoll = lr;
 	}
@@ -223,6 +236,10 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 		return color;
 	}
 	
+	public Tile getTile() {
+		return tile;
+	}
+	
 	public boolean isSelected() {
 		return isSelected;
 	}
@@ -236,7 +253,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	}
 	
 	public byte getTileID() {
-		return tileID;
+		return tile.getTileID();
 	}
 	
 	public int getLastRoll() {
