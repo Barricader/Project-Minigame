@@ -1,6 +1,5 @@
 package main;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -15,6 +14,7 @@ import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 public class Dice extends Rectangle implements ActionListener {
+	private static final long serialVersionUID = 1L;
 	public final static int SIZE = 6;
 	public static final int WIDTH = 64;
 	public static final int HEIGHT = 64;
