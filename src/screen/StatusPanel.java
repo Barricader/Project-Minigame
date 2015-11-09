@@ -1,15 +1,16 @@
 package screen;
 
 import java.awt.Color;
+import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 import main.NewDirector;
-import main.Player;
 
 /**
  * This panel will be displayed at the top of the screen in the board state.
@@ -33,10 +34,11 @@ public class StatusPanel extends JPanel {
 	}
 	
 	private void init() {
-		curPlayerLabel = new JLabel("Current Player Turn: <P>");
+		setSize(new Dimension(1280, 20));
+		curPlayerLabel = new JLabel("Current Player Turn:");
 		curPlayerLabel = GameUtils.customizeLabel(curPlayerLabel, Color.BLACK, Color.CYAN, 20);
-		
-		turnsRemainingLabel = new JLabel("Turns Remaining: <T>");
+
+		turnsRemainingLabel = new JLabel("Turns Remaining: " + dir.getTurn());
 		turnsRemainingLabel = GameUtils.customizeLabel(turnsRemainingLabel, Color.BLACK, Color.CYAN, 20);
 		
 		// decorate this panel

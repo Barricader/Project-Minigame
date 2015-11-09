@@ -1,6 +1,7 @@
 package states;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -14,11 +15,12 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 import main.Dice;
+import main.Main;
 import main.NewDirector;
 import main.Player;
 import main.Tile;
@@ -51,6 +53,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	private ArrayList<Tile> tiles;	// tiles of the board
 	//private Map<Byte, Tile> tileMap;	// more efficient way to keep track of tiles on board, instead of tiles array
+	private boolean havePlayersRolled = false;	// have players first rolled 
 	/**
 	 * Constructs a new board state.
 	 * @param director - main director control of application
@@ -92,6 +95,19 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		repaint();
 	}
 	
+	public void firstRollPlayers() {
+		for (Player p : director.getPlayers()) {
+			if (!p.hasFirstRolled()) {
+				JOptionPane.showMessageDialog(null, "Player: " + p + " hasn't rolled yet!");
+				p.moveTo(tiles.get(0).getLocation());
+				p.setLastRoll(dice.roll(Dice.SIZE));
+				p.setHasFirstRolled(true);
+				return;
+			}
+		}
+		havePlayersRolled = true;
+	}
+	
 	/**
 	 * Mouse click event. Checks to see if mouse click pt location is contained
 	 * inside of dice and players. If it is, their state is then updated to 
@@ -99,7 +115,11 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	public void mouseClicked(MouseEvent e) {
 		if (dice.contains(e.getPoint())) {
-			movePlayer();
+			if (!havePlayersRolled) {
+				firstRollPlayers();
+			} else {
+				movePlayer();	
+			}
 		}
 		
 		for (Player p : director.getPlayers()) {
@@ -167,6 +187,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	public void init() {
 		statusPanel = new StatusPanel(director);
+		statusPanel.setSize(new Dimension(1264, 35));
 		midRect = createMidRect();
 		dice = new Dice(600, 400);
 		
@@ -190,6 +211,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		addComponentListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		Main.getInstance().setSize(new Dimension(1281, 722));	//TODO this is a workaround to loading status panel!
 	}
 	
 	/**
@@ -305,12 +327,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * Redraws each tile to the screen.
 	 * @param g - Graphics to draw to
 	 */
-	private void drawTiles(Graphics g) {
-//		for (int i = 0; i < tiles.size(); i++) {	//TODO remove this
-//			Tile t = tiles.get(i);
-//			t.draw(g);
-//		}
-		
+	private void drawTiles(Graphics g) {		
 		for (Tile t : tiles) {
 			t.draw(g);
 		}
