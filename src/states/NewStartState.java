@@ -1,7 +1,6 @@
 package states;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -12,16 +11,13 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -276,7 +272,8 @@ public class NewStartState extends State {
 	 * @author David Kramer
 	 *
 	 */
-	private class PlayerList<E> extends JList {
+	private class PlayerList<E> extends JList<E> {
+		private static final long serialVersionUID = 1644702000601062587L;
 		private DefaultListModel<Player> listModel;
 		private ArrayList<Player> players;
 		private PlayerListCellRenderer renderer;
@@ -285,17 +282,20 @@ public class NewStartState extends State {
 			init();
 		}
 		
+		@SuppressWarnings("unchecked")
 		private void init() {
 			players = new ArrayList<>();
 			setBackground(Color.BLACK);
 			listModel = new DefaultListModel<>();
-			setModel(listModel);
+			setModel((ListModel<E>) listModel);
 			renderer = new PlayerListCellRenderer();	// custom list element rendering
 			renderer.setBorder(new EmptyBorder(5, 20, 5, 10));	// add some padding
 			setCellRenderer(renderer);
 			
 			// Allow user to select and deselect users to edit or remove them
 			setSelectionModel(new DefaultListSelectionModel() {
+				private static final long serialVersionUID = 2260831323907229099L;
+
 				public void setSelectionInterval(int index0, int index1) {
 					if (index0 == index1) {
 						if (playerList.isSelectedIndex(index0)) {
@@ -364,8 +364,9 @@ public class NewStartState extends State {
 		/**
 		 * Removes a player from this list, based on the selection.
 		 */
+		@SuppressWarnings("unchecked")
 		public void removePlayer() {
-			List<Player> selectedPlayers = getSelectedValuesList();
+			List<Player> selectedPlayers = (List<Player>) getSelectedValuesList();
 			
 			for (Player p : selectedPlayers) {
 				listModel.removeElement(p);
@@ -406,6 +407,8 @@ public class NewStartState extends State {
 	 *
 	 */
 	private class NameField extends JTextField implements KeyListener {
+		private static final long serialVersionUID = 2334059067385201593L;
+
 		// Default border appearance
 		private final Border DEFAULT_BORDER = new TitledBorder(new LineBorder(Color.CYAN), "Enter a player name:",
 													TitledBorder.LEFT, TitledBorder.BELOW_TOP,

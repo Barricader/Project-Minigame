@@ -34,7 +34,6 @@ public class GameUtils {
 		int blue = rgbColor & 0xff;
 		
 		return new Color(red, green, blue);
-
 	}
 	
 	/**

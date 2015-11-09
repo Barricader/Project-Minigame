@@ -15,13 +15,14 @@ import main.Player;
  * @author David Kramer
  *
  */
-public class PlayerListCellRenderer extends JLabel implements ListCellRenderer {
-	
+public class PlayerListCellRenderer extends JLabel implements ListCellRenderer<Object> {
+	private static final long serialVersionUID = 1L;
+
 	public PlayerListCellRenderer() {
 		setOpaque(true);
 	}
 
-	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
 			boolean cellHasFocus) {
 		
 		setText(value.toString());

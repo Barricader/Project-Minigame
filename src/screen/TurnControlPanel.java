@@ -23,6 +23,7 @@ import javax.swing.border.TitledBorder;
  *
  */
 public class TurnControlPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
 	private ButtonGroup buttonGroup;	// button group for radio buttons
 	private JRadioButton turn10Btn;	// 10 turns
 	private JRadioButton turn20Btn;	// 20 turns

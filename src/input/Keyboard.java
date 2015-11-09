@@ -6,7 +6,7 @@ import java.awt.event.KeyListener;
 /**
  * Basic keyboard class that listens to and keeps track of keyboard input.
  * @author David Kramer
- *
+ * @author Joseph Jones
  */
 public class Keyboard implements KeyListener {
 	// Modifier key flags
@@ -14,7 +14,7 @@ public class Keyboard implements KeyListener {
 	private boolean altFlag;
 	private boolean ctrlFlag;
 	
-	private boolean keyDownFlag;	// is a key down currently?
+	private boolean[] keys = new boolean[120]; // encompasses most used keys
 	
 	private int lastKey;	// key code of last key press
 	
@@ -24,8 +24,6 @@ public class Keyboard implements KeyListener {
 	 * Updates last key and also any modifier key flags.
 	 */
 	public void keyTyped(KeyEvent e) {
-		System.out.println("Key Typed!");
-		keyDownFlag = true;
 		lastKey = e.getKeyCode();
 		
 		switch (e.getModifiers()) {
@@ -45,13 +43,9 @@ public class Keyboard implements KeyListener {
 	 * Updates last key and also any modifier key flags.
 	 */
 	public void keyPressed(KeyEvent e) {
-		System.out.println("Key pressed!");
-		keyDownFlag = true;
 		lastKey = e.getKeyCode();
-		
-		System.out.println("Last Key: " + lastKey + "was pressed!");
-		
-		switch (e.getModifiers()) {
+
+		switch (e.getKeyCode()) {
 		case KeyEvent.VK_ALT:
 			altFlag = true;
 			break;
@@ -61,18 +55,25 @@ public class Keyboard implements KeyListener {
 		case KeyEvent.CTRL_DOWN_MASK:
 			ctrlFlag = true;
 		}
-		
+		keys[e.getKeyCode()] = true;
 	}
 
 	/**
 	 * Clears out all keys, as none as currently pressed.
 	 */
 	public void keyReleased(KeyEvent e) {
-		System.out.println("Key Released!");
-		keyDownFlag = false;
-		altFlag = false;
-		shiftFlag = false;
-		ctrlFlag = false;
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_ALT:
+			altFlag = false;
+			break;
+		case KeyEvent.VK_SHIFT:
+			shiftFlag = false;
+			break;
+		case KeyEvent.CTRL_DOWN_MASK:
+			ctrlFlag = false;
+		}
+		
+		keys[e.getKeyCode()] = false;
 	}
 	
 	// Accessor methods
@@ -108,14 +109,4 @@ public class Keyboard implements KeyListener {
 	public boolean isCtrl() {
 		return ctrlFlag;
 	}
-	
-	/**
-	 * 
-	 * @return true if any key is pressed
-	 */
-	public boolean isKeyDown() {
-		return keyDownFlag;
-	}
-	
-
 }

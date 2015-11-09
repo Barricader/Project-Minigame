@@ -13,6 +13,12 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
+/**
+ * A dice object that renders the dice and randomly rolls when asked
+ * @author David Kramer
+ * @author JoJones
+ *
+ */
 public class Dice extends Rectangle implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	public final static int SIZE = 6;
