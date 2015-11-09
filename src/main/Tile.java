@@ -106,9 +106,6 @@ public class Tile extends Rectangle {
 			g2d.drawRect(x * width, y * height+Y_OFFSET, width, height);
 			g2d.setColor(color);
 			g2d.fillRect(x * width, y * height+Y_OFFSET, width, height);
-			g2d.setColor(GameUtils.getInvertedColor(color));
-			g2d.setFont(new Font("Courier New", Font.BOLD, 20));
-			g2d.drawString("" + ID, (x * width) + 50, (y * height) + 50);	
 		} finally {
 			g2d.dispose();
 		}

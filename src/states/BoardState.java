@@ -239,7 +239,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			while(sc.hasNextLine()) {
 				String line = sc.nextLine();
 				coords.add(line);
-				System.out.println(line);
+				//System.out.println(line);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -255,12 +255,23 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		
 		// Set the tiles with our x's and y's from our file
 		for (int i = 0; i < coords.size(); i++) {
-			Color color = GameUtils.getRandomColor();
 			// tile ID's are being setup through a static variable in the tile class.
 			// whenever a new tile is created, the overall Tile ID is incremented.
 			String[] s = coords.get(i).split(",");
 			int x = Integer.parseInt(s[0]);
 			int y = Integer.parseInt(s[1]);
+			int c = Integer.parseInt(s[2]);
+			
+			Color color = Color.PINK;
+			if (c == 0) {
+				color = Color.BLUE;
+			}
+			else if (c == 1) {
+				color = Color.RED;
+			}
+			else {
+				color = Color.GREEN;
+			}
 				
 			Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
 			tileMap.put(t.getTileID(), t);
@@ -311,12 +322,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		int tileWidth = (getWidth() / HORIZONTAL_TILE_COUNT);
 		int tileHeight = (getHeight() / VERTICAL_TILE_COUNT);
 		
-//		for (int i = 0; i < tiles.size(); i++) {	//TODO remove this
-//			Tile t = tiles.get(i);
-//			t.width = tileWidth;
-//			t.height = tileHeight;
-//		}
-//		
 		for (Tile t : tileMap.values()) {
 			t.width = tileWidth;
 			t.height = tileHeight;
