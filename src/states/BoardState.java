@@ -12,9 +12,12 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
@@ -257,28 +260,39 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * Creates all the game tiles of the game. Currently it is 10 x 5 x 10 x 5.
 	 */
 	private void createTiles() {
-//		tiles = new ArrayList<>();
+		// Get the values of the file "tiles.map". They are our x's and y's for our tiles
+		ArrayList<String> coords = new ArrayList<String>();
+		File map = new File("res/tiles.map");
+		try {
+			Scanner sc = new Scanner(map);
+			while(sc.hasNextLine()) {
+				String line = sc.nextLine();
+				coords.add(line);
+				System.out.println(line);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
 		tileMap = new HashMap<Byte, Tile>();
 		System.out.println(tileMap);
 		// default size 1280 x 720 for initial tile sizing
 		int tileWidth = 1280 / HORIZONTAL_TILE_COUNT;
 		int tileHeight = 720 / VERTICAL_TILE_COUNT;
 		
-		for (int y = 0; y < 5; y++) {
-			for (int x = 0; x < 10; x++) {
-				Color color = GameUtils.getRandomColor();
-				// tile ID's are being setup through a static variable in the tile class.
-				// whenever a new tile is created, the overall Tile ID is incremented.
-				if (y == 0 || y == 4) {	// top and bottom tiles
-					Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
-					tileMap.put(t.getTileID(), t);
-//					tiles.add(t);	//TODO remove this
-				} else if (x == 0 || x == 9) { // side tiles
-					Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
-					tileMap.put(t.getTileID(), t);
-//					tiles.add(t);	//TODO remove this
-				}
-			}
+		// Set the tiles with our x's and y's from our file
+		for (int i = 0; i < coords.size(); i++) {
+			Color color = GameUtils.getRandomColor();
+			// tile ID's are being setup through a static variable in the tile class.
+			// whenever a new tile is created, the overall Tile ID is incremented.
+			String[] s = coords.get(i).split(",");
+			int x = Integer.parseInt(s[0]);
+			int y = Integer.parseInt(s[1]);
+				
+			Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
+			tileMap.put(t.getTileID(), t);
 		}
 	}
 	
@@ -312,11 +326,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * @param g - Graphics to draw to
 	 */
 	private void drawTiles(Graphics g) {
-//		for (int i = 0; i < tiles.size(); i++) {	//TODO remove this
-//			Tile t = tiles.get(i);
-//			t.draw(g);
-//		}
-		
 		for (Tile t : tileMap.values()) {
 			t.draw(g);
 		}
