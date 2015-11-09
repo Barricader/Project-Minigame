@@ -5,7 +5,11 @@ public class Test extends Minigame {
 		super(id);
 	}
 
-	public void loop() {
+	public void update() {
+		
+	}
+	
+	public void render() {
 		
 	}
 }

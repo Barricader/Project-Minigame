@@ -1,6 +1,5 @@
 package states;
 
-import java.awt.Color;
 import java.util.Random;
 
 import main.NewDirector;
@@ -13,39 +12,50 @@ public class MinigameState extends State {
 	private Minigame[] minigames;
 	private byte[] minigameWeight;
 	private Random r;
+	private int curMinigame;
+	private boolean chosen;
 	
 	public MinigameState(NewDirector director) {
 		super(director);
 		r = new Random();
+		curMinigame = 0;
+		chosen = false;
 	}
 
 	public void update() {
-		// Get a random minigame
-		int minigameNum = getRandomMinigame();
-		
-		System.out.println("Playing minigame: " + minigameNum);
+		if (!chosen) {
+			// Get a random minigame
+			curMinigame = getRandomMinigame();
+			
+			System.out.println("Playing minigame: " + curMinigame);
+			chosen = true;
+		}
 		
 		// Play minigame here
-		minigames[minigameNum].setRunning(true);
-		while (minigames[minigameNum].getRunning()) {
+		minigames[curMinigame].setRunning(true);
+		while (minigames[curMinigame].getRunning()) {
 			// minigame loop
-			// FIx this, this might break the loop maybe dunno
-			minigames[minigameNum].setRunning(false);
+			
+			minigames[curMinigame].update();
+			
+			// DELETE THIS
+			minigames[curMinigame].setRunning(false);
 		}
 		
 		// Update weights after minigame has been played
 		for (int i = 0; i < MAX_GAMES; i++) {
 			minigameWeight[i] -= 10;
 		}
-		minigameWeight[minigameNum] = MAX_WEIGHT;
-		//director.setState();
+		minigameWeight[curMinigame] = MAX_WEIGHT;
+		chosen = false;
+		//director.setState(director.);
 		System.out.println("Minigame State Updating!");
 	}
 
 	public void render() {
-		//g = getGraphics();
-		g.setColor(Color.RED);
-		g.fillRect(20, 20, 100, 100);
+		if (curMinigame != -1) {
+			minigames[curMinigame].render();
+		}
 		
 		// DRAW STUFF HERE!
 		System.out.println("Minigame State Rendering");
