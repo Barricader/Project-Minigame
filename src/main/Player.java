@@ -36,6 +36,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	private byte tileID = 0;
 	private int score1 = 0;
 	private int lastRoll;
+	private boolean hasFirstRolled = false;	// has player been rolled for the first time?
 
 	//private int score2 = 0;	// Not implemented currently
 	
@@ -204,6 +205,10 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 		this.lastRoll = lr;
 	}
 	
+	public void setHasFirstRolled(boolean b) {
+		hasFirstRolled = b;
+	}
+	
 //	public void setGoes(int goes) {
 //	this.goes = goes;
 //	}
@@ -246,6 +251,10 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	
 	public boolean isMoving() {
 		return isMoving;
+	}
+	
+	public boolean hasFirstRolled() {
+		return hasFirstRolled;
 	}
 	
 	public byte getPlayerID() {
