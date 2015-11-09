@@ -100,11 +100,12 @@ public class Tile extends Rectangle {
 		final Graphics2D g2d = (Graphics2D)g.create();
 		
 		try {
+			final int Y_OFFSET = 20;
 			g2d.setColor(Color.BLACK);
 			g2d.setStroke(new BasicStroke(2.0f));
-			g2d.drawRect(x * width, y * height, width, height);
+			g2d.drawRect(x * width, y * height+Y_OFFSET, width, height);
 			g2d.setColor(color);
-			g2d.fillRect(x * width, y * height, width, height);
+			g2d.fillRect(x * width, y * height+Y_OFFSET, width, height);
 			g2d.setColor(GameUtils.getInvertedColor(color));
 			g2d.setFont(new Font("Courier New", Font.BOLD, 20));
 			g2d.drawString("" + ID, (x * width) + 50, (y * height) + 50);	
