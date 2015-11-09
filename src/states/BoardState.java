@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -13,8 +14,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+
+import javax.swing.JOptionPane;
 
 import main.Dice;
 import main.NewDirector;
@@ -41,6 +43,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	private Rectangle midRect;	// rect in the middle that contains game objects such as dice
 	private Player activePlayer;
 	private Dice dice;
+	private boolean havePlayersRolled;	// have players rolled first?
 	
 	/**
 	 * Tiles will now be mapped with their tile ID. This will make it more
@@ -56,11 +59,13 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	public BoardState(NewDirector director) {
 		super(director);
-		init();
+		havePlayersRolled = false;
+//		init();
 	}
 
 	public void update() {
 		//TODO update director after player has moved
+//		System.out.println("Have all players rolled? " + havePlayersRolled);
 	}
 	
 	/**
@@ -91,15 +96,38 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		repaint();
 	}
 	
+	public void initRollPlayers() {
+		for (Player p : director.getPlayers()) {
+			if (!p.hasFirstRolled()) {
+				JOptionPane.showMessageDialog(null, "Player: " + p + ", needs to roll!");
+				p.setLastRoll(dice.roll(Dice.SIZE));
+				p.setHasFirstRolled(true);
+//				p.moveTo(tileMap.get(0).getLocation());
+				System.out.println("TileMap @ 1: " + tileMap.get(1));
+				p.moveTo(tileMap.get(1).getLocation());
+				return;
+			}
+		}
+		havePlayersRolled = true;
+	}
+	
 	/**
 	 * Mouse click event. Checks to see if mouse click pt location is contained
 	 * inside of dice and players. If it is, their state is then updated to 
 	 * reflect this event.
 	 */
 	public void mouseClicked(MouseEvent e) {
-		if (dice.contains(e.getPoint())) {
-			movePlayer();
+		if (dice.contains(e.getPoint())) {	// clicked on the dice!
+			if (!havePlayersRolled) {
+				initRollPlayers();
+			} else {
+				JOptionPane.showMessageDialog(null, "All players have rolled! time to move!");
+			}
+			
 		}
+//		if (dice.contains(e.getPoint())) {
+//			movePlayer();
+//		}
 		
 		for (Player p : director.getPlayers()) {
 			if (p.contains(e.getPoint())) {
@@ -164,7 +192,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	/**
 	 * Initializes everything and sets up the layout of the board. 
 	 */
-	private void init() {
+	public void init() {
 		statusPanel = new StatusPanel(director);
 		midRect = createMidRect();
 		dice = new Dice(600, 400);

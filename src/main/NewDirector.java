@@ -1,6 +1,7 @@
 package main;
 import java.util.ArrayList;
 
+import states.BoardState;
 import states.NewStartState;
 import states.State;
 
@@ -19,6 +20,8 @@ public class NewDirector implements Runnable {
 	
 	// States of the board
 	private ArrayList<Player> players;
+	private BoardState boardState;
+	private State miniGameState;
 	private State curState;
 	private int turn;
 	private int maxTurns;
@@ -32,6 +35,7 @@ public class NewDirector implements Runnable {
 	 */
 	public NewDirector (Main m) {
 		this.curState = new NewStartState(this);
+		this.boardState = new BoardState(this);
 		this.turn = 1;
 		this.m = m;
 		
@@ -165,6 +169,9 @@ public class NewDirector implements Runnable {
 	}
 	
 	public void setState(State state) {
+		if (state instanceof BoardState) {
+			
+		}
 		this.curState = state;
 		m.updateView();	// we have to update view to main manually!
 	}	
@@ -177,6 +184,10 @@ public class NewDirector implements Runnable {
 
 	public ArrayList<Player> getPlayers() {
 		return players;
+	}
+	
+	public BoardState getBoardState() {
+		return boardState;
 	}
 	
 	public State getState() {
