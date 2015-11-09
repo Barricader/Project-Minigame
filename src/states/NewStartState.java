@@ -368,9 +368,18 @@ public class NewStartState extends State {
 		public void removePlayer() {
 			List<Player> selectedPlayers = (List<Player>) getSelectedValuesList();
 			
+			// Added an extra layer to check player namees and remove based
+			//on the name comparison
 			for (Player p : selectedPlayers) {
-				listModel.removeElement(p);
-				players.remove(p);
+				int index = 0;
+				for (int i = 0; i < players.size(); i++) {
+					if (p.getName().equals(players.get(i).getName())) {
+						index = i;
+					}
+				}
+
+				listModel.remove(index);
+				players.remove(index);
 			}
 			
 			updateControls();
