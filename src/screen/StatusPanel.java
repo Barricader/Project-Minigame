@@ -7,7 +7,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 import main.NewDirector;
@@ -20,6 +19,7 @@ import main.NewDirector;
  *
  */
 public class StatusPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
 	private JLabel curPlayerLabel;	// displays current players' turn
 	private JLabel turnsRemainingLabel;	// displays turns that are left
 	private NewDirector dir;

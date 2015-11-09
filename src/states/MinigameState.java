@@ -5,8 +5,13 @@ import java.util.Random;
 import main.NewDirector;
 import mini.Minigame;
 
+/**
+ * 
+ * @author JoJones
+ *
+ */
 public class MinigameState extends State {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 198430L;
 	private final byte MAX_WEIGHT = 100;
 	private final byte MAX_GAMES = 20;
 	private Minigame[] minigames;

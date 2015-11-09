@@ -21,6 +21,7 @@ import javax.swing.Timer;
  *
  */
 public class Player extends Rectangle implements ActionListener, Comparable<Player> {
+	private static final long serialVersionUID = 1L;
 	/* Size of players should be uniform for all */
 	public static final int WIDTH = 40;
 	public static final int HEIGHT = 40;
@@ -33,22 +34,11 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	private boolean isSelected;	// have we clicked on a player?
 	private boolean isMoving;	// are we moving right now?
 	private byte playerID = 0;
-	private byte tileID = 0;
 	private int score1 = 0;
 	private int lastRoll;
 	private boolean hasFirstRolled = false;	// has player been rolled for the first time?
 
 	//private int score2 = 0;	// Not implemented currently
-	
-	/**
-	 * @deprecated - We have sub-classed Rectangle
-	 */
-	private int xPos;
-	
-	/**
-	 * @deprecated - We have sub-classed Rectangle
-	 */
-	private int yPos;
 	
 	/**
 	 * Default constructor. Sets players position to (0,0) and default WIDTH and HEIGHT.
@@ -209,24 +199,6 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 		hasFirstRolled = b;
 	}
 	
-//	public void setGoes(int goes) {
-//	this.goes = goes;
-//	}
-	
-	/**
-	 * @deprecated - We have sub-classed Rectangle
-	 */
-	public void setXPos(int x) {
-		xPos = x;
-	}
-	
-	/**
-	 * @deprecated - We have sub-classed Rectangle
-	 */
-	public void setYPos(int y) {
-		yPos = y;
-	}
-	
 	// accessor methods
 	
 	public String getName() {
@@ -272,23 +244,4 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	public int getScore1() {
 		return score1;
 	}
-	
-//	public int getGoes() {
-//		return goes;
-//	}
-	
-	/**
-	 * @deprecated - We have sub-classed Rectangle
-	 */
-	public int getXPos() {
-		return xPos;
-	}
-	
-	/**
-	 * @deprecated - We have sub-classed Rectangle
-	 */	
-	public int getYPos() {
-		return yPos;
-	}
-
 }

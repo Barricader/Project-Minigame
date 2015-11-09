@@ -17,8 +17,7 @@ public class Main extends JFrame {
 	private static final Dimension SIZE = new Dimension(1280, 720);
 	
 	private static Main instance = null;	//singleton reference
-	
-//	private StartPanel startPanel;	// initial start panel	//TODO remove this when we know everything else works!
+
 	private NewDirector dir;	// main director to control states of application
 
 	/**

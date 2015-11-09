@@ -171,10 +171,16 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * doesn't completely exit the midrect bounds.
 	 */
 	public void mouseDragged(MouseEvent e) {
-		if (midRect.contains(e.getPoint())) {
+		// Make the collision box smaller so the dice doesn't show out of bounds
+		Rectangle newMid = (Rectangle) midRect.clone();
+		newMid.x += dice.width/2;
+		newMid.y += dice.height/2;
+		newMid.width -= dice.width;
+		newMid.height -= dice.height;
+		if (newMid.contains(e.getPoint())) {
 			if (midRect.intersects(dice)) {
-				dice.x = e.getPoint().x;
-				dice.y = e.getPoint().y;
+				dice.x = e.getPoint().x - dice.width/2;
+				dice.y = e.getPoint().y - dice.height/2;
 			}
 		}
 	}
@@ -263,6 +269,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 				coords.add(line);
 				//System.out.println(line);
 			}
+			sc.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

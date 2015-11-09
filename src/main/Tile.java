@@ -2,13 +2,10 @@ package main;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-
-import screen.GameUtils;
 
 /**
  * A tile is a rectangular shape that is contained within the grid of the board. A tile
@@ -22,6 +19,7 @@ import screen.GameUtils;
  * @author David Kramer
  */
 public class Tile extends Rectangle {
+	private static final long serialVersionUID = -244176986965426238L;
 	public static final int ACTION_ADDSCORE1 = 0;
 	public static final int ACTION_SUBTRACT = 1;
 	public static final int ACTION_ADDSCORE2 = 2;
