@@ -48,10 +48,9 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * Tiles will now be mapped with their tile ID. This will make it more
 	 * efficient when we move from tile to tile based on the roll. We can know
 	 * exactly where to go, based on the tile ID. 
-	 * @deprecated
 	 */
 	private ArrayList<Tile> tiles;	// tiles of the board
-	private Map<Byte, Tile> tileMap;	// more efficient way to keep track of tiles on board, instead of tiles array
+	//private Map<Byte, Tile> tileMap;	// more efficient way to keep track of tiles on board, instead of tiles array
 	/**
 	 * Constructs a new board state.
 	 * @param director - main director control of application
@@ -111,7 +110,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 					p.setSelected(true);
 				}
 			} else if (p.isSelected()) {
-				for (Tile t : tileMap.values()) {
+				for (Tile t : tiles) {
 					if (t.contains(e.getPoint())) {
 						p.moveTo(t.getLocation());
 						activePlayer = p;
@@ -216,11 +215,11 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			byte curTileID = activePlayer.getTileID();
 			byte newTileID = (byte)(curTileID + roll);
 			
-			if (newTileID > tileMap.size()) {
+			if (newTileID > tiles.size()) {
 				newTileID = 1;
 			}
 			
-			Tile newTile = tileMap.get(newTileID);
+			Tile newTile = tiles.get(newTileID);
 			
 			activePlayer.moveTo(newTile.getLocation());
 			activePlayer.setTile(newTile);
@@ -233,6 +232,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	private void createTiles() {
 		// Get the values of the file "tiles.map". They are our x's and y's for our tiles
 		ArrayList<String> coords = new ArrayList<String>();
+		tiles = new ArrayList<Tile>();
 		File map = new File("res/tiles.map");
 		try {
 			Scanner sc = new Scanner(map);
@@ -245,8 +245,8 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			e.printStackTrace();
 		}
 		
-		tileMap = new HashMap<Byte, Tile>();
-		System.out.println(tileMap);
+		//tiles = new HashMap<Byte, Tile>();
+		//System.out.println(tileMap);
 		// default size 1280 x 720 for initial tile sizing
 		int tileWidth = 1280 / HORIZONTAL_TILE_COUNT;
 		int tileHeight = 720 / VERTICAL_TILE_COUNT;
@@ -272,7 +272,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			}
 				
 			Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
-			tileMap.put(t.getTileID(), t);
+			tiles.add(t.getTileID(), t);
 		}
 	}
 	
@@ -311,7 +311,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 //			t.draw(g);
 //		}
 		
-		for (Tile t : tileMap.values()) {
+		for (Tile t : tiles) {
 			t.draw(g);
 		}
 	}
@@ -325,7 +325,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		int tileWidth = (getWidth() / HORIZONTAL_TILE_COUNT);
 		int tileHeight = (getHeight() / VERTICAL_TILE_COUNT);
 		
-		for (Tile t : tileMap.values()) {
+		for (Tile t : tiles) {
 			t.width = tileWidth;
 			t.height = tileHeight;
 		}
