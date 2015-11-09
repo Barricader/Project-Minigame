@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -106,8 +105,15 @@ public class BoardState extends State implements ComponentListener, MouseListene
 				p.setLastRoll(dice.roll(Dice.SIZE));
 				p.setHasFirstRolled(true);
 //				p.moveTo(tileMap.get(0).getLocation());
-				System.out.println("TileMap @ 1: " + tileMap.get(1));
-				p.moveTo(tileMap.get(1).getLocation());
+				
+				for (Tile t : tileMap.values()) {
+					System.out.println("tile t: " + t);
+				}
+				
+				System.out.println("tilemap: " + tileMap.get(1));
+				
+//				p.moveTo(tileMap.get(1).getLocation());
+				p.moveTo(tiles.get(0).getLocation());
 				return;
 			}
 		}
@@ -261,6 +267,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	private void createTiles() {
 		// Get the values of the file "tiles.map". They are our x's and y's for our tiles
+		tiles = new ArrayList<>();
 		ArrayList<String> coords = new ArrayList<String>();
 		File map = new File("res/tiles.map");
 		try {
@@ -292,6 +299,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			int y = Integer.parseInt(s[1]);
 				
 			Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
+			tiles.add(t);
 			tileMap.put(t.getTileID(), t);
 		}
 	}
