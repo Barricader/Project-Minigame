@@ -26,6 +26,8 @@ public class NewDirector implements Runnable {
 	private State curState;
 	private int turn;
 	private int maxTurns;
+	private int turnCount;
+	private int turnsLeft;
 	private Main m;
 	private Thread t;
 	private boolean running;
@@ -134,6 +136,18 @@ public class NewDirector implements Runnable {
 		maxTurns = turns;
 	}
 	
+	public void minusTurn() {
+		turnsLeft--;
+		if (turnsLeft == 0) {
+			System.out.println("NO MORE TURNS. GAME SHOULD GO TO ENDSTATE!");
+		}
+	}
+	
+	public void setTurnCount(int turnCount) {
+		this.turnCount = turnCount;
+		this.turnsLeft = turnCount;	// initial turns left
+	}
+	
 	// Accessor methods
 
 	public ArrayList<Player> getPlayers() {
@@ -158,6 +172,10 @@ public class NewDirector implements Runnable {
 	
 	public int getTurn() {
 		return turn;
+	}
+	
+	public int getTurnsLeft() {
+		return turnsLeft;
 	}
 	
 }

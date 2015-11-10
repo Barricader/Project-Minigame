@@ -43,6 +43,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	
 	private StatusPanel statusPanel;	// display active player and turns remaining
 	private Rectangle midRect;	// rect in the middle that contains game objects such as dice
+	private PlayerManager playerMngr;
 	private Player activePlayer;
 	private Dice dice;			// TODO maybe split up some more stuff to make this class smaller and easier to read
 
@@ -126,8 +127,9 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	public void mouseClicked(MouseEvent e) {
 		if (dice.contains(e.getPoint())) {
-			if (!havePlayersRolled) {
-				firstRollPlayers();
+			if (!playerMngr.havePlayersRolled()) {
+//				firstRollPlayers();
+				playerMngr.firstRoll();
 			} else {
 				boolean t = false;
 				for (int i = 0; i < director.getPlayers().size(); i++) {
@@ -136,7 +138,8 @@ public class BoardState extends State implements ComponentListener, MouseListene
 					}
 				}
 				if (!t) {
-					movePlayer();
+//					movePlayer();
+					playerMngr.movePlayer();
 				}
 			}
 		}
@@ -206,6 +209,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	public void init() {
 		statusPanel = new StatusPanel(director);
 		statusPanel.setSize(new Dimension(1264, 35));
+		playerMngr = new PlayerManager();
 		midRect = createMidRect();
 		dice = new Dice(600, 400);
 		//key = new Keyboard();
@@ -376,11 +380,162 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		for (Tile t : tiles) {
 			t.width = tileWidth;
 			t.height = tileHeight;
+			t.createPlayerRects();
 		}
 		
 		// update player within tile bounds
 		if (activePlayer != null) {
 			activePlayer.setLocation(activePlayer.getTile().getLocation());	
+		}
+	}
+	
+	/**
+	 * This inner class will be responsible for managing players and determining which 
+	 * player can move. This class will also keep track of all turns that have occurred.
+	 * For instance, if player "foo" rolled and move. Foo can't roll next round, until
+	 * all other players have rolled.
+	 * @author David Kramer
+	 *
+	 */
+	private class PlayerManager {
+		private ArrayList<Player> players;
+		private Player activePlayer;	// the current player
+		private Player nextPlayer;	// the next player that will go
+		private boolean haveAllPlayersRolled = false;	// have all players first rolled initially?
+		
+		public PlayerManager() {
+			players = director.getPlayers();
+		}
+		
+//		/**
+//		 * Determines who will be the first to play the game, by whoever rolls
+//		 * the highest.
+//		 */
+//		public void firstRoll() {
+//			for (Player p : players) {
+//				if (!p.hasFirstRolled()) {
+//					activePlayer = p;
+//					activePlayer.setLastRoll(dice.roll(Dice.SIZE));
+//					JOptionPane.showMessageDialog(null, "Player: " + activePlayer + " hasn't rolled yet!");
+//					activePlayer.moveTo(tiles.get(0).getLocation(activePlayer.getPlayerID()));
+//					activePlayer.setTile(tiles.get(0));
+//					activePlayer.setHasFirstRolled(true);
+//				}
+//			}
+//			// TODO check for duplicate rolls
+//			havePlayersRolled = true;
+//			System.out.println("have players rolled? " + havePlayersRolled);
+//		}
+		
+		public void firstRoll() {
+			for (Player p : director.getPlayers()) {
+				if (!p.hasFirstRolled()) {
+					JOptionPane.showMessageDialog(null, "Player: " + p + " hasn't rolled yet!");
+					//p.moveTo(tiles.get(0).getLocation());
+					//p.move(tiles.get(0));
+					p.setTile(tiles.get(1));
+					p.setLastRoll(dice.roll(Dice.SIZE));
+					p.setHasFirstRolled(true);
+					activePlayer = p;
+					if (director.getPlayers().indexOf(p) == director.getPlayers().size()-1) {
+						for (Player p2 : director.getPlayers()) {
+							p2.move(tiles.get(0));
+						}
+					}
+					return;
+				}
+			}
+			havePlayersRolled = true;
+		}
+		
+		public void movePlayer() {
+			byte roll = (byte)dice.roll(Dice.SIZE);
+			System.out.println("Rolled: " + roll);
+			
+			int ID = activePlayer.getPlayerID();
+			if (!(++ID >= players.size())) {	// alternate player
+				activePlayer = players.get(ID);
+			} else {
+				activePlayer = players.get(0);
+			}
+			
+			statusPanel.updateCurPlayerLabel(activePlayer);
+//			activePlayer.setLastRoll(dice.roll(Dice.SIZE));
+			
+			byte curTileID = activePlayer.getTileID();
+			byte newTileID = (byte)(curTileID + roll);
+			
+			ArrayList<Tile> temp = new ArrayList<Tile>();
+			for (int i = curTileID; i < newTileID; i++) {
+				if (i > tiles.size()-1) {
+					temp.add(tiles.get(i - tiles.size()));
+				}
+				else {
+					temp.add(tiles.get(i));
+				}
+			}
+			
+			if (newTileID >= tiles.size()) {
+				newTileID -= tiles.size();
+			}
+			
+			Tile newTile = tiles.get(newTileID);
+			
+			//activePlayer.moveTo(newTile.getLocation());
+			activePlayer.setPath(temp);
+			activePlayer.move();
+			activePlayer.setTile(newTile);
+		}
+		
+//		/**
+//		 * Moves the active player, based on the dice roll. Once a player has 
+//		 * arrived onto a tile, that event will fire, and a random mini game
+//		 * state will be created thereafter.
+//		 */
+//		public void movePlayer() {
+//			updateTurns();
+//			if (activePlayer != null) {
+//				System.out.println("Active PLayer was: " + activePlayer);
+//				int ID = activePlayer.getPlayerID();
+//				if (!(++ID >= players.size())) {
+//					activePlayer = players.get(ID);
+//				} else {
+//					activePlayer = players.get(0);
+//				}
+//				statusPanel.updateCurPlayerLabel(activePlayer);
+//				activePlayer.setLastRoll(dice.roll(Dice.SIZE));
+//				System.out.println("Active PLayer is now: " + activePlayer);
+//				byte roll = (byte)dice.roll(Dice.SIZE);
+//				System.out.println("Rolled: " + roll);
+//		
+//				byte curTileID = activePlayer.getTileID();
+//				byte newTileID = (byte)(curTileID + roll);
+//				
+//				if (newTileID > tiles.size()) {
+//					newTileID = 1;
+//				}
+//				
+//				Tile newTile = tiles.get(newTileID);
+//				
+//				activePlayer.setTile(newTile);
+//				activePlayer.moveTo(newTile.getLocation(activePlayer.getPlayerID()));
+//			}
+//		}
+		
+		private boolean updateTurns() {
+			if (director.getTurnsLeft() > 0) {
+				director.minusTurn();
+				statusPanel.updateTurnsRemainingLabel();
+				return true;
+			} else {
+				JOptionPane.showMessageDialog(null, "Game over. Thanks for playing!");
+				System.out.println("We should be calculating final player scores!");
+				return false;
+			}
+		}
+		
+		public boolean havePlayersRolled() {
+			return havePlayersRolled;
 		}
 	}
 	

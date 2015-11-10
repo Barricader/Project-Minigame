@@ -84,11 +84,11 @@ public class Player extends Rectangle implements Comparable<Player> {
 			
 			if (isSelected) {
 				g2d.setColor(color.brighter());
-				g2d.drawRect(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);
-				g2d.fillOval(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);
+				g2d.drawRect(x, y, WIDTH, HEIGHT);
+				g2d.fillOval(x, y, WIDTH, HEIGHT);
 			} else {
-				g2d.drawRect(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);
-				g2d.drawOval(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);	
+				g2d.drawRect(x, y, WIDTH, HEIGHT);
+				g2d.drawOval(x, y, WIDTH, HEIGHT);	
 			}
 			
 			if (isMoving) {
@@ -97,7 +97,7 @@ public class Player extends Rectangle implements Comparable<Player> {
 				g2d.drawLine(newLocation.x + 10, newLocation.y, newLocation.x, newLocation.y + 10);
 			}
 			
-			g2d.drawString(name, x-WIDTH/2, y-HEIGHT/2 + 52);	// draw name of player	
+			g2d.drawString(name, x, y + 50);	// draw name of player	
 		} finally {
 			g2d.dispose();
 		}
@@ -112,7 +112,7 @@ public class Player extends Rectangle implements Comparable<Player> {
 	public void move() {
 		if (!isMoving && path.size() > 0) {
 			isMoving = true;
-			newLocation = path.get(0).getLocation();
+			newLocation = path.get(0).getLocation(playerID);
 		}
 		else {
 			if (path.size() != 0) {
@@ -129,7 +129,7 @@ public class Player extends Rectangle implements Comparable<Player> {
 
 					path.remove(0);
 					if (path.size() != 0) {
-						newLocation = path.get(0).getLocation();
+						newLocation = path.get(0).getLocation(playerID);
 					}
 				}
 			}

@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 import main.NewDirector;
+import main.Player;
 
 /**
  * This panel will be displayed at the top of the screen in the board state.
@@ -19,6 +20,7 @@ import main.NewDirector;
  *
  */
 public class StatusPanel extends JPanel {
+	public static final int Y_OFFSET = 20;
 	private static final long serialVersionUID = 1L;
 	private JLabel curPlayerLabel;	// displays current players' turn
 	private JLabel turnsRemainingLabel;	// displays turns that are left
@@ -38,7 +40,7 @@ public class StatusPanel extends JPanel {
 		curPlayerLabel = new JLabel("Current Player Turn:");
 		curPlayerLabel = GameUtils.customizeLabel(curPlayerLabel, Color.BLACK, Color.CYAN, 20);
 
-		turnsRemainingLabel = new JLabel("Turns Remaining: " + dir.getTurn());
+		turnsRemainingLabel = new JLabel("Turns Remaining: " + dir.getTurnsLeft());
 		turnsRemainingLabel = GameUtils.customizeLabel(turnsRemainingLabel, Color.BLACK, Color.CYAN, 20);
 		
 		// decorate this panel
@@ -51,6 +53,14 @@ public class StatusPanel extends JPanel {
 		add(Box.createHorizontalGlue());
 		add(turnsRemainingLabel);
 		add(Box.createHorizontalStrut(20));
+	}
+	
+	public void updateCurPlayerLabel(Player p) {
+		System.out.println("UPDATE CUR PLAYER!");
+	}
+	
+	public void updateTurnsRemainingLabel() {
+		System.out.println("UPDATE TURNS REMAINING");
 	}
 
 }

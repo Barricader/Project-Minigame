@@ -13,6 +13,7 @@ import javax.swing.JLabel;
  *
  */
 public class GameUtils {
+	public static Random random = new Random();
 
 	/**
 	 * Returns an RGB color based on a 6-character hex value string. The # at the 
@@ -55,15 +56,27 @@ public class GameUtils {
 	 * Creates a random RGB color
 	 * @return RGB Color 
 	 */
-	public static Color getRandomColor() {
-		Random rng = new Random();
-		
-		int red = rng.nextInt(255);
-		int green = rng.nextInt(255);
-		int blue = rng.nextInt(255);
+	public static Color getRandomColor() {		
+		int red = random.nextInt(255);
+		int green = random.nextInt(255);
+		int blue = random.nextInt(255);
 		
 		return new Color(red, green, blue);
 	}
+	
+	/**
+	 * Creates a random RGB color that has a guarantee for displaying
+	 * brighter.
+	 * @return RGB Color
+	 */
+	public static Color getBrightColor() {
+		int red = random.nextInt(130) + 125;
+		int green = random.nextInt(130) + 125;
+		int blue = random.nextInt(130) + 125;
+		
+		return new Color(red, green, blue);
+	}
+	
 	
 	/**
 	 * Customize labels to reduce some redundancy when applying styles. The font set is
