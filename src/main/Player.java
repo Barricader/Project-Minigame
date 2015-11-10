@@ -1,12 +1,18 @@
 package main;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import util.Vector;
 
@@ -24,6 +30,8 @@ public class Player extends Rectangle implements Comparable<Player> {
 	/* Size of players should be uniform for all */
 	public static final int WIDTH = 40;
 	public static final int HEIGHT = 40;
+	public static boolean[] taken = { false, false, false, false, false, false, false, false, false };
+	private static Image[] imgs = { null, null, null, null, null, null, null, null, null };
 	
 	private String name = "";
 	private Color color;
@@ -37,12 +45,74 @@ public class Player extends Rectangle implements Comparable<Player> {
 	private boolean hasFirstRolled = false;	// has player been rolled for the first time?
 	private ArrayList<Tile> path;
 	//private int score2 = 0;	// Not implemented currently
+	private int colorNum;
 	
 	/**
 	 * Default constructor. Sets players position to (0,0) and default WIDTH and HEIGHT.
 	 */
 	public Player() {
 		super(0, 0, WIDTH, HEIGHT);
+	}
+	
+	/**
+	 * Constructs a player with a name
+	 * @param name - name of Player
+	 */
+	public Player(String name) {
+		super(0, 0, WIDTH, HEIGHT);
+		this.name = name;
+		colorNum = -1;
+		
+		Random r = new Random();
+		Color myColor = new Color(0);
+		
+		boolean chosen = false;
+		int c = 0;
+		
+		// Get a random, not yet chosen, number
+		while (!chosen) {
+			// Change to 9 if you want teal
+			c = r.nextInt(8);
+			if (!taken[c]) {
+				taken[c] = true;
+				chosen = true;
+				colorNum = c;
+			}
+		}
+		
+		// Choose color based on the random number
+		switch (colorNum) {
+		case 0:
+			myColor = new Color(255, 0, 0);
+			break;
+		case 1:
+			myColor = new Color(0, 255, 0);
+			break;
+		case 2:
+			myColor = new Color(0, 0, 255);
+			break;
+		case 3:
+			myColor = new Color(255, 255, 0);
+			break;
+		case 4:
+			myColor = new Color(255, 0, 255);
+			break;
+		case 5:
+			myColor = new Color(0, 255, 255);
+			break;
+		case 6:
+			myColor = new Color(255, 127, 0);
+			break;
+		case 7:
+			myColor = new Color(127, 0, 255);
+			break;
+		case 8:
+			myColor = new Color(0, 255, 127);
+			break;
+		}
+		
+		color = myColor;
+		init();
 	}
 	
 	/**
@@ -71,6 +141,16 @@ public class Player extends Rectangle implements Comparable<Player> {
 		init();
 	}
 	
+	public static void load() throws IOException {
+		String[] pColors = { "res/pRed.png",    "res/pGreen.png",  "res/pBlue.png",
+							 "res/pYellow.png", "res/pPink.png",   "res/pCyan.png",
+							 "res/pOrange.png", "res/pPurple.png", "res/pTeal.png" };
+		for (int i = 0; i < pColors.length; i++) {
+			BufferedImage img = ImageIO.read(new File(pColors[i]));
+			imgs[i] = img;
+		}
+	}
+	
 	/**
 	 * Draws the player to the screen with their current location and name.
 	 * @param g Graphics context we will draw to
@@ -78,18 +158,10 @@ public class Player extends Rectangle implements Comparable<Player> {
 	public void draw(Graphics g) {
 		final Graphics2D g2d = (Graphics2D)g.create();
 		
-		try {
-			g2d.setStroke(new BasicStroke(1.0f));
-			g2d.setColor(color);
-			
-			if (isSelected) {
-				g2d.setColor(color.brighter());
-				g2d.drawRect(x, y, WIDTH, HEIGHT);
-				g2d.fillOval(x, y, WIDTH, HEIGHT);
-			} else {
-				g2d.drawRect(x, y, WIDTH, HEIGHT);
-				g2d.drawOval(x, y, WIDTH, HEIGHT);	
-			}
+		try {			
+			// Maybe have a highlight when selected?
+			// TODO: this won't draw red for some dumb reason, fix me
+			g2d.drawImage(imgs[colorNum], x, y, null);
 			
 			if (isMoving) {
 				// draw crosshair
@@ -278,5 +350,9 @@ public class Player extends Rectangle implements Comparable<Player> {
 	
 	public ArrayList<Tile> getPath() {
 		return path;
+	}
+	
+	public int getColorNum() {
+		return colorNum;
 	}
 }
