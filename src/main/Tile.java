@@ -107,7 +107,7 @@ public class Tile extends Rectangle {
 	 * where to move to.
 	 */
 	public Point getLocation() {
-		Point p = new Point(x * width + (width / 2), y * height + (height / 2));
+		Point p = new Point(x * width + (width / 2), y * height + (height / 2)+20);
 		return p;
 	}
 	

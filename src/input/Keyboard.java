@@ -17,13 +17,14 @@ public class Keyboard implements KeyListener {
 	public boolean[] keys; // encompasses most used keys
 	
 	private int lastKey;	// key code of last key press
+	public boolean spacePressed = false;
 	
 	public Keyboard() {
 		shiftFlag = false;
 		altFlag = false;
 		ctrlFlag = false;
 		lastKey = 0;
-		
+
 		keys = new boolean[120];
 		//System.out.println("UUUUUUUUUUUUUUUH");
 	}
@@ -33,7 +34,7 @@ public class Keyboard implements KeyListener {
 	 */
 	public void keyPressed(KeyEvent e) {
 		lastKey = e.getKeyCode();
-		System.out.println(e.getKeyCode());
+		//System.out.println(e.getKeyCode());
 
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_ALT:
@@ -46,6 +47,10 @@ public class Keyboard implements KeyListener {
 			ctrlFlag = true;
 		}
 		keys[e.getKeyCode()] = true;
+		
+		if (!spacePressed && e.getKeyCode() == KeyEvent.VK_SPACE) {
+			spacePressed = true;
+		}
 	}
 
 	/**
@@ -61,6 +66,10 @@ public class Keyboard implements KeyListener {
 			break;
 		case KeyEvent.CTRL_DOWN_MASK:
 			ctrlFlag = false;
+		}
+		
+		if (spacePressed && e.getKeyCode() == KeyEvent.VK_SPACE) {
+			spacePressed = false;
 		}
 		
 		keys[e.getKeyCode()] = false;

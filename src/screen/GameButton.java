@@ -1,19 +1,13 @@
 package screen;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Font;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
 import javax.swing.JButton;
-
-import main.Main;
 
 /**
  * Custom button appearance that changes from the default look and feel
@@ -22,6 +16,7 @@ import main.Main;
  *
  */
 public class GameButton extends JButton implements MouseListener {	
+	private static final long serialVersionUID = -1397629762869536751L;
 	private Color bgColor;	// bg color of button
 	private boolean isHovered;
 

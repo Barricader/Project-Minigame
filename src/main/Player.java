@@ -6,8 +6,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import util.Vector;
@@ -21,7 +19,7 @@ import util.Vector;
  * @author David Kramer
  *
  */
-public class Player extends Rectangle implements ActionListener, Comparable<Player> {
+public class Player extends Rectangle implements Comparable<Player> {
 	private static final long serialVersionUID = 1L;
 	/* Size of players should be uniform for all */
 	public static final int WIDTH = 40;
@@ -30,7 +28,6 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	private String name = "";
 	private Color color;
 	private Point newLocation;	// the new location that the player will move to
-	//private Timer animationTimer;	// timer to control player movement animation
 	private Tile tile;	// what tile are we on
 	private boolean isSelected;	// have we clicked on a player?
 	private boolean isMoving;	// are we moving right now?
@@ -87,11 +84,11 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 			
 			if (isSelected) {
 				g2d.setColor(color.brighter());
-				g2d.drawRect(x, y, WIDTH, HEIGHT);
-				g2d.fillOval(x, y, WIDTH, HEIGHT);
+				g2d.drawRect(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);
+				g2d.fillOval(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);
 			} else {
-				g2d.drawRect(x, y, WIDTH, HEIGHT);
-				g2d.drawOval(x, y, WIDTH, HEIGHT);	
+				g2d.drawRect(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);
+				g2d.drawOval(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);	
 			}
 			
 			if (isMoving) {
@@ -100,7 +97,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 				g2d.drawLine(newLocation.x + 10, newLocation.y, newLocation.x, newLocation.y + 10);
 			}
 			
-			g2d.drawString(name, x, y + 50);	// draw name of player	
+			g2d.drawString(name, x-WIDTH/2, y-HEIGHT/2 + 52);	// draw name of player	
 		} finally {
 			g2d.dispose();
 		}
@@ -110,38 +107,8 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	 * When the player needs to move to a new location (i.e. after a dice roll).
 	 * This method will run the animation to move the player to their new
 	 * location in a smooth fashion. The location information should be specified
-	 * by the tile that they will move to.
-	 * @param newLocation - new destination location to move player to
+	 * by the array of tiles that they will move through plus the destination tile.
 	 */
-	public void moveTo(Point newLocation) {
-		// TODO make player stay on board
-		if (!isMoving) {
-			isMoving = true;
-			this.newLocation = newLocation;
-			//animationTimer.start();
-		} else {
-			double finalX = this.newLocation.x - (double)x;
-			double finalY = this.newLocation.y - (double)y;
-			Vector vec = new Vector(finalX, finalY);
-			vec = vec.normalize();
-			// TODO Make it travel straight
-			
-			//System.out.println("toX: " + this.newLocation.x + " toY: " +
-			//					this.newLocation.y + " | x: " + x + 
-			//					" y: " + y);
-			
-			x += vec.getdX() * 2;
-			y += vec.getdY() * 2;
-			
-			if ((x < this.newLocation.x + 2 && x > this.newLocation.x - 2) &&
-				(y < this.newLocation.y + 2 && y > this.newLocation.y - 2)) {
-				//animationTimer.stop();
-				isMoving = false;
-				this.newLocation = null;	// clear out, we don't need anymore
-			}
-		}
-	}
-	
 	public void move() {
 		if (!isMoving && path.size() > 0) {
 			isMoving = true;
@@ -155,48 +122,50 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 				vec = vec.normalize();
 				
 				x += vec.getdX() * 3;
-				y += vec.getdY() * 4;
+				y += vec.getdY() * 3;
 				
 				if ((x < this.newLocation.x + 2 && x > this.newLocation.x - 2) &&
 					(y < this.newLocation.y + 2 && y > this.newLocation.y - 2)) {
-					//animationTimer.stop();
-					//isMoving = false;
+
 					path.remove(0);
 					if (path.size() != 0) {
 						newLocation = path.get(0).getLocation(playerID);
 					}
-					//this.newLocation = null;	// clear out, we don't need anymore
 				}
 			}
 			else {
 				isMoving = false;
+				newLocation = null;
 			}
 		}
 	}
 	
+	/**
+	 * Allows you to specify a point to move to
+	 * @param p - Point to travel to
+	 */
 	public void move(Point p) {
+		// Maybe change this to x/64 and y/64
 		path.add(new Tile(p.x, p.y, 64, 64));
 		move();
 	}     
 	
+	/**
+	 * Specifies a tile to move to, only use this for testing and for the start, (and teleporting)?
+	 * @param t - Tile to travel to
+	 */
 	public void move(Tile t) {
 		path.add(t);
 		move();
 	}
 	
+	/**
+	 * Updates the player every 1/60 of a second
+	 */
 	public void update() {
 		if (newLocation != null) {
-			//moveTo(newLocation);
 			move();
 		}
-	}
-	
-	/**
-	 * Animation timer update method. Just calls moveTo() to continue
-	 * the animation, if possible.
-	 */
-	public void actionPerformed(ActionEvent e) {
-		//moveTo(newLocation);
 	}
 	
 	public int compareTo(Player comparePlayer) {
@@ -204,7 +173,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 		
 		// ASC
 		//return this.lastRoll - compareRoll;
-		// DESC
+		// DESC - largest roll to shortest roll
 		return compareRoll - lastRoll;
 	}
 	
@@ -213,10 +182,8 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	 */
 	private void init() {
 		this.lastRoll = 0;
-		//animationTimer = new Timer(10, this);	// player movement update timer
 		isMoving = false;
 		path = new ArrayList<Tile>();
-		//tile = Tile.DEFAULT;
 	}
 	
 	// mutator methods
@@ -288,7 +255,13 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	}
 	
 	public byte getTileID() {
-		return tile.getTileID();
+		byte t = (byte)(tile.getTileID() + 1);
+		if (t > 26) {
+			return 0;
+		}
+		else {
+			return t;
+		}
 	}
 	
 	public int getLastRoll() {

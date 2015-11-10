@@ -52,6 +52,10 @@ public class Main extends JFrame {
 		return instance;
 	}
 	
+	public Keyboard getKeyboard() {
+		return key;
+	}
+	
 	/**
 	 * Updates the view when director changes to a different state.
 	 */
