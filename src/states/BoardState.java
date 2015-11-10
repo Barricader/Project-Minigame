@@ -73,6 +73,9 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		//if (key.getKeys()[KeyEvent.VK_SPACE]) {
 		//	System.out.println("SPACE IS PRESSED");
 		//}
+		for (Player p : director.getPlayers()) {
+			p.update();
+		}
 	}
 	
 	/**
