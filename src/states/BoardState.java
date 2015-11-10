@@ -19,9 +19,6 @@ import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
-import com.sun.glass.events.KeyEvent;
-
-import input.Keyboard;
 import main.Dice;
 import main.Main;
 import main.NewDirector;

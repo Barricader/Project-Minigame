@@ -151,6 +151,10 @@ public class NewDirector implements Runnable {
 		return m;
 	}
 	
+	public int maxTurns() {
+		return maxTurns;
+	}
+	
 	public int getTurn() {
 		return turn;
 	}
