@@ -113,6 +113,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	 * @param newLocation - new destination location to move player to
 	 */
 	public void moveTo(Point newLocation) {
+		// TODO make player stay on board
 		if (!isMoving) {
 			isMoving = true;
 			this.newLocation = newLocation;
