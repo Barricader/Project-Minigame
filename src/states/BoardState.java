@@ -9,6 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -65,11 +66,9 @@ public class BoardState extends State implements ComponentListener, MouseListene
 
 	public void update() {
 		//TODO update director after player has moved
-		//System.out.println(key.keys[32]);
-
-		//if (key.getKeys()[KeyEvent.VK_SPACE]) {
-		//	System.out.println("SPACE IS PRESSED");
-		//}
+		if (director.getMain().getKeyboard().spacePressed) {
+			System.out.println("Space is pressed");
+		}
 		for (Player p : director.getPlayers()) {
 			p.update();
 		}
@@ -107,8 +106,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		for (Player p : director.getPlayers()) {
 			if (!p.hasFirstRolled()) {
 				JOptionPane.showMessageDialog(null, "Player: " + p + " hasn't rolled yet!");
-				//p.moveTo(tiles.get(0).getLocation());
-				//p.move(tiles.get(0));
 				p.setTile(tiles.get(1));
 				p.setLastRoll(dice.roll(Dice.SIZE));
 				p.setHasFirstRolled(true);
@@ -121,9 +118,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			}
 		}
 		havePlayersRolled = true;
-//		for (Player p : director.getPlayers()) {
-//			p.move(tiles.get(0));
-//		}
 	}
 	
 	/**
@@ -280,7 +274,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			
 			Tile newTile = tiles.get(newTileID);
 			
-			//activePlayer.moveTo(newTile.getLocation());
 			activePlayer.setPath(temp);
 			activePlayer.move();
 			activePlayer.setTile(newTile);
@@ -307,8 +300,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			e.printStackTrace();
 		}
 		
-		//tiles = new HashMap<Byte, Tile>();
-		//System.out.println(tileMap);
 		// default size 1280 x 720 for initial tile sizing
 		int tileWidth = 1280 / HORIZONTAL_TILE_COUNT;
 		int tileHeight = 720 / VERTICAL_TILE_COUNT;
