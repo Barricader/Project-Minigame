@@ -145,7 +145,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	public void move() {
 		if (!isMoving && path.size() > 0) {
 			isMoving = true;
-			newLocation = path.get(0).getLocation();
+			newLocation = path.get(0).getLocation(playerID);
 		}
 		else {
 			if (path.size() != 0) {
@@ -163,7 +163,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 					//isMoving = false;
 					path.remove(0);
 					if (path.size() != 0) {
-						newLocation = path.get(0).getLocation();
+						newLocation = path.get(0).getLocation(playerID);
 					}
 					//this.newLocation = null;	// clear out, we don't need anymore
 				}

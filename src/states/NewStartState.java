@@ -229,9 +229,9 @@ public class NewStartState extends State {
 		
 		director.setPlayers(playerList.players);
 		director.setState(director.getBoardState());
+		director.setTurnCount(turnCtrlPanel.getTurnCount());
 		director.getBoardState().init();
 //		director.setState(new BoardState(director));
-		director.setTurns(turnCtrlPanel.getTurnCount());
 	}
 	
 	/**
@@ -352,7 +352,7 @@ public class NewStartState extends State {
 		 * Adds a player with a random color to the list and player array.
 		 */
 		public void addPlayer() {
-			Player p = new Player(nameField.getText(), GameUtils.getRandomColor());
+			Player p = new Player(nameField.getText(), GameUtils.getBrightColor());
 			listModel.addElement(p);
 			players.add(p);
 			nameField.setText(""); // clear out
