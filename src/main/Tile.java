@@ -48,6 +48,14 @@ public class Tile extends Rectangle {
 		TILE_ID++;
 	}
 	
+	public Tile(int x, int y, int width, int height) {
+		super(x, y, width, height);
+	}
+	
+	public String toString() {
+		return "Tile [x=" + x + ", y=" + y + ", ID=" + ID + "]";
+	}
+
 	/**
 	 * Performs an action on Player p based on the tiles action
 	 * @param p - a Player

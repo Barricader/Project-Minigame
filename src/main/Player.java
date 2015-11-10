@@ -8,8 +8,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.Timer;
+import java.util.ArrayList;
 
 import util.Vector;
 
@@ -39,7 +38,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	private int score1 = 0;
 	private int lastRoll;
 	private boolean hasFirstRolled = false;	// has player been rolled for the first time?
-
+	private ArrayList<Tile> path;
 	//private int score2 = 0;	// Not implemented currently
 	
 	/**
@@ -143,9 +142,52 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 		}
 	}
 	
+	public void move() {
+		if (!isMoving && path.size() > 0) {
+			isMoving = true;
+			newLocation = path.get(0).getLocation();
+		}
+		else {
+			if (path.size() != 0) {
+				double finalX = this.newLocation.x - (double)x;
+				double finalY = this.newLocation.y - (double)y;
+				Vector vec = new Vector(finalX, finalY);
+				vec = vec.normalize();
+				
+				x += vec.getdX() * 3;
+				y += vec.getdY() * 4;
+				
+				if ((x < this.newLocation.x + 2 && x > this.newLocation.x - 2) &&
+					(y < this.newLocation.y + 2 && y > this.newLocation.y - 2)) {
+					//animationTimer.stop();
+					//isMoving = false;
+					path.remove(0);
+					if (path.size() != 0) {
+						newLocation = path.get(0).getLocation();
+					}
+					//this.newLocation = null;	// clear out, we don't need anymore
+				}
+			}
+			else {
+				isMoving = false;
+			}
+		}
+	}
+	
+	public void move(Point p) {
+		path.add(new Tile(p.x, p.y, 64, 64));
+		move();
+	}     
+	
+	public void move(Tile t) {
+		path.add(t);
+		move();
+	}
+	
 	public void update() {
 		if (newLocation != null) {
-			moveTo(newLocation);
+			//moveTo(newLocation);
+			move();
 		}
 	}
 	
@@ -173,6 +215,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 		this.lastRoll = 0;
 		//animationTimer = new Timer(10, this);	// player movement update timer
 		isMoving = false;
+		path = new ArrayList<Tile>();
 		//tile = Tile.DEFAULT;
 	}
 	
@@ -254,5 +297,13 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	
 	public int getScore1() {
 		return score1;
+	}
+	
+	public void setPath(ArrayList<Tile> p) {
+		path = p;
+	}
+	
+	public ArrayList<Tile> getPath() {
+		return path;
 	}
 }
