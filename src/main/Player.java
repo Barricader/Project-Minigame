@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
+import util.Vector;
+
 /**
  * A player should be created from the main start state. A player has a random name,
  * color, and score. During game play, players can move from tile to tile in the board.
@@ -29,7 +31,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	private String name = "";
 	private Color color;
 	private Point newLocation;	// the new location that the player will move to
-	private Timer animationTimer;	// timer to control player movement animation
+	//private Timer animationTimer;	// timer to control player movement animation
 	private Tile tile;	// what tile are we on
 	private boolean isSelected;	// have we clicked on a player?
 	private boolean isMoving;	// are we moving right now?
@@ -113,29 +115,37 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	 * @param newLocation - new destination location to move player to
 	 */
 	public void moveTo(Point newLocation) {
+		// TODO make player stay on board
 		if (!isMoving) {
 			isMoving = true;
 			this.newLocation = newLocation;
-			animationTimer.start();
+			//animationTimer.start();
 		} else {
+			double finalX = this.newLocation.x - (double)x;
+			double finalY = this.newLocation.y - (double)y;
+			Vector vec = new Vector(finalX, finalY);
+			vec = vec.normalize();
+			// TODO Make it travel straight
 			
-			if (newLocation.x > x) {
-				x++;
-			} else if (newLocation.x != x) {	// only move x if not equal
-				x--;
-			}
+			//System.out.println("toX: " + this.newLocation.x + " toY: " +
+			//					this.newLocation.y + " | x: " + x + 
+			//					" y: " + y);
 			
-			if (newLocation.y > y) {
-				y++;
-			} else if (newLocation.y != y) {	// only move y if not equal
-				y--;
-			}
+			x += vec.getdX() * 2;
+			y += vec.getdY() * 2;
 			
-			if (x == newLocation.x && y == newLocation.y) {	// reached destination!
-				animationTimer.stop();
+			if ((x < this.newLocation.x + 2 && x > this.newLocation.x - 2) &&
+				(y < this.newLocation.y + 2 && y > this.newLocation.y - 2)) {
+				//animationTimer.stop();
 				isMoving = false;
-				newLocation = null;	// clear out, we don't need anymore
+				this.newLocation = null;	// clear out, we don't need anymore
 			}
+		}
+	}
+	
+	public void update() {
+		if (newLocation != null) {
+			moveTo(newLocation);
 		}
 	}
 	
@@ -144,7 +154,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	 * the animation, if possible.
 	 */
 	public void actionPerformed(ActionEvent e) {
-		moveTo(newLocation);
+		//moveTo(newLocation);
 	}
 	
 	public int compareTo(Player comparePlayer) {
@@ -161,8 +171,9 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 	 */
 	private void init() {
 		this.lastRoll = 0;
-		animationTimer = new Timer(10, this);	// player movement update timer
+		//animationTimer = new Timer(10, this);	// player movement update timer
 		isMoving = false;
+		//tile = Tile.DEFAULT;
 	}
 	
 	// mutator methods

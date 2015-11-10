@@ -72,7 +72,7 @@ public class Dice extends Rectangle implements ActionListener {
 			animationTimer.start();
 		}
 		value = r.nextInt(size) + 1;
-		System.out.println("DICE ROLLED: " + value);
+		//System.out.println("DICE ROLLED: " + value);
 		return value;
 	}
 	

@@ -19,6 +19,9 @@ import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
+import com.sun.glass.events.KeyEvent;
+
+import input.Keyboard;
 import main.Dice;
 import main.Main;
 import main.NewDirector;
@@ -44,8 +47,8 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	private StatusPanel statusPanel;	// display active player and turns remaining
 	private Rectangle midRect;	// rect in the middle that contains game objects such as dice
 	private Player activePlayer;
-	private Dice dice;
-	
+	private Dice dice;			// TODO maybe split up some more stuff to make this class smaller and easier to read
+
 	/**
 	 * Tiles will now be mapped with their tile ID. This will make it more
 	 * efficient when we move from tile to tile based on the roll. We can know
@@ -65,6 +68,14 @@ public class BoardState extends State implements ComponentListener, MouseListene
 
 	public void update() {
 		//TODO update director after player has moved
+		//System.out.println(key.keys[32]);
+
+		//if (key.getKeys()[KeyEvent.VK_SPACE]) {
+		//	System.out.println("SPACE IS PRESSED");
+		//}
+		for (Player p : director.getPlayers()) {
+			p.update();
+		}
 	}
 	
 	/**
@@ -100,6 +111,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			if (!p.hasFirstRolled()) {
 				JOptionPane.showMessageDialog(null, "Player: " + p + " hasn't rolled yet!");
 				p.moveTo(tiles.get(0).getLocation());
+				p.setTile(tiles.get(0));
 				p.setLastRoll(dice.roll(Dice.SIZE));
 				p.setHasFirstRolled(true);
 				return;
@@ -118,16 +130,25 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			if (!havePlayersRolled) {
 				firstRollPlayers();
 			} else {
-				movePlayer();	
+				boolean t = false;
+				for (int i = 0; i < director.getPlayers().size(); i++) {
+					if (director.getPlayers().get(i).isMoving()) {
+						t = true;
+					}
+				}
+				if (!t) {
+					movePlayer();
+				}
 			}
 		}
-		
+			
 		for (Player p : director.getPlayers()) {
 			if (p.contains(e.getPoint())) {
 				if (p.isSelected()) {	//toggle between isSelected
 					p.setSelected(false);
 				} else {
 					p.setSelected(true);
+					activePlayer = p;
 				}
 			} else if (p.isSelected()) {
 				for (Tile t : tiles) {
@@ -196,6 +217,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		statusPanel.setSize(new Dimension(1264, 35));
 		midRect = createMidRect();
 		dice = new Dice(600, 400);
+		//key = new Keyboard();
 		
 		// setup layout
 		setLayout(new GridBagLayout());
@@ -214,6 +236,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		createTiles();
 		
 		// add event listeners
+		//addKeyListener(key);
 		addComponentListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
