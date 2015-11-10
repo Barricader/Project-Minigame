@@ -14,29 +14,18 @@ public class Keyboard implements KeyListener {
 	private boolean altFlag;
 	private boolean ctrlFlag;
 	
-	private boolean[] keys = new boolean[120]; // encompasses most used keys
+	public boolean[] keys; // encompasses most used keys
 	
 	private int lastKey;	// key code of last key press
 	
-	public Keyboard() {}
-
-	/**
-	 * Updates last key and also any modifier key flags.
-	 */
-	public void keyTyped(KeyEvent e) {
-		lastKey = e.getKeyCode();
+	public Keyboard() {
+		shiftFlag = false;
+		altFlag = false;
+		ctrlFlag = false;
+		lastKey = 0;
 		
-		switch (e.getModifiers()) {
-		case KeyEvent.VK_ALT:
-			altFlag = true;
-			break;
-		case KeyEvent.VK_SHIFT:
-			shiftFlag = true;
-			break;
-		case KeyEvent.CTRL_DOWN_MASK:
-			ctrlFlag = true;
-		}
-		
+		keys = new boolean[120];
+		//System.out.println("UUUUUUUUUUUUUUUH");
 	}
 
 	/**
@@ -44,6 +33,7 @@ public class Keyboard implements KeyListener {
 	 */
 	public void keyPressed(KeyEvent e) {
 		lastKey = e.getKeyCode();
+		System.out.println(e.getKeyCode());
 
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_ALT:
@@ -76,7 +66,19 @@ public class Keyboard implements KeyListener {
 		keys[e.getKeyCode()] = false;
 	}
 	
+	// Not used
+	public void keyTyped(KeyEvent e) {
+	}
+	
 	// Accessor methods
+	
+	/**
+	 * 
+	 * @return Gives the array of keys
+	 */
+	public boolean[] getKeys() {
+		return keys;
+	}
 	
 	/**
 	 * 

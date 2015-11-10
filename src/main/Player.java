@@ -163,6 +163,7 @@ public class Player extends Rectangle implements ActionListener, Comparable<Play
 		this.lastRoll = 0;
 		animationTimer = new Timer(10, this);	// player movement update timer
 		isMoving = false;
+		//tile = Tile.DEFAULT;
 	}
 	
 	// mutator methods

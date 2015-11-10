@@ -3,6 +3,8 @@ package main;
 import java.awt.Dimension;
 import javax.swing.JFrame;
 
+import input.Keyboard;
+
 /**
  * Main window of the application that provides a container for the active view. This class
  * contains the director of the application, and all content rendered to the screen is 
@@ -19,6 +21,7 @@ public class Main extends JFrame {
 	private static Main instance = null;	//singleton reference
 
 	private NewDirector dir;	// main director to control states of application
+	private Keyboard key;
 
 	/**
 	 * Constructs window and sets up the viewable content of the game.
@@ -26,6 +29,7 @@ public class Main extends JFrame {
 	public Main() {
 //		startPanel = new StartPanel(this);
 		dir = new NewDirector(this);
+		key = new Keyboard();
 		setContentPane(dir.getState());
 		setTitle(TITLE);
 		setSize(SIZE);
@@ -34,6 +38,7 @@ public class Main extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 		instance = this;
+		addKeyListener(key);
 	}
 	
 	/**

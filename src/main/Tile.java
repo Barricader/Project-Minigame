@@ -31,15 +31,6 @@ public class Tile extends Rectangle {
 	private byte ID;
 	
 	/**
-	 * @deprecated	- We have sub-classed Rectangle
-	 */
-	private int xPos;
-	/**
-	 * @deprecated - We have sub-classed Rectangle
-	 */
-	private int yPos;
-	
-	/**
 	 * Constructs a new tile
 	 * @param color - Color of tile
 	 * @param action - Action of tile
@@ -140,23 +131,5 @@ public class Tile extends Rectangle {
 	public double getHeight() {
 		return height;
 	}
-	
-	/**
-	 * 
-	 * @deprecated - We have sub-classed Rectangle
-	 * @return
-	 */
-	public int getXPos() {
-		return xPos;
-	}
-	
-	/**
-	 * @deprecated - We have sub-classed Rectangle
-	 * @return
-	 */
-	public int getYPos() {
-		return yPos;
-	}
-	
 }
 
