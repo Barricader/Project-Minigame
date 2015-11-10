@@ -19,9 +19,6 @@ import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
-import com.sun.glass.events.KeyEvent;
-
-import input.Keyboard;
 import main.Dice;
 import main.Main;
 import main.NewDirector;
@@ -68,11 +65,9 @@ public class BoardState extends State implements ComponentListener, MouseListene
 
 	public void update() {
 		//TODO update director after player has moved
-		//System.out.println(key.keys[32]);
-
-		//if (key.getKeys()[KeyEvent.VK_SPACE]) {
-		//	System.out.println("SPACE IS PRESSED");
-		//}
+		if (director.getMain().getKeyboard().spacePressed) {
+			System.out.println("Space is pressed");
+		}
 		for (Player p : director.getPlayers()) {
 			p.update();
 		}
@@ -110,9 +105,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		for (Player p : director.getPlayers()) {
 			if (!p.hasFirstRolled()) {
 				JOptionPane.showMessageDialog(null, "Player: " + p + " hasn't rolled yet!");
-				//p.moveTo(tiles.get(0).getLocation());
-				//p.move(tiles.get(0));
-				p.setTile(tiles.get(1));
+				p.setTile(tiles.get(0));
 				p.setLastRoll(dice.roll(Dice.SIZE));
 				p.setHasFirstRolled(true);
 				if (director.getPlayers().indexOf(p) == director.getPlayers().size()-1) {
@@ -124,9 +117,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			}
 		}
 		havePlayersRolled = true;
-//		for (Player p : director.getPlayers()) {
-//			p.move(tiles.get(0));
-//		}
 	}
 	
 	/**
@@ -281,9 +271,9 @@ public class BoardState extends State implements ComponentListener, MouseListene
 				newTileID -= tiles.size();
 			}
 			
-			Tile newTile = tiles.get(newTileID);
+			Tile newTile = tiles.get(newTileID-1);
 			
-			//activePlayer.moveTo(newTile.getLocation());
+			
 			activePlayer.setPath(temp);
 			activePlayer.move();
 			activePlayer.setTile(newTile);
@@ -310,8 +300,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			e.printStackTrace();
 		}
 		
-		//tiles = new HashMap<Byte, Tile>();
-		//System.out.println(tileMap);
 		// default size 1280 x 720 for initial tile sizing
 		int tileWidth = 1280 / HORIZONTAL_TILE_COUNT;
 		int tileHeight = 720 / VERTICAL_TILE_COUNT;

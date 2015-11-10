@@ -6,8 +6,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import util.Vector;
@@ -86,11 +84,11 @@ public class Player extends Rectangle implements Comparable<Player> {
 			
 			if (isSelected) {
 				g2d.setColor(color.brighter());
-				g2d.drawRect(x, y, WIDTH, HEIGHT);
-				g2d.fillOval(x, y, WIDTH, HEIGHT);
+				g2d.drawRect(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);
+				g2d.fillOval(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);
 			} else {
-				g2d.drawRect(x, y, WIDTH, HEIGHT);
-				g2d.drawOval(x, y, WIDTH, HEIGHT);	
+				g2d.drawRect(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);
+				g2d.drawOval(x-WIDTH/2, y-HEIGHT/2, WIDTH, HEIGHT);	
 			}
 			
 			if (isMoving) {
@@ -99,7 +97,7 @@ public class Player extends Rectangle implements Comparable<Player> {
 				g2d.drawLine(newLocation.x + 10, newLocation.y, newLocation.x, newLocation.y + 10);
 			}
 			
-			g2d.drawString(name, x, y + 50);	// draw name of player	
+			g2d.drawString(name, x-WIDTH/2, y-HEIGHT/2 + 52);	// draw name of player	
 		} finally {
 			g2d.dispose();
 		}
@@ -257,7 +255,13 @@ public class Player extends Rectangle implements Comparable<Player> {
 	}
 	
 	public byte getTileID() {
-		return tile.getTileID();
+		byte t = (byte)(tile.getTileID() + 1);
+		if (t > 26) {
+			return 0;
+		}
+		else {
+			return t;
+		}
 	}
 	
 	public int getLastRoll() {

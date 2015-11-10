@@ -35,11 +35,12 @@ public class NewDirector implements Runnable {
 	 * @param m - An instance of Main to use in NewDirector
 	 */
 	public NewDirector (Main m) {
+		this.m = m;
 		this.curState = new NewStartState(this);
 		this.boardState = new BoardState(this);
 		this.mgState = new MinigameState(this);
 		this.turn = 1;
-		this.m = m;
+		//this.m = m;
 		
 		this.players = new ArrayList<>();
 		start();
@@ -149,6 +150,10 @@ public class NewDirector implements Runnable {
 	
 	public Main getMain() {
 		return m;
+	}
+	
+	public int maxTurns() {
+		return maxTurns;
 	}
 	
 	public int getTurn() {
