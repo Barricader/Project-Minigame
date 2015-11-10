@@ -1,6 +1,5 @@
 package main;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -80,7 +79,7 @@ public class Tile extends Rectangle {
 	 * where to move to.
 	 */
 	public Point getLocation() {
-		Point p = new Point(x * width + (width / 2), y * height + (height / 2));
+		Point p = new Point(x * width + (width / 2), y * height + (height / 2)+20);
 		return p;
 	}
 	
@@ -98,9 +97,9 @@ public class Tile extends Rectangle {
 		
 		try {
 			final int Y_OFFSET = 20;
-			g2d.setColor(Color.BLACK);
-			g2d.setStroke(new BasicStroke(2.0f));
-			g2d.drawRect(x * width, y * height+Y_OFFSET, width, height);
+			//g2d.setColor(Color.BLACK);
+			//g2d.setStroke(new BasicStroke(2.0f));
+			//g2d.drawRect(x * width-32, y * height+Y_OFFSET, width, height);
 			g2d.setColor(color);
 			g2d.fillRect(x * width, y * height+Y_OFFSET, width, height);
 		} finally {

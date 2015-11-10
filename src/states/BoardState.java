@@ -9,7 +9,6 @@ import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -106,7 +105,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		for (Player p : director.getPlayers()) {
 			if (!p.hasFirstRolled()) {
 				JOptionPane.showMessageDialog(null, "Player: " + p + " hasn't rolled yet!");
-				p.setTile(tiles.get(1));
+				p.setTile(tiles.get(0));
 				p.setLastRoll(dice.roll(Dice.SIZE));
 				p.setHasFirstRolled(true);
 				if (director.getPlayers().indexOf(p) == director.getPlayers().size()-1) {
@@ -272,7 +271,8 @@ public class BoardState extends State implements ComponentListener, MouseListene
 				newTileID -= tiles.size();
 			}
 			
-			Tile newTile = tiles.get(newTileID);
+			Tile newTile = tiles.get(newTileID-1);
+			
 			
 			activePlayer.setPath(temp);
 			activePlayer.move();
