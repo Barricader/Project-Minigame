@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -184,6 +185,12 @@ public class NewStartState extends State {
 		c.weighty = 1.0;
 		c.ipady = 10;
 		add(startBtn, c);
+		
+		try {
+			Player.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -352,7 +359,8 @@ public class NewStartState extends State {
 		 * Adds a player with a random color to the list and player array.
 		 */
 		public void addPlayer() {
-			Player p = new Player(nameField.getText(), GameUtils.getBrightColor());
+			//Player p = new Player(nameField.getText(), GameUtils.getBrightColor());
+			Player p = new Player(nameField.getText());
 			listModel.addElement(p);
 			players.add(p);
 			nameField.setText(""); // clear out
@@ -378,6 +386,7 @@ public class NewStartState extends State {
 					}
 				}
 
+				Player.taken[players.get(index).getColorNum()] = false;;
 				listModel.remove(index);
 				players.remove(index);
 			}
