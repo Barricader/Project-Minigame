@@ -110,14 +110,23 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		for (Player p : director.getPlayers()) {
 			if (!p.hasFirstRolled()) {
 				JOptionPane.showMessageDialog(null, "Player: " + p + " hasn't rolled yet!");
-				p.moveTo(tiles.get(0).getLocation());
-				p.setTile(tiles.get(0));
+				//p.moveTo(tiles.get(0).getLocation());
+				//p.move(tiles.get(0));
+				p.setTile(tiles.get(1));
 				p.setLastRoll(dice.roll(Dice.SIZE));
 				p.setHasFirstRolled(true);
+				if (director.getPlayers().indexOf(p) == director.getPlayers().size()-1) {
+					for (Player p2 : director.getPlayers()) {
+						p2.move(tiles.get(0));
+					}
+				}
 				return;
 			}
 		}
 		havePlayersRolled = true;
+//		for (Player p : director.getPlayers()) {
+//			p.move(tiles.get(0));
+//		}
 	}
 	
 	/**
@@ -149,14 +158,6 @@ public class BoardState extends State implements ComponentListener, MouseListene
 				} else {
 					p.setSelected(true);
 					activePlayer = p;
-				}
-			} else if (p.isSelected()) {
-				for (Tile t : tiles) {
-					if (t.contains(e.getPoint())) {
-						p.moveTo(t.getLocation());
-						activePlayer = p;
-						p.setTile(t);
-					}
 				}
 			}
 		}
@@ -266,13 +267,25 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			byte curTileID = activePlayer.getTileID();
 			byte newTileID = (byte)(curTileID + roll);
 			
-			if (newTileID > tiles.size()) {
-				newTileID = 1;
+			ArrayList<Tile> temp = new ArrayList<Tile>();
+			for (int i = curTileID; i < newTileID; i++) {
+				if (i > tiles.size()-1) {
+					temp.add(tiles.get(i - tiles.size()));
+				}
+				else {
+					temp.add(tiles.get(i));
+				}
+			}
+			
+			if (newTileID >= tiles.size()) {
+				newTileID -= tiles.size();
 			}
 			
 			Tile newTile = tiles.get(newTileID);
 			
-			activePlayer.moveTo(newTile.getLocation());
+			//activePlayer.moveTo(newTile.getLocation());
+			activePlayer.setPath(temp);
+			activePlayer.move();
 			activePlayer.setTile(newTile);
 		}
 	}
