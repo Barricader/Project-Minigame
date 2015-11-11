@@ -12,12 +12,14 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import main.Dice;
 import main.Main;
@@ -42,8 +44,10 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	private static final long serialVersionUID = 1L;	
 	
 	private StatusPanel statusPanel;	// display active player and turns remaining
+	private JPanel boardPanel;	// this will contain all the board tile drawing
 	private Rectangle midRect;	// rect in the middle that contains game objects such as dice
 	private PlayerManager playerMngr;
+	private BufferedImage img;	// img we will draw stuff to
 	private Player activePlayer;
 	private Dice dice;			// TODO maybe split up some more stuff to make this class smaller and easier to read
 
@@ -61,6 +65,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	public BoardState(NewDirector director) {
 		super(director);
+		img = new BufferedImage(1280, 720, BufferedImage.TYPE_INT_RGB);
 		//init();
 	}
 
@@ -82,17 +87,22 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	public void paintComponent(Graphics g) {
 		final Graphics2D g2d = (Graphics2D)g.create();
 		try {
-			g2d.setColor(GameUtils.colorFromHex("#2b2b2b"));
-			g2d.fillRect(0, 0, getWidth(), getHeight());
+//			g2d.setColor(GameUtils.colorFromHex("#2b2b2b"));
+//			g2d.translate(0, StatusPanel.Y_OFFSET);
+//			g2d.fillRect(0, 0, getWidth(), getHeight());
+//			statusPanel.repaint();
+//			boardPanel.repaint();
+//			g2d.setColor(Color.CYAN);
+//			g2d.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
+//			drawTiles(g2d);
+//			dice.draw(g2d);
+//			drawPlayers(g2d);
 			statusPanel.repaint();
-			g2d.setColor(Color.CYAN);
-			g2d.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
-			drawTiles(g2d);
-			dice.draw(g2d);
-			drawPlayers(g2d);	
+			boardPanel.repaint();
 		} finally {
 			g2d.dispose();	
 		}
+	
 	}
 
 	/**
@@ -126,7 +136,10 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * reflect this event.
 	 */
 	public void mouseClicked(MouseEvent e) {
+		System.out.println("Mouse clicked! @ " + e.getPoint());
+		System.out.println("Dice is at : " + dice);
 		if (dice.contains(e.getPoint())) {
+			System.out.println("Dice clicked!");
 			if (!playerMngr.havePlayersRolled()) {
 //				firstRollPlayers();
 				playerMngr.firstRoll();
@@ -172,6 +185,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		System.out.println("Board resized! Updating stuff!");
 		midRect.x = (getWidth() - midRect.width) / 2;
 		midRect.y = (getHeight() - midRect.height) / 2;
+//		img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 		resizeTiles();	// update tiles with new size info
 	}
 
@@ -208,7 +222,9 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 */
 	public void init() {
 		statusPanel = new StatusPanel(director);
-		statusPanel.setSize(new Dimension(1264, 35));
+		boardPanel = new BoardPanel();
+		img = new BufferedImage(1280, 720, BufferedImage.TYPE_INT_RGB);
+		boardPanel.setBackground(Color.ORANGE);
 		playerMngr = new PlayerManager();
 		midRect = createMidRect();
 		dice = new Dice(600, 400);
@@ -223,10 +239,16 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		c.gridx = 0;
 		c.gridy = 0;
 		c.ipady = 10;
+		add(statusPanel, c);
+		
+		c.gridx = 0;
+		c.gridy = 1;
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor = GridBagConstraints.SOUTH;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
+		add(boardPanel, c);
 		
-		add(statusPanel, c);
 		loadPlayers();	// setup players for first
 		createTiles();
 		
@@ -305,8 +327,8 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		}
 		
 		// default size 1280 x 720 for initial tile sizing
-		int tileWidth = 1280 / HORIZONTAL_TILE_COUNT;
-		int tileHeight = 720 / VERTICAL_TILE_COUNT;
+		int tileWidth = boardPanel.getWidth() / HORIZONTAL_TILE_COUNT;
+		int tileHeight = boardPanel.getHeight() / VERTICAL_TILE_COUNT;
 		
 		// Set the tiles with our x's and y's from our file
 		for (int i = 0; i < coords.size(); i++) {
@@ -374,8 +396,8 @@ public class BoardState extends State implements ComponentListener, MouseListene
 	 * current size of the window.
 	 */
 	private void resizeTiles() {
-		int tileWidth = (getWidth() / HORIZONTAL_TILE_COUNT);
-		int tileHeight = (getHeight() / VERTICAL_TILE_COUNT);
+		int tileWidth = (boardPanel.getWidth() / HORIZONTAL_TILE_COUNT);
+		int tileHeight = (boardPanel.getHeight() / VERTICAL_TILE_COUNT);
 		
 		for (Tile t : tiles) {
 			t.width = tileWidth;
@@ -386,6 +408,24 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		// update player within tile bounds
 		if (activePlayer != null) {
 			activePlayer.setLocation(activePlayer.getTile().getLocation());	
+		}
+	}
+	
+	private class BoardPanel extends JPanel {
+		
+		public void paintComponent(Graphics g) {
+			final Graphics2D g2d = (Graphics2D)g.create();
+			try {
+				g2d.setColor(GameUtils.colorFromHex("#2b2b2b"));
+				g2d.fillRect(0, 0, getWidth(), getHeight());
+				g2d.setColor(Color.CYAN);
+				g2d.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
+				drawTiles(g2d);
+				dice.draw(g2d);
+				drawPlayers(g2d);	
+			} finally {
+				g2d.dispose();
+			}
 		}
 	}
 	
@@ -431,9 +471,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 			for (Player p : director.getPlayers()) {
 				if (!p.hasFirstRolled()) {
 					JOptionPane.showMessageDialog(null, "Player: " + p + " hasn't rolled yet!");
-					//p.moveTo(tiles.get(0).getLocation());
-					//p.move(tiles.get(0));
-					p.setTile(tiles.get(1));
+					p.setTile(tiles.get(0));
 					p.setLastRoll(dice.roll(Dice.SIZE));
 					p.setHasFirstRolled(true);
 					activePlayer = p;

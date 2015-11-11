@@ -41,6 +41,7 @@ public class Player extends Rectangle implements Comparable<Player> {
 	private boolean isMoving;	// are we moving right now?
 	private byte playerID = 0;
 	private int score1 = 0;
+	private int firstRoll;	// first time rolling value
 	private int lastRoll;
 	private boolean hasFirstRolled = false;	// has player been rolled for the first time?
 	private ArrayList<Tile> path;
@@ -168,8 +169,14 @@ public class Player extends Rectangle implements Comparable<Player> {
 				g2d.drawLine(newLocation.x, newLocation.y, newLocation.x + 10, newLocation.y + 10);
 				g2d.drawLine(newLocation.x + 10, newLocation.y, newLocation.x, newLocation.y + 10);
 			}
+			g2d.setColor(color);
 			
-			g2d.drawString(name, x, y + 50);	// draw name of player	
+			if (getTile() != null && getTile().y == 4) {
+				g2d.drawString(name, x, y - 20);
+			} else {
+				g2d.drawString(name, x, y + 50);	// draw name of player	
+			}
+				
 		} finally {
 			g2d.dispose();
 		}
@@ -284,6 +291,10 @@ public class Player extends Rectangle implements Comparable<Player> {
 		this.tile = t;
 	}
 	
+	public void setFirstRoll(int roll) {
+		firstRoll = roll;
+	}
+	
 	public void setLastRoll(int lr) {
 		this.lastRoll = lr;
 	}
@@ -320,6 +331,10 @@ public class Player extends Rectangle implements Comparable<Player> {
 	
 	public boolean hasFirstRolled() {
 		return hasFirstRolled;
+	}
+	
+	public int getFirstRoll() {
+		return firstRoll;
 	}
 	
 	public byte getPlayerID() {

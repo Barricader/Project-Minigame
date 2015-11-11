@@ -110,6 +110,10 @@ public class Dice extends Rectangle implements ActionListener {
 	public int getValue() {
 		return value;
 	}
+	
+	public boolean isRolling() {
+		return isRolling;
+	}
 
 }
 

@@ -55,20 +55,15 @@ public class Tile extends Rectangle {
 	public void createPlayerRects() {
 		playerRects = new Rectangle[4];
 
-		final int X_OFFSET = width / 2 + 20;
-		final int WIDTH = 40;
-		final int HEIGHT = 40;
-		
-		// upper right
-		Rectangle r0 = new Rectangle(x * width + X_OFFSET, y * height + StatusPanel.Y_OFFSET, WIDTH, HEIGHT);
 		// upper left
-		Rectangle r1 = new Rectangle(x * width, y * height + StatusPanel.Y_OFFSET, WIDTH, HEIGHT);	
-		// lower right
-		Rectangle r2 = new Rectangle(x * width + X_OFFSET, y * height + height - StatusPanel.Y_OFFSET, WIDTH, HEIGHT);
+		Rectangle r0 = new Rectangle(x * width, y * height, 40, 40);
+		// upper right
+		Rectangle r1 = new Rectangle(x * width + (width - 40), y * height, 40, 40);
 		// lower left
-		Rectangle r3 = new Rectangle(x * width, y * height + height - StatusPanel.Y_OFFSET, WIDTH, HEIGHT);
+		Rectangle r2 = new Rectangle(x * width, y * height + (height - 40), 40, 40);
+		// lower right
+		Rectangle r3 = new Rectangle(x * width + (width - 40), y * height + (height - 40), 40, 40);
 		
-		// add rectangles
 		playerRects[0] = r0;
 		playerRects[1] = r1;
 		playerRects[2] = r2;
@@ -131,9 +126,9 @@ public class Tile extends Rectangle {
 		try {
 			g2d.setColor(Color.BLACK);
 			g2d.setStroke(new BasicStroke(2.0f));
-			g2d.drawRect(x * width, y * height + StatusPanel.Y_OFFSET, width, height);
+			g2d.drawRect(x * width, y * height, width, height);
 			g2d.setColor(color);
-			g2d.fillRect(x * width, y * height + StatusPanel.Y_OFFSET, width, height);
+			g2d.fillRect(x * width, y * height, width, height);
 			drawPlayerCells(g2d);
 		} finally {
 			g2d.dispose();
@@ -142,31 +137,16 @@ public class Tile extends Rectangle {
 	
 	private void drawPlayerCells(Graphics2D g2d) {
 		g2d.setColor(new Color(0, 0, 0, 50));
-//		for (Rectangle r : playerRects) {
-//			g2d.fillRect(r.x, r.y, r.width, r.height);
-//		}
-//		g2d.fillRect(x * width + width - 40, y * height + 20, 40, 40);	// upper right
-//		g2d.fillRect(x * width, y * height + 20, 40, 40);	// upper left
-//		g2d.fillRect(x * width, y * height + height - 20, 40, 40);	// lower left
-//		g2d.fillRect(x * width + width - 40, y * height + height - 20, 40, 40); // lower right
-		
 		final int X_OFFSET = 40;
 		final int Y_OFFSET = 20;
 		final int WIDTH = 40;
 		final int HEIGHT = 40;
 		
+		createPlayerRects();
+		
 		for (Rectangle r : playerRects) {
 			g2d.fillRect(r.x, r.y, r.width, r.height);
 		}
-		
-//		// upper right
-//		g2d.fillRect(x * width + width - X_OFFSET, y * height + Y_OFFSET, WIDTH, HEIGHT);
-//		// upper left
-//		g2d.fillRect(x * width, y * height + Y_OFFSET, WIDTH, HEIGHT);	
-//		// lower right
-//		g2d.fillRect(x * width + width - X_OFFSET, y * height + height - Y_OFFSET, WIDTH, HEIGHT);
-//		// lower left
-//		g2d.fillRect(x * width, y * height + height - Y_OFFSET, WIDTH, HEIGHT);
 	}
 	
 	// Mutator methods

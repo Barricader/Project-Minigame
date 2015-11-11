@@ -36,7 +36,6 @@ public class StatusPanel extends JPanel {
 	}
 	
 	private void init() {
-		setSize(new Dimension(1280, 20));
 		curPlayerLabel = new JLabel("Current Player Turn:");
 		curPlayerLabel = GameUtils.customizeLabel(curPlayerLabel, Color.BLACK, Color.CYAN, 20);
 
@@ -56,11 +55,16 @@ public class StatusPanel extends JPanel {
 	}
 	
 	public void updateCurPlayerLabel(Player p) {
-		System.out.println("UPDATE CUR PLAYER!");
+		curPlayerLabel.setForeground(p.getColor());
+		curPlayerLabel.setText("Current Player Turn: " + p.getName());
 	}
 	
 	public void updateTurnsRemainingLabel() {
 		System.out.println("UPDATE TURNS REMAINING");
+	}
+	
+	public JLabel getCurPlayerLabel() {
+		return curPlayerLabel;
 	}
 
 }

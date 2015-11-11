@@ -235,9 +235,13 @@ public class NewStartState extends State {
 		}
 		
 		director.setPlayers(playerList.players);
-		director.setState(director.getBoardState());
 		director.setTurnCount(turnCtrlPanel.getTurnCount());
-		director.getBoardState().init();
+//		director.setState(director.getBoardState());
+		
+		NewBoardState test = new NewBoardState(director);
+		test.init();
+		director.setState(test);
+//		director.getBoardState().init();
 //		director.setState(new BoardState(director));
 	}
 	
