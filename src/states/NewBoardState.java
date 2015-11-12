@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -100,6 +101,7 @@ public class NewBoardState extends State {
 			init();
 			addComponentListener(this);
 			addMouseListener(this);
+			addMouseMotionListener(this);
 		}
 		
 		public void paintComponent(Graphics g) {
@@ -107,7 +109,7 @@ public class NewBoardState extends State {
 			try {
 				g2d.setColor(GameUtils.colorFromHex("#2b2b2b"));
 				g2d.fillRect(0, 0, getWidth(), getHeight());
-				g2d.setColor(Color.BLUE);
+				g2d.setColor(Color.CYAN);
 				g2d.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
 				drawTiles(g2d);
 				dice.draw(g2d);
@@ -140,8 +142,8 @@ public class NewBoardState extends State {
 			
 			for (int i = 0; i < playerMngr.getPlayers().size(); i++) {
 				Player p = playerMngr.getPlayers().get(i);
-				p.x = midRect.x + (p.width * i) + 50;
-				p.y = midRect.y;
+				p.x = midRect.x + (p.width * i) + 100 + (i * 50);
+				p.y = midRect.y + 50;
 			}
 		}
 		
@@ -201,13 +203,13 @@ public class NewBoardState extends State {
 				
 				Color color = Color.PINK;
 				if (c == 0) {
-					color = Color.BLUE;
+					color = GameUtils.colorFromHex("#3772BF"); // blue
 				}
 				else if (c == 1) {
-					color = Color.RED;
+					color = GameUtils.colorFromHex("#D91E2B");	// red
 				}
 				else {
-					color = Color.GREEN;
+					color = GameUtils.colorFromHex("#1DD147");	// green
 				}
 					
 				Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
@@ -236,20 +238,27 @@ public class NewBoardState extends State {
 			midRect.y = (getHeight() - midRect.height) / 2;
 		}
 		
+		private void dragDice(Point p) {
+			Rectangle newMid = (Rectangle) midRect.clone();
+			newMid.x += dice.width/2;
+			newMid.y += dice.height/2;
+			newMid.width -= dice.width;
+			newMid.height -= dice.height;
+			if (newMid.contains(p)) {
+				if (midRect.intersects(dice)) {
+					dice.x = p.x - dice.width/2;
+					dice.y = p.y - dice.height/2;
+				}
+			}
+		}
+		
 		/**
 		 * Updates the positioning of the dice, relative to the midrect, in response
 		 * to the window being resized.
 		 */
 		private void updateDiceFromResize() {
-			
-		}
-		
-		/**
-		 * Updates the positioning of the players, relative to the midrect, in response
-		 * to the window being resized. 
-		 */
-		private void updatePlayersFromResize() {
-			
+			dice.x = midRect.x + (midRect.width / 2 - Dice.WIDTH);
+			dice.y = midRect.y + (midRect.height / 2 - Dice.HEIGHT);
 		}
 
 		public void mouseClicked(MouseEvent e) {
@@ -263,7 +272,9 @@ public class NewBoardState extends State {
 		}
 		
 		public void mouseDragged(MouseEvent e) {
-			
+			if (dice.contains(e.getPoint())) {
+				dragDice(e.getPoint());
+			}
 		}
 
 		// unused mouse listener methods
@@ -277,7 +288,7 @@ public class NewBoardState extends State {
 			resizeTiles();
 			resizeMidRect();
 			updateDiceFromResize();
-			updatePlayersFromResize();
+			playerMngr.updatePlayersFromResize();
 		}
 
 		// unused component listener methods
@@ -288,6 +299,10 @@ public class NewBoardState extends State {
 		
 		public ArrayList<Tile> getTiles() {
 			return tiles;
+		}
+		
+		public Rectangle getMidRect() {
+			return midRect;
 		}
 
 	}

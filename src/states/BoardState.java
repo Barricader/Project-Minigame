@@ -563,7 +563,7 @@ public class BoardState extends State implements ComponentListener, MouseListene
 		private boolean updateTurns() {
 			if (director.getTurnsLeft() > 0) {
 				director.minusTurn();
-				statusPanel.updateTurnsRemainingLabel();
+//				statusPanel.updateTurnsRemainingLabel();
 				return true;
 			} else {
 				JOptionPane.showMessageDialog(null, "Game over. Thanks for playing!");

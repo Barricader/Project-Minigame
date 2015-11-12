@@ -136,12 +136,7 @@ public class Tile extends Rectangle {
 	}
 	
 	private void drawPlayerCells(Graphics2D g2d) {
-		g2d.setColor(new Color(0, 0, 0, 50));
-		final int X_OFFSET = 40;
-		final int Y_OFFSET = 20;
-		final int WIDTH = 40;
-		final int HEIGHT = 40;
-		
+		g2d.setColor(new Color(0, 0, 0, 50));		
 		createPlayerRects();
 		
 		for (Rectangle r : playerRects) {

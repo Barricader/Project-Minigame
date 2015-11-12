@@ -23,7 +23,7 @@ public class StatusPanel extends JPanel {
 	public static final int Y_OFFSET = 20;
 	private static final long serialVersionUID = 1L;
 	private JLabel curPlayerLabel;	// displays current players' turn
-	private JLabel turnsRemainingLabel;	// displays turns that are left
+	private JLabel turnsLeftLabel;	// displays turns that are left
 	private NewDirector dir;
 	
 	public StatusPanel(NewDirector dir) {
@@ -39,8 +39,8 @@ public class StatusPanel extends JPanel {
 		curPlayerLabel = new JLabel("Current Player Turn:");
 		curPlayerLabel = GameUtils.customizeLabel(curPlayerLabel, Color.BLACK, Color.CYAN, 20);
 
-		turnsRemainingLabel = new JLabel("Turns Remaining: " + dir.getTurnsLeft());
-		turnsRemainingLabel = GameUtils.customizeLabel(turnsRemainingLabel, Color.BLACK, Color.CYAN, 20);
+		turnsLeftLabel = new JLabel("Turns Left: " + dir.getTurnsLeft());
+		turnsLeftLabel = GameUtils.customizeLabel(turnsLeftLabel, Color.BLACK, Color.CYAN, 20);
 		
 		// decorate this panel
 		setBackground(GameUtils.colorFromHex("3a3a3a"));	// dark grey
@@ -50,7 +50,7 @@ public class StatusPanel extends JPanel {
 		add(Box.createHorizontalStrut(20));
 		add(curPlayerLabel);
 		add(Box.createHorizontalGlue());
-		add(turnsRemainingLabel);
+		add(turnsLeftLabel);
 		add(Box.createHorizontalStrut(20));
 	}
 	
@@ -59,8 +59,8 @@ public class StatusPanel extends JPanel {
 		curPlayerLabel.setText("Current Player Turn: " + p.getName());
 	}
 	
-	public void updateTurnsRemainingLabel() {
-		System.out.println("UPDATE TURNS REMAINING");
+	public void updateTurnsLeftLabel() {
+		turnsLeftLabel.setText("Turns Left: " + dir.getTurnsLeft());
 	}
 	
 	public JLabel getCurPlayerLabel() {

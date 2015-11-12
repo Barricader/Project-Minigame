@@ -174,6 +174,10 @@ public class NewDirector implements Runnable {
 		return turn;
 	}
 	
+	public int getTurnCount() {
+		return turnCount;
+	}
+	
 	public int getTurnsLeft() {
 		return turnsLeft;
 	}

@@ -28,6 +28,7 @@ public class Dice extends Rectangle implements ActionListener {
 	private int value;
 	private boolean isRolling;	// are we rolling and animating the dice?
 	private Timer animationTimer;	// timer to control dice animation
+	private boolean isEnabled;	
 	private Random r;
 	
 	public Dice(int x, int y) {
@@ -43,6 +44,7 @@ public class Dice extends Rectangle implements ActionListener {
 		}
 		
 		isRolling = false;
+		isEnabled = true;
 		animationTimer = new Timer(1000, this);
 	}
 	
@@ -66,7 +68,8 @@ public class Dice extends Rectangle implements ActionListener {
 	 * @param size - Boundary of dice. Typically should be 6.
 	 * @return numeric value of dice roll
 	 */
-	public int roll(int size) {		
+	public int roll(int size) {
+		isEnabled = false;
 		if (!isRolling) {
 			isRolling = true;
 			animationTimer.start();
@@ -83,6 +86,7 @@ public class Dice extends Rectangle implements ActionListener {
 		if (animationTimer.isRunning()) {
 			isRolling = false;
 			animationTimer.stop();
+			isEnabled = true;
 		}
 	}
 	
@@ -104,7 +108,7 @@ public class Dice extends Rectangle implements ActionListener {
 	public void setY(int y) {
 		this.y = y;
 	}
-	
+
 	// Accessor methods
 	
 	public int getValue() {

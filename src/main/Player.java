@@ -1,11 +1,13 @@
 package main;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -38,12 +40,14 @@ public class Player extends Rectangle implements Comparable<Player> {
 	private Point newLocation;	// the new location that the player will move to
 	private Tile tile;	// what tile are we on
 	private boolean isSelected;	// have we clicked on a player?
+	private boolean isActive;	// is this player the active one?
 	private boolean isMoving;	// are we moving right now?
 	private byte playerID = 0;
 	private int score1 = 0;
 	private int firstRoll;	// first time rolling value
 	private int lastRoll;
 	private boolean hasFirstRolled = false;	// has player been rolled for the first time?
+	private boolean hasRolled = false;
 	private ArrayList<Tile> path;
 	//private int score2 = 0;	// Not implemented currently
 	private int colorNum;
@@ -162,6 +166,16 @@ public class Player extends Rectangle implements Comparable<Player> {
 		try {			
 			// Maybe have a highlight when selected?
 			// TODO: this won't draw red for some dumb reason, fix me
+			if (isActive) {	// draw a translucent oval around active player
+				g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // smooth on
+				g2d.setColor(Color.BLACK);
+				g2d.setStroke(new BasicStroke(4.0f));
+				g2d.drawOval(x - 5, y - 5, 50, 50);
+				g2d.setColor(new Color(255, 255, 255, 180));
+				g2d.fillOval(x - 5, y - 5, 50, 50);
+			}
+			g2d.setStroke(new BasicStroke());	// default
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_OFF); // smooth off
 			g2d.drawImage(imgs[colorNum], x, y, null);
 			
 			if (isMoving) {
@@ -169,6 +183,7 @@ public class Player extends Rectangle implements Comparable<Player> {
 				g2d.drawLine(newLocation.x, newLocation.y, newLocation.x + 10, newLocation.y + 10);
 				g2d.drawLine(newLocation.x + 10, newLocation.y, newLocation.x, newLocation.y + 10);
 			}
+			
 			g2d.setColor(color);
 			
 			if (getTile() != null && getTile().y == 4) {
@@ -248,12 +263,13 @@ public class Player extends Rectangle implements Comparable<Player> {
 	}
 	
 	public int compareTo(Player comparePlayer) {
-		int compareRoll = comparePlayer.getLastRoll();
+		// changed to first roll compare
+		int compareRoll = comparePlayer.getFirstRoll();
 		
 		// ASC
 		//return this.lastRoll - compareRoll;
 		// DESC - largest roll to shortest roll
-		return compareRoll - lastRoll;
+		return compareRoll - firstRoll;
 	}
 	
 	/**
@@ -283,6 +299,10 @@ public class Player extends Rectangle implements Comparable<Player> {
 		isSelected = b;
 	}
 	
+	public void setActive(boolean b) {
+		isActive = b;
+	}
+	
 	public void setID(byte ID) {
 		this.playerID = ID;
 	}
@@ -301,6 +321,10 @@ public class Player extends Rectangle implements Comparable<Player> {
 	
 	public void setHasFirstRolled(boolean b) {
 		hasFirstRolled = b;
+	}
+	
+	public void setHasRolled(boolean b) {
+		hasRolled = b;
 	}
 	
 	// accessor methods
@@ -329,8 +353,16 @@ public class Player extends Rectangle implements Comparable<Player> {
 		return isMoving;
 	}
 	
+	public boolean isActive() {
+		return isActive;
+	}
+	
 	public boolean hasFirstRolled() {
 		return hasFirstRolled;
+	}
+	
+	public boolean hasRolled() {
+		return hasRolled;
 	}
 	
 	public int getFirstRoll() {
