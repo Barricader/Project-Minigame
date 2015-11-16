@@ -15,12 +15,14 @@ public class Server implements Runnable {
 	private ServerSocket serverSock = null;
 	private Thread t = null;
 	private int clientCount = 0;
+	private MessageParser parser;
 	
 	public Server() throws IOException {
 		serverSock = new ServerSocket(PORT);
 		System.out.println("Server started: " + serverSock);
 		t = new Thread(this);
 		t.start();
+		parser = new MessageParser(this);
 	}
 	
 	/**
@@ -84,34 +86,11 @@ public class Server implements Runnable {
 			clients[findClient(ID)].send("bye");
 			remove(ID);
 		}
-		// Move commands | REMOVE TEMP STUFF WHEN GRAPHIC IS USED
-		else if (input.contains("!move")) {
-			clients[findClient(ID)].send("Moving something");
-			System.out.println("<Move Command>");
-			if (input.contains("up")) {
-				clients[findClient(ID)].send("Move Up");
-				// Reference graphic to move it up
-			}
-			else if (input.contains("right")) {
-				clients[findClient(ID)].send("Move Right");
-				// Reference graphic to move it right
-			}
-			else if (input.contains("down")) {
-				clients[findClient(ID)].send("Move Down");
-				// Reference graphic to move it down
-			}
-			else if (input.contains("left")) {
-				clients[findClient(ID)].send("Move Left");
-				// Reference graphic to move it left
-			}
-		}
-		else if (input.equals("!TestCommand")) {
-			// Do test thing here, such as change graphic color
-		}
-		else {
-			for (int i = 0; i < clientCount; i++) {
-				clients[i].send(ID + ": " + input);
-			}
+		parser.parse(input);
+		
+		// send message to clients
+		for (int i = 0; i < clientCount; i++) {
+			clients[i].send(ID + ": " + input);
 		}
 	}
 	
