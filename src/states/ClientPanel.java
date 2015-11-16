@@ -46,6 +46,8 @@ public class ClientPanel extends JPanel {
 	private JButton collapseBtn;
 	private JButton connectBtn;	// connect or disconnect button
 	
+	private boolean isConnected;
+	
 	public ClientPanel() {
 		init();
 		setMinimumSize(SIZE);
@@ -89,6 +91,7 @@ public class ClientPanel extends JPanel {
 	public void disconnect() {
 		try {
 			client.send("!disc " + client.getID());
+			isConnected = false;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -102,6 +105,7 @@ public class ClientPanel extends JPanel {
 		connectBtn.setText("Connect To Server....");
 		connectBtn.addActionListener(e -> {
 			if (connect(HOST, PORT)) {
+				isConnected = true;
 				connectBtn = disconnectAction();
 			}
 		});
@@ -263,6 +267,10 @@ public class ClientPanel extends JPanel {
 			sendMessage();
 		});
 	}	
+	
+	public boolean isConnected() {
+		return isConnected;
+	}
 	
 	public ClientThread getClient() {
 		return client;

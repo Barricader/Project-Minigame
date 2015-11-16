@@ -56,7 +56,10 @@ public class Main extends JFrame {
 		// disconnect from server when client is closed!
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				clientPanel.disconnect();
+				if (clientPanel.isConnected()) {
+					clientPanel.disconnect();
+				}
+				dispose();
 			}
 		});
 	}
