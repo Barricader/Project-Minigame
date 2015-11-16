@@ -43,6 +43,7 @@ public class MessageParser {
 			if (command.equals("!quit")) {
 				if (parameters.size() == 0) {
 					if (server.existsID(ID)) {
+						System.out.println("Parsed command: should be removing client!");
 						server.remove(ID);
 						reset();
 						return 0;
