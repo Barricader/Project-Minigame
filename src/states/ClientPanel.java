@@ -1,16 +1,12 @@
 package states;
 
 import java.awt.Color;
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -79,22 +75,20 @@ public class ClientPanel extends JPanel {
 
 	public void close() {
 		try {
-			client.close();
+			connectBtn = connectAction();
 			client.join();
-		} catch (IOException e) {
-			e.printStackTrace();
+			client.close();
+			client = null;
 		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void disconnect() {
-		try {
-			client.send("!disc " + client.getID());
-			isConnected = false;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		isConnected = false;
+		close();
 	}
 	
 	public JButton connectAction() {
@@ -123,7 +117,9 @@ public class ClientPanel extends JPanel {
 					, "Confirm Disconnect", JOptionPane.OK_CANCEL_OPTION);
 			
 			if (val == 0) {	// they hit OK button
-				// TODO disconnect them from server
+//				disconnect();
+//				send("bye");
+				send("!quit " + client.getID());
 				connectBtn = connectAction();
 			}
 
@@ -142,22 +138,23 @@ public class ClientPanel extends JPanel {
 	
 	public void handle(String msg) {
 		System.out.println("msg: " + msg);
-		
-		if (msg.startsWith("/ID/")) {
-			System.out.println("SHould be assigning ID!");
-			String ID = msg.split("/ID/|/e/")[1].trim();
-			client.setID(Integer.parseInt(ID));
-		} else if (msg.equals("bye")) {
-			printMessage(msg);
-			close();
-		} else {
-			printMessage(msg);
+		if (isConnected) {
+			if (msg.startsWith("/ID/")) {
+				System.out.println("SHould be assigning ID!");
+				String ID = msg.split("/ID/|/e/")[1].trim();
+				client.setID(Integer.parseInt(ID));
+			} else if (msg.equals("bye")) {
+				printMessage(msg);
+				close();
+			} else {
+				printMessage(msg);
+			}	
 		}
 	}
 
 	private void sendMessage() {
 		String text = msgField.getText();
-		if (!text.isEmpty()) {
+		if (!text.isEmpty() && isConnected) {
 			send(text);
 		}
 	}

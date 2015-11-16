@@ -5,12 +5,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import client.Client;
 import input.Keyboard;
 import states.ClientPanel;
 
@@ -57,7 +55,7 @@ public class Main extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				if (clientPanel.isConnected()) {
-					clientPanel.disconnect();
+					clientPanel.send("!quit " + clientPanel.getClient().getID());
 				}
 				dispose();
 			}

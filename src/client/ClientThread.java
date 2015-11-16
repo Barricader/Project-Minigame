@@ -9,20 +9,12 @@ import states.ClientPanel;
 
 public class ClientThread extends Thread {
 	private Socket sock = null;
-	private Client client = null;
 	private ClientPanel clientPanel = null;
 
 	private DataInputStream streamIn = null;
 	private DataOutputStream streamOut = null;
 	
 	private int ID;
-
-	public ClientThread(Client client, Socket sock) throws IOException {
-		this.client = client;
-		this.sock = sock;
-		open();
-		start();
-	}
 
 	/**
 	 * Constructor for connecting to a client window.
@@ -44,11 +36,14 @@ public class ClientThread extends Thread {
 	}
 
 	public void close() throws IOException {
+		if (sock != null) {
+			sock.close();
+		}
 		if (streamOut != null) {
 			streamOut.close();
 		}
-		if (sock != null) {
-			sock.close();
+		if (streamIn != null) {
+			streamIn.close();
 		}
 	}
 
@@ -63,7 +58,8 @@ public class ClientThread extends Thread {
 			try {
 				clientPanel.handle(streamIn.readUTF());
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("An error occurred in client thread! " + e.getMessage());
+//				e.printStackTrace();
 			}
 		}
 	}

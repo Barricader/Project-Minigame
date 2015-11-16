@@ -86,11 +86,12 @@ public class Server implements Runnable {
 			clients[findClient(ID)].send("bye");
 			remove(ID);
 		}
-		parser.parse(input);
+		
+		parser.parse(input, ID);
 		
 		// send message to clients
 		for (int i = 0; i < clientCount; i++) {
-			clients[i].send(ID + ": " + input);
+			clients[i].send(ID + ": " + input);	
 		}
 	}
 	
@@ -105,7 +106,7 @@ public class Server implements Runnable {
 		if (pos >= 0) {
 			ServerThread toTerminate = clients[pos];
 			System.out.println("Removing client thread " + ID + " at " + pos);
-			
+//			clients[findClient(ID)].send("!disc");
 			if (pos < clientCount - 1) {
 				for (int i = pos + 1; i < clientCount; i++) {
 					clients[i - 1] = clients[i];

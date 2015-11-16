@@ -29,6 +29,42 @@ public class MessageParser {
 		this.server = server;
 	}
 	
+	public int parse(String str, int ID) throws IOException, InterruptedException  {
+		if (str.startsWith("!")) {
+			String temp = str.replace(" ", "");
+			String[] words = str.split(" ");
+			command = words[0];
+			
+			for (String s : words) {
+				parameters.add(s);
+			}
+			parameters.remove(0);		// Remove the command string
+			
+			if (command.equals("!quit")) {
+				if (parameters.size() == 0) {
+					if (server.existsID(ID)) {
+						server.remove(ID);
+						reset();
+						return 0;
+					} else {
+						reset();
+						return -3;
+					}
+				} else {
+					reset();
+					return -2;
+				}
+			} else {
+				reset();
+				return -1;
+			}
+		} else {
+			reset();
+			return 0;
+		}
+		
+	}
+	
 	public int parse(String str) {
 		String temp = str.replace(" ", "");
 		paramCount = str.length() - temp.length();
