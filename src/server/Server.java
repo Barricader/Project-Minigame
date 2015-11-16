@@ -141,6 +141,20 @@ public class Server implements Runnable {
 	}
 	
 	/**
+	 * Checks if the client exists via ID
+	 * @param id - ID to check for
+	 * @return Whether or not the client exists
+	 */
+	public boolean existsID(int id) {
+		int code = findClient(id);
+		if (code != -1) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * Add a thread for each client
 	 * @param sock - Socket of incoming client
 	 * @throws IOException
