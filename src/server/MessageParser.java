@@ -10,6 +10,12 @@ import java.util.ArrayList;
  * -3 - Incorrect parameter
  */
 
+/**
+ * Checks messages sent to server and checks if they are commands or not.
+ * If they are commands, it then executes some code.
+ * @author JoJones
+ *
+ */
 public class MessageParser {
 	private String command;
 	private ArrayList<String> parameters;
@@ -47,17 +53,21 @@ public class MessageParser {
 					}
 				}
 				else {
+					reset();
 					return -3;
 				}
 			}
 			else {
+				reset();
 				return -2;
 			}
 		}
 		else {
+			reset();
 			return -1;
 		}
 		
+		reset();
 		return 0;
 	}
 	
