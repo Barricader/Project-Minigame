@@ -45,6 +45,7 @@ public class NewBoardState extends State {
 		statusPanel = new StatusPanel(director);
 		playerMngr = new PlayerManager(director, this);
 		boardPanel = new BoardPanel();
+		
 		GridBagConstraints c = new GridBagConstraints();
 		
 		// status panel

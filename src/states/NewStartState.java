@@ -176,6 +176,7 @@ public class NewStartState extends State {
 		// start button
 		c.anchor = GridBagConstraints.SOUTH;
 		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(0, 0, 0, 0);	// clear out insets
 		c.gridx = 1;
 		c.gridwidth = 0;
 		c.weightx = 1.0;
@@ -252,20 +253,20 @@ public class NewStartState extends State {
 		// game label
 		gameLabel = new JLabel("<Project Mini Game>");
 		gameLabel.setOpaque(false);
-		gameLabel = GameUtils.customizeLabel(gameLabel, null, new Color(0, 255, 255, 50), 50);
+		gameLabel = GameUtils.customizeLabel(gameLabel, null, new Color(0, 255, 255, 50), 40);
 		gameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		// title label
 		titleLabel = new JLabel("Add Players");
 		titleLabel.setOpaque(true);
-		titleLabel = GameUtils.customizeLabel(titleLabel, Color.BLACK, Color.CYAN, 35);
+		titleLabel = GameUtils.customizeLabel(titleLabel, Color.BLACK, Color.CYAN, 25);
 		titleLabel.setBorder(new LineBorder(Color.BLACK));
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		// players label
 		playersLabel = new JLabel("Players:");
 		playersLabel.setOpaque(true);
-		playersLabel = GameUtils.customizeLabel(playersLabel, Color.BLACK, Color.CYAN, 35);
+		playersLabel = GameUtils.customizeLabel(playersLabel, Color.BLACK, Color.CYAN, 25);
 		playersLabel.setBorder(new EmptyBorder(0, 20, 0, 0));
 		
 		// players remaining label
