@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -46,7 +47,8 @@ public class Main extends JFrame {
 		setSize(SIZE);
 		setMinimumSize(SIZE);  // no smaller than 1280 x 720
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+//		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setVisible(true);
 		instance = this;
 		addKeyListener(key);
@@ -54,8 +56,7 @@ public class Main extends JFrame {
 		// disconnect from server when client is closed!
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				String disconnect = "/d/";
-				System.out.println("Closed!");
+				clientPanel.disconnect();
 			}
 		});
 	}

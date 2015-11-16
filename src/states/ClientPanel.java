@@ -86,6 +86,14 @@ public class ClientPanel extends JPanel {
 		}
 	}
 	
+	public void disconnect() {
+		try {
+			client.send("!disc " + client.getID());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public JButton connectAction() {
 		// clear out any previous actions
 		for (ActionListener action : connectBtn.getActionListeners()) {
@@ -255,4 +263,8 @@ public class ClientPanel extends JPanel {
 			sendMessage();
 		});
 	}	
+	
+	public ClientThread getClient() {
+		return client;
+	}
 }
