@@ -3,20 +3,21 @@ package server;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/* Possible return codes:
- * 0 - All is fine
- * -1 - Incorrect command
- * -2 - Incorrect amount of parameters
- * -3 - Incorrect parameter
- */
-
 /**
  * Checks messages sent to server and checks if they are commands or not.
  * If they are commands, it then executes some code.
  * @author JoJones
- *
+ * @author David Kramer
  */
 public class MessageParser {
+	/*
+	 * Possible return codes
+	 */
+	public static final int VALID_CMD = 0;
+	public static final int INVALID_CMD = -1;
+	public static final int INVALID_PARAM_COUNT = -2;
+	public static final int INVALID_PARAM = -3;
+	
 	private String command;
 	private ArrayList<String> parameters;
 	private int paramCount;
@@ -29,42 +30,72 @@ public class MessageParser {
 		this.server = server;
 	}
 	
-	public int parse(String str, int ID) throws IOException, InterruptedException  {
-		if (str.startsWith("!")) {
-			String temp = str.replace(" ", "");
-			String[] words = str.split(" ");
-			command = words[0];
+	public int parse(String str, int ID) throws IOException, InterruptedException {
+		if (str.startsWith("!")) {	// potential command by using delim
+			reset();	// clear out before we process
+			String temp = str.replace(" ", "");	// remove space
+			String[] params = str.split(" ");
+			command = params[0];
 			
-			for (String s : words) {
-				parameters.add(s);
+			for (String p : params) {
+				parameters.add(p);
 			}
-			parameters.remove(0);		// Remove the command string
 			
-			if (command.equals("!quit")) {
-				if (parameters.size() == 0) {
-					if (server.existsID(ID)) {
-						System.out.println("Parsed command: should be removing client!");
-						server.remove(ID);
-						reset();
-						return 0;
+			// check commands
+			if (server.clientExistsByID(ID)) {
+				if (command.equals("!quit")) {
+					server.remove(ID);
+					return VALID_CMD;
+				} else if (command.equals("!name")) {
+					String name = null;
+					if (parameters.size() >= 2) {
+						name = parameters.get(1);	
 					} else {
-						reset();
-						return -3;
+						return INVALID_CMD;
 					}
-				} else {
-					reset();
-					return -2;
+					ServerThread client = server.getClientMap().get(ID);
+					client.setClientName(name);
+					client.send("You will now be seen as: " + name);
+					return VALID_CMD;
 				}
-			} else {
-				reset();
-				return -1;
 			}
-		} else {
-			reset();
-			return 0;
 		}
-		
+		return INVALID_CMD;
 	}
+	
+//	public int parse(String str, int ID) throws IOException, InterruptedException  {
+//		if (str.startsWith("!")) {
+//			String temp = str.replace(" ", "");
+//			String[] words = str.split(" ");
+//			command = words[0];
+//			
+//			for (String s : words) {
+//				parameters.add(s);
+//			}
+//			parameters.remove(0);		// Remove the command string
+//			
+//			reset();	// reset before we process
+//			
+//			if (command.startsWith("!quit")) {
+//				if (parameters.size() == 0) {
+//					if (server.existsByID(ID)) {
+//						System.out.println("Parsed command: should be removing client!");
+//						server.remove(ID);
+//						return VALID_CMD;
+//					} else {
+//						return INVALID_PARAM;
+//					}
+//				} else {
+//					return INVALID_PARAM_COUNT;
+//				}
+//			} else {
+//				return INVALID_CMD;
+//			}
+//		} else {
+//			return VALID_CMD;
+//		}
+//		
+//	}
 	
 	public int parse(String str) {
 		String temp = str.replace(" ", "");

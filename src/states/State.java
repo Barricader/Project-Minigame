@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
-import main.NewDirector;
+import main.Director;
 
 /**
  * Base class for all states. A state is represents how things should be updated
@@ -15,10 +15,10 @@ import main.NewDirector;
  */
 public abstract class State extends JPanel {
 	private static final long serialVersionUID = 1L;
-	protected NewDirector director;	// director we will communicate too
+	protected Director director;	// director we will communicate too
 	protected Graphics2D g2d;	// graphics we will draw too
 	
-	public State(NewDirector director) {
+	public State(Director director) {
 		this.director = director;
 	}
 	

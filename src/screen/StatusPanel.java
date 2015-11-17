@@ -9,8 +9,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import main.NewDirector;
+import main.Director;
 import main.Player;
+import util.GameUtils;
 
 /**
  * This panel will be displayed at the top of the screen in the board state.
@@ -24,9 +25,9 @@ public class StatusPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JLabel curPlayerLabel;	// displays current players' turn
 	private JLabel turnsLeftLabel;	// displays turns that are left
-	private NewDirector dir;
+	private Director dir;
 	
-	public StatusPanel(NewDirector dir) {
+	public StatusPanel(Director dir) {
 		this.dir = dir;
 		init();
 	}

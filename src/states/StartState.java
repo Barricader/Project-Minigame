@@ -25,12 +25,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import main.NewDirector;
+import main.Director;
 import main.Player;
 import screen.GameButton;
-import screen.GameUtils;
 import screen.PlayerListCellRenderer;
 import screen.TurnControlPanel;
+import util.GameUtils;
 
 /**
  * This is the initial state of the application. The user is presented with the ability
@@ -40,7 +40,7 @@ import screen.TurnControlPanel;
  * @author David Kramer
  *
  */
-public class NewStartState extends State {
+public class StartState extends State {
 	private static final long serialVersionUID = 1L;
 	
 	private NameField nameField;	// field for entering player name
@@ -55,7 +55,7 @@ public class NewStartState extends State {
 	private JLabel remainingLabel;
 	private int playersRemaining;	
 	
-	public NewStartState(NewDirector director) {
+	public StartState(Director director) {
 		super(director);
 		init();
 	}
@@ -77,7 +77,7 @@ public class NewStartState extends State {
 	 */
 	private void init() {
 		// create all GUI components first
-		playersRemaining = NewDirector.MAX_PLAYERS;
+		playersRemaining = Director.MAX_PLAYERS;
 		nameField = new NameField(10);	// player name field
 		playerList = new PlayerList<>();
 		turnCtrlPanel = new TurnControlPanel();
@@ -237,13 +237,10 @@ public class NewStartState extends State {
 		
 		director.setPlayers(playerList.players);
 		director.setTurnCount(turnCtrlPanel.getTurnCount());
-//		director.setState(director.getBoardState());
-		
-		NewBoardState test = new NewBoardState(director);
-		test.init();
-		director.setState(test);
-//		director.getBoardState().init();
-//		director.setState(new BoardState(director));
+		// create board state
+		BoardState boardState = new BoardState(director);
+		boardState.init();
+		director.setState(boardState);
 	}
 	
 	/**
@@ -404,7 +401,7 @@ public class NewStartState extends State {
 		 * depending on how many players have been created.
 		 */
 		private void updateControls() {
-			playersRemaining = NewDirector.MAX_PLAYERS - players.size();
+			playersRemaining = Director.MAX_PLAYERS - players.size();
 			
 			if (playersRemaining == 0) {
 				addBtn.setEnabled(false);
@@ -487,7 +484,6 @@ public class NewStartState extends State {
 					playerList.addPlayer();
 				}
 			}
-			
 		}
 
 		/**

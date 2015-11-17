@@ -1,23 +1,26 @@
-package states;
+package client;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
-import client.ClientThread;
 import main.Main;
 
 /**
@@ -30,26 +33,38 @@ import main.Main;
  */
 public class ClientPanel extends JPanel {
 	private static Dimension SIZE = new Dimension(250, 720);	// min size!
+	
 	// server info
 	private static final String HOST = "localhost";
 	private static final int PORT = 64837;
-	
 	private ClientThread client;
 	
+	// GUI components
+	private JScrollPane chatScrollPane;	// scroll pane for long chats
 	private JTextArea chatArea;
 	private JTextField msgField;
 	private JButton sendBtn;
-	private JButton collapseBtn;
-	private JButton connectBtn;	// connect or disconnect button
+	private JButton collapseBtn; 	// TODO make the chat window able to collapse / expand
+	private JButton connectBtn;		// connect or disconnect button
 	
-	private boolean isConnected;
+	private boolean isConnected;	// are we connected to the server?
 	
+	/**
+	 * Constructs a new ClientPanel.
+	 */
 	public ClientPanel() {
 		init();
 		setMinimumSize(SIZE);
 		setPreferredSize(SIZE);
 	}
 	
+	/**
+	 * Connects to the specified host name and port. This will also display a warning
+	 * message if the connection to server was unsuccessful.
+	 * @param name - Host name of server
+	 * @param port - Port number of server
+	 * @return - true if connection was successful, false otherwise.
+	 */
 	public boolean connect(String name, int port) {
 		printMessage("Attempting to connect to: " + name + "...");
 		try {
@@ -65,6 +80,10 @@ public class ClientPanel extends JPanel {
 		return false;
 	}
 
+	/**
+	 * Opens a new client thread based on the available socket.
+	 * @param socket - Socket to connect the client thread to.
+	 */
 	public void open(Socket socket) {
 		try {
 			client = new ClientThread(this, socket);
@@ -73,24 +92,39 @@ public class ClientPanel extends JPanel {
 		}
 	}
 
-	public void close() {
+	/**
+	 * Closes and terminates any client threads and its input/output data streams. The client
+	 * thread is then set to null. The connect button to perform a connection action, if clicked
+	 * again later.
+	 */
+	public void terminateClient() throws IOException, InterruptedException {
+		connectBtn = connectAction();
+		// do everything to kill thread!
+		client.close();
+		client.interrupt();
+		client.stopThread();
+		client.join();
+		client = null;
+	}
+	
+	/**
+	 * Disconnects from server and closes the client out.
+	 */
+	public void disconnect() {
+		isConnected = false;
 		try {
-			connectBtn = connectAction();
-			client.join();
-			client.close();
-			client = null;
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			terminateClient();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// don't do anything. Thread should be stopped. No further action should be necessary
 		}
 	}
 	
-	public void disconnect() {
-		isConnected = false;
-		close();
-	}
-	
+	/**
+	 * Changes out the connectBtn with the connection action.
+	 * @return - JButton with connection action listener
+	 */
 	public JButton connectAction() {
 		// clear out any previous actions
 		for (ActionListener action : connectBtn.getActionListeners()) {
@@ -106,6 +140,10 @@ public class ClientPanel extends JPanel {
 		return connectBtn;
 	}
 	
+	/**
+	 * Changes out the connectBtn with the disconnect action.
+	 * @return - JButton with disconnect action listener
+	 */
 	public JButton disconnectAction() { 
 		// clear out any previous actions
 		for (ActionListener action : connectBtn.getActionListeners()) {
@@ -127,6 +165,11 @@ public class ClientPanel extends JPanel {
 		return connectBtn;
 	}
 
+	/**
+	 * Sends specified text to the client thread, to be send to the server, and then 
+	 * clears out the text field in this chat panel.
+	 * @param text
+	 */
 	public void send(String text) {
 		try {
 			client.send(text);
@@ -136,22 +179,32 @@ public class ClientPanel extends JPanel {
 		}
 	}
 	
-	public void handle(String msg) {
+	/**
+	 * This method is called from the client thread run method, and is called whenever
+	 * data has been written to the input stream of this client. Unless the incoming 
+	 * message is a special command, this will just print the text out to the text
+	 * area. If the text is a command, it will then execute the proper command.
+	 * @param msg
+	 */
+	public void handle(String msg) throws IOException, SocketException, InterruptedException {
 		System.out.println("msg: " + msg);
 		if (isConnected) {
 			if (msg.startsWith("/ID/")) {
 				System.out.println("SHould be assigning ID!");
 				String ID = msg.split("/ID/|/e/")[1].trim();
 				client.setID(Integer.parseInt(ID));
-			} else if (msg.equals("bye")) {
+			} else if (msg.equals("bye") || msg.equals("!quit")) {
 				printMessage(msg);
-				close();
+				terminateClient();
 			} else {
 				printMessage(msg);
 			}	
 		}
 	}
 
+	/**
+	 * Sends a message to the client if we're connected and the text field is not empty.
+	 */
 	private void sendMessage() {
 		String text = msgField.getText();
 		if (!text.isEmpty() && isConnected) {
@@ -159,12 +212,19 @@ public class ClientPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Prints specified message to the chat area.
+	 * @param msg
+	 */
 	private void printMessage(String msg) {
 		String msgArea = chatArea.getText();
 		msgArea += msg + "\n";
 		chatArea.setText(msgArea);
 	}
 	
+	/**
+	 * Initializes all GUI components of this panel using a GridBagLayout.
+	 */
 	private void init() {
 		createComponents();
 		setLayout(new GridBagLayout());
@@ -190,7 +250,7 @@ public class ClientPanel extends JPanel {
 		c.ipady = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		add(chatArea, c);
+		add(chatScrollPane, c);
 		
 		// text field
 		c.anchor = GridBagConstraints.SOUTH;
@@ -210,7 +270,11 @@ public class ClientPanel extends JPanel {
 		add(sendBtn, c);
 	}
 	
+	/**
+	 * Creates all GUI components and adds any necessary action listeners.
+	 */
 	private void createComponents() {
+		
 		// chat history area
 		chatArea = new JTextArea();
 		chatArea.setBorder(new LineBorder(Color.CYAN));
@@ -219,6 +283,17 @@ public class ClientPanel extends JPanel {
 		chatArea.setLineWrap(true);
 		chatArea.setWrapStyleWord(true);
 		chatArea.setEditable(false);
+		
+//		chat scroll pane
+		chatScrollPane = new JScrollPane(chatArea);
+		chatScrollPane.setBackground(Color.BLACK);
+		chatScrollPane.setBorder(new LineBorder(Color.BLACK));
+		chatScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		chatScrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
+	        public void adjustmentValueChanged(AdjustmentEvent e) {  // auto scroll when text overflows viewable area
+	            e.getAdjustable().setValue(e.getAdjustable().getMaximum());  
+	        }
+	    });
 		
 		// text field
 		msgField = new JTextField(10);
@@ -247,7 +322,7 @@ public class ClientPanel extends JPanel {
 		collapseBtn.setForeground(Color.BLACK);
 		collapseBtn.setBorder(new LineBorder(Color.CYAN));
 		collapseBtn.addActionListener( e -> {
-			
+			// TODO possibly add chat window collapse functionality?
 		});
 		
 		connectBtn = new JButton("Connect To Server...");
@@ -264,6 +339,8 @@ public class ClientPanel extends JPanel {
 			sendMessage();
 		});
 	}	
+	
+	// Accessor methods
 	
 	public boolean isConnected() {
 		return isConnected;

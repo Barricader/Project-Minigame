@@ -3,6 +3,8 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.HashMap;
 
 /**
  * Server wrapper
@@ -11,14 +13,26 @@ import java.net.Socket;
 public class Server implements Runnable {
 	private static int PORT = 64837;
 	private static final int MAX_CLIENTS = 4;
+	@Deprecated 
+	/*
+	 * We are using clientMap now, to store and look up clients by ID
+	 */
 	private ServerThread clients[] = new ServerThread[MAX_CLIENTS];
+	private HashMap<Integer, ServerThread> clientMap; // testing hash map instead of array
 	private ServerSocket serverSock = null;
 	private Thread t = null;
 	private int clientCount = 0;
 	private MessageParser parser;
 	
+	/**
+	 * Starts the main server that all clients and their associated server threads
+	 * will connect to. Also creates the message parser, that will be useful for
+	 * performing actions based on data input.
+	 * @throws IOException
+	 */
 	public Server() throws IOException {
 		serverSock = new ServerSocket(PORT);
+		clientMap = new HashMap<>();
 		System.out.println("Server started: " + serverSock);
 		t = new Thread(this);
 		t.start();
@@ -39,24 +53,22 @@ public class Server implements Runnable {
 			}
 		}
 	}
-	
+
 	/**
-	 * Kills server
+	 * Kills all ServerThread clients.
+	 * @throws IOException
 	 * @throws InterruptedException
-	 * @throws IOException 
 	 */
-	public void stop() throws InterruptedException, IOException {
-		if (t != null) {
-			t.join();
-			t = null;
-			for (int i = 0; i < clients.length; i++) {
-				clients[i].close();
-			}
-			serverSock.close();
+	public void stop() throws IOException, InterruptedException {
+		for (ServerThread t : clientMap.values()) {
+			terminateClient(t);
 		}
+		serverSock.close();
 	}
 	
 	/**
+	 * @deprecated - We can now lookup client using ID key in client map!
+	 * 
 	 * Finds client by an ID
 	 * @param ID - Uses this ID to search for a client
 	 * @return
@@ -78,49 +90,76 @@ public class Server implements Runnable {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public synchronized void handle(int ID, String input) throws IOException, InterruptedException {
-		// If a client types 'bye', they exit from the server
+	public synchronized void handle(int ID, String input) throws IOException, SocketException, InterruptedException {
 		System.out.println("Server handle");
 		System.out.println("Input: " + input);
-		if (input.equals("bye")) {
-			clients[findClient(ID)].send("bye");
-			remove(ID);
+	
+		if (parser.parse(input, ID) == MessageParser.VALID_CMD) { // if command is valid, don't echo to clients
+			return;
+		} else {
+			for (ServerThread t : clientMap.values()) {			
+				t.send(getClientName(ID) + ": " + input);
+			}	
 		}
 		
-		parser.parse(input, ID);
-		
-		// send message to clients
-		for (int i = 0; i < clientCount; i++) {
-			clients[i].send(ID + ": " + input);	
+	}
+	
+	/**
+	 * Returns the name of the client, if it isn't null, else it will return a string
+	 * of the client ID. Useful, for echoing stuff to other clients to determine which
+	 * client is the sender.
+	 * @param ID - ID of client to lookup
+	 * @return - Client name or client ID as a string
+	 */
+	public String getClientName(int ID) {
+		String name = clientMap.get(ID).getClientName() != null ? clientMap.get(ID).getClientName() : "" + ID;
+		return name;
+	}
+	
+	/**
+	 * Sends specified message to all clients.
+	 * @param msg - Message to send
+	 * @throws IOException
+	 */
+	public void sendToAll(String msg) throws IOException {
+		for (ServerThread t : clientMap.values()) {
+			t.send(msg);
 		}
 	}
 	
 	/**
-	 * Removes a client
-	 * @param ID - Client ID to remove
+	 * Removes a specified client
+	 * @param ID - ID of client to lookup in client map
+	 * @throws IOException
+	 * @throws SocketException
+	 * @throws InterruptedException
+	 */
+	public synchronized void remove(int ID) throws IOException, SocketException, InterruptedException {
+		ServerThread clientToRemove = clientMap.get(ID);
+		clientToRemove.send("!quit");
+		sendToAll("Client: " + getClientName(ID) + ", has disconnected.");
+		clientMap.remove(ID);
+		clientCount--;
+		terminateClient(clientToRemove);
+		System.out.println("Removed client : " + ID);
+	}
+	
+	/**
+	 * Closes all streams on client and kills the thread process.
+	 * @param client - ServerThread client to terminate
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public synchronized void remove(int ID) throws IOException, InterruptedException {
-		int pos = findClient(ID);
-		if (pos >= 0) {
-			ServerThread toTerminate = clients[pos];
-			System.out.println("Removing client thread " + ID + " at " + pos);
-//			clients[findClient(ID)].send("!disc");
-			if (pos < clientCount - 1) {
-				for (int i = pos + 1; i < clientCount; i++) {
-					clients[i - 1] = clients[i];
-				}
-			}
-			
-			clientCount--;
-			
-			toTerminate.close();
-			toTerminate.join();
-		}
+	private void terminateClient(ServerThread client) throws IOException, InterruptedException {
+		client.close();
+		client.stopThread();
+		client.interrupt();
 	}
 	
 	/**
+	 * @deprecated - Use clientExistsByID instead to lookup key in client map and see
+	 * if it exists.
+	 * 
 	 * Checks if the client exists via ID
 	 * @param id - ID to check for
 	 * @return Whether or not the client exists
@@ -134,18 +173,25 @@ public class Server implements Runnable {
 		return false;
 	}
 	
+	public boolean clientExistsByID(int ID) {
+		return clientMap.containsKey(ID);
+	}
+	
 	/**
-	 * Add a thread for each client
+	 * Add a thread for each client, and stores it in the client map.
 	 * @param sock - Socket of incoming client
 	 * @throws IOException
 	 */
 	public void addThread(Socket sock) throws IOException {
 		if (clientCount < clients.length) {
 			System.out.println("Client accepted: " + sock);
-			clients[clientCount] = new ServerThread(this, sock);
-			
-			clients[clientCount].open();
-			clients[clientCount].start();
+			// create server client and add to client map
+			ServerThread serverClient = new ServerThread(this, sock);
+			int serverClientID = serverClient.getID();
+			serverClient.open();
+			serverClient.start();
+			clientMap.put(serverClientID, serverClient);
+			sendToAll("Client: " + getClientName(serverClientID) + ", has connected!");	
 			clientCount++;
 		}
 		else {
@@ -155,5 +201,9 @@ public class Server implements Runnable {
 	
 	public static void main(String[] args) throws IOException {
 		Server s = new Server();
+	}
+	
+	public HashMap<Integer, ServerThread> getClientMap() {
+		return clientMap;
 	}
 }

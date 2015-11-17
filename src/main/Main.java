@@ -9,8 +9,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import client.ClientPanel;
 import input.Keyboard;
-import states.ClientPanel;
 
 /**
  * Main window of the application that provides a container for the active view. This class
@@ -28,27 +28,25 @@ public class Main extends JFrame {
 	
 	private static Main instance = null;	//singleton reference
 
-	private NewDirector dir;	// main director to control states of application
-	private JPanel panel;
-	private ClientPanel clientPanel;
+	private Director dir;					// main director to control states of application
+	private JPanel panel;					// container to hold everything
+	private ClientPanel clientPanel;		// chat / command sidebar for server connection
 	private Keyboard key;
 
 	/**
 	 * Constructs window and sets up the viewable content of the game.
 	 */
 	public Main() {
-		dir = new NewDirector(this);
+		dir = new Director(this);
 		key = new Keyboard();
+		clientPanel = new ClientPanel();	// create here, so it's not overwritten when view is updated!
 		init();
-//		setContentPane(dir.getState());
 		setTitle(TITLE);
 		setSize(SIZE);
 		setMinimumSize(SIZE);  // no smaller than 1280 x 720
 		setLocationRelativeTo(null);
-//		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);	// handle disconnection first!
 		setVisible(true);
-		instance = this;
 		addKeyListener(key);
 		
 		// disconnect from server when client is closed!
@@ -57,9 +55,12 @@ public class Main extends JFrame {
 				if (clientPanel.isConnected()) {
 					clientPanel.send("!quit " + clientPanel.getClient().getID());
 				}
+				setDefaultCloseOperation(EXIT_ON_CLOSE);
 				dispose();
 			}
 		});
+		
+		instance = this;
 	}
 	
 	private void init() {
@@ -71,7 +72,6 @@ public class Main extends JFrame {
 		System.out.println("Creating components!");
 		panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
-		clientPanel = new ClientPanel();
 		
 		GridBagConstraints c = new GridBagConstraints();
 		
@@ -86,6 +86,7 @@ public class Main extends JFrame {
 		
 		System.out.println("Director state: " + dir.getState());
 		
+		// client sidebar
 		c.anchor = GridBagConstraints.EAST;
 		c.gridx = 1;
 		c.gridy = 0;
@@ -93,21 +94,6 @@ public class Main extends JFrame {
 		panel.add(clientPanel, c);
 		
 		setContentPane(panel);
-	}
-	
-	/**
-	 * 
-	 * @return Singleton instance of this application.
-	 */
-	public static Main getInstance() {
-		if (instance == null) {
-			instance = new Main();
-		}
-		return instance;
-	}
-	
-	public Keyboard getKeyboard() {
-		return key;
 	}
 	
 	/**
@@ -131,12 +117,28 @@ public class Main extends JFrame {
 	}
 	
 	// accessor methods
-	public NewDirector getDirector() {
+	
+	/**
+	 * 
+	 * @return Singleton instance of this application.
+	 */
+	public static Main getInstance() {
+		if (instance == null) {
+			instance = new Main();
+		}
+		return instance;
+	}
+	
+	public Director getDirector() {
 		return dir;
 	}
 	
 	public ClientPanel getClientPanel() {
 		return clientPanel;
+	}
+	
+	public Keyboard getKeyboard() {
+		return key;
 	}
 
 }
