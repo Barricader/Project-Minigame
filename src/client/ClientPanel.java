@@ -35,8 +35,8 @@ public class ClientPanel extends JPanel {
 	private static Dimension SIZE = new Dimension(250, 720);	// min size!
 	
 	// server info
-	private static final String HOST = "localhost";
-	private static final int PORT = 64837;
+	public static final String HOST = "localhost";
+	public static final int PORT = 64837;
 	private ClientThread client;
 	
 	// GUI components
@@ -59,6 +59,17 @@ public class ClientPanel extends JPanel {
 	}
 	
 	/**
+	 * Constructs a new ClientPanel with an active client thread.
+	 * @param client - The client thread
+	 */
+	public ClientPanel(ClientThread client) {
+		this.client = client;
+		init();
+		setMinimumSize(SIZE);
+		setPreferredSize(SIZE);
+	}
+	
+	/**
 	 * Connects to the specified host name and port. This will also display a warning
 	 * message if the connection to server was unsuccessful.
 	 * @param name - Host name of server
@@ -71,10 +82,12 @@ public class ClientPanel extends JPanel {
 			Socket sock = new Socket(name, port);
 			open(sock);
 			printMessage("Connected to: " + sock);
+			connectBtn = disconnectAction();	// change button status
+			isConnected = true;
 			return true;
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(Main.getInstance(), "Unable to connect! Server may have"
-					+ " not been started...", "Connection Error", JOptionPane.ERROR_MESSAGE);
+//			JOptionPane.showMessageDialog(Main.getInstance(), "Unable to connect! Server may have"
+//					+ " not been started...", "Connection Error", JOptionPane.ERROR_MESSAGE);
 			printMessage("Connection attempt failed.");
 		}
 		return false;

@@ -37,10 +37,28 @@ public class Main extends JFrame {
 	 * Constructs window and sets up the viewable content of the game.
 	 */
 	public Main() {
-		dir = new Director(this);
-		key = new Keyboard();
 		clientPanel = new ClientPanel();	// create here, so it's not overwritten when view is updated!
 		init();
+		
+	}
+	
+	/**
+	 * Constructs new main window with an already open client panel, that
+	 * should have been created from running the ClientLogin.
+	 * @param clientPanel
+	 */
+	public Main(ClientPanel clientPanel) {
+		this.clientPanel = clientPanel;
+		init();
+	}
+	
+	/**
+	 * Initialize and setup all the rest of the components.
+	 */
+	private void init() {
+		dir = new Director(this);
+		key = new Keyboard();
+		createComponents();
 		setTitle(TITLE);
 		setSize(SIZE);
 		setMinimumSize(SIZE);  // no smaller than 1280 x 720
@@ -63,14 +81,12 @@ public class Main extends JFrame {
 		instance = this;
 	}
 	
-	private void init() {
-		createComponents();
-	}
-	
+	/**
+	 * Lays out the components using GridBagLayout.
+	 */
 	private void createComponents() {
-		// panel that will hold director state and chat panel
 		System.out.println("Creating components!");
-		panel = new JPanel();
+		panel = new JPanel(); // panel that will hold director state and chat panel
 		panel.setLayout(new GridBagLayout());
 		
 		GridBagConstraints c = new GridBagConstraints();

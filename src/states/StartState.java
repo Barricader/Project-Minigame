@@ -275,13 +275,17 @@ public class StartState extends State {
 		
 	}
 	
+	public PlayerList<Player> getPlayerList() {
+		return playerList;
+	}
+	
 	/**
 	 * Inner class for Player list, which is the list of players that the user can 
 	 * add to / delete, as necessary.
 	 * @author David Kramer
 	 *
 	 */
-	private class PlayerList<E> extends JList<E> {
+	public class PlayerList<E> extends JList<E> {
 		private static final long serialVersionUID = 1644702000601062587L;
 		private DefaultListModel<Player> listModel;
 		private ArrayList<Player> players;
@@ -361,8 +365,17 @@ public class StartState extends State {
 		 * Adds a player with a random color to the list and player array.
 		 */
 		public void addPlayer() {
-			//Player p = new Player(nameField.getText(), GameUtils.getBrightColor());
 			Player p = new Player(nameField.getText());
+			listModel.addElement(p);
+			players.add(p);
+			nameField.setText(""); // clear out
+			updateControls();
+			addBtn.setEnabled(false);
+			playerList.repaint();
+		}
+		
+		public void addPlayer(String name) {
+			Player p = new Player(name);
 			listModel.addElement(p);
 			players.add(p);
 			nameField.setText(""); // clear out
