@@ -7,16 +7,19 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Random;
 
 /**
  * Server thread base class
  * @author JoJones
  */
 public class ServerThread extends Thread {
+	public static boolean[] taken = { false, false, false, false, false, false, false, false, false };
 	private Server server = null;
 	private Socket sock = null;
 	private int ID = -1;
 	private String name = null;
+	private int color = 0;
 	private boolean running = false;
 	
 	private DataInputStream streamIn = null;
@@ -29,6 +32,28 @@ public class ServerThread extends Thread {
 		this.sock = sock;
 		ID = this.sock.getPort();
 		setName("SERVER THREAD: " + ID);
+		
+		boolean chosen = false;
+		Random r = new Random();
+		int c = 0;
+		
+		// Get a random, not yet chosen, number
+		while (!chosen) {
+			// Change to 9 if you want teal
+			c = r.nextInt(8);
+			if (!taken[c]) {
+				taken[c] = true;
+				chosen = true;
+				color = c;
+			}
+		}
+		
+		// Send message to create player on client
+		try {
+			send("!hookPlayer" + ID + " " + name + " " + color);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**

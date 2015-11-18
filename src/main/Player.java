@@ -31,7 +31,7 @@ public class Player extends Rectangle implements Comparable<Player> {
 	private static final long serialVersionUID = 1L;
 	/* Size of players should be uniform for all */
 	public static final int WIDTH = 40;
-	public static final int HEIGHT = 40;
+	public static final int HEIGHT = 40; // DELETE taken?
 	public static boolean[] taken = { false, false, false, false, false, false, false, false, false };
 	private static Image[] imgs = { null, null, null, null, null, null, null, null, null };
 	
@@ -54,6 +54,7 @@ public class Player extends Rectangle implements Comparable<Player> {
 	
 	/**
 	 * Default constructor. Sets players position to (0,0) and default WIDTH and HEIGHT.
+	 * @deprecated
 	 */
 	public Player() {
 		super(0, 0, WIDTH, HEIGHT);
@@ -125,10 +126,62 @@ public class Player extends Rectangle implements Comparable<Player> {
 	 * @param name - name of Player
 	 * @param color - color of player
 	 */
-	public Player(String name, Color color) {
+	public Player(String name, int color) {
 		super(0, 0, WIDTH, HEIGHT);
 		this.name = name;
-		this.color = color;
+		colorNum = color;
+		
+		Random r = new Random();
+		Color myColor = new Color(0);
+		
+		if (!taken[colorNum]) {
+			boolean chosen = false;
+			int c = 0;
+			
+			// Get a random, not yet chosen, number
+			while (!chosen) {
+				// Change to 9 if you want teal
+				c = r.nextInt(8);
+				if (!taken[c]) {
+					taken[c] = true;
+					chosen = true;
+					colorNum = c;
+				}
+			}
+		}
+		
+		// Choose color based on the random number
+		switch (colorNum) {
+		case 0:
+			myColor = new Color(255, 0, 0);
+			break;
+		case 1:
+			myColor = new Color(0, 255, 0);
+			break;
+		case 2:
+			myColor = new Color(0, 0, 255);
+			break;
+		case 3:
+			myColor = new Color(255, 255, 0);
+			break;
+		case 4:
+			myColor = new Color(255, 0, 255);
+			break;
+		case 5:
+			myColor = new Color(0, 255, 255);
+			break;
+		case 6:
+			myColor = new Color(255, 127, 0);
+			break;
+		case 7:
+			myColor = new Color(127, 0, 255);
+			break;
+		case 8:
+			myColor = new Color(0, 255, 127);
+			break;
+		}
+		
+		this.color = myColor;
 		init();
 	}
 	
@@ -137,6 +190,7 @@ public class Player extends Rectangle implements Comparable<Player> {
 	 * @param name - name of Player
 	 * @param color - color of Player
 	 * @param playerID - ID of Player
+	 * @deprecated
 	 */
 	public Player(String name, Color color, byte playerID) {
 		super(0, 0, WIDTH, HEIGHT);
@@ -144,6 +198,10 @@ public class Player extends Rectangle implements Comparable<Player> {
 		this.color = color;
 		this.playerID = playerID;
 		init();
+	}
+	
+	public void initColor() {
+		
 	}
 	
 	public static void load() throws IOException {
@@ -397,6 +455,10 @@ public class Player extends Rectangle implements Comparable<Player> {
 	
 	public ArrayList<Tile> getPath() {
 		return path;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	public int getColorNum() {

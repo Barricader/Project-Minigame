@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -8,6 +9,8 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import javax.swing.JOptionPane;
+
+import main.Player;
 
 /**
  * Establishes a connection to the main server socket. A client thread is an
@@ -19,6 +22,13 @@ import javax.swing.JOptionPane;
  *
  */
 public class ClientThread extends Thread {
+	public static Color[] PLAYER_COLORS = { new Color(255, 0, 0),
+			new Color(0, 255, 0), new Color(0, 0, 255), new Color(255, 255, 0),
+			new Color(255, 0, 255), new Color(0, 255, 255), new Color(255, 127, 0),
+			new Color(127, 0, 255), new Color(0, 255, 127) };
+	public static boolean[] CHOSEN_COLOR = { false, false, false,
+			false, false, false, false, false, false }; // DELETE CHOSEN_COLOR?
+	private Player player = null;
 	private Socket sock = null;
 	private String name = null;
 	private int ID;
@@ -44,6 +54,7 @@ public class ClientThread extends Thread {
 		setName("CLIENT THREAD");
 		open();
 		start();
+		//player = new Player();
 	}
 	
 	/**
@@ -127,6 +138,10 @@ public class ClientThread extends Thread {
 				running = false;		
 			}
 		}
+	}
+	
+	public void initPlayer(String name, int color) {
+		player = new Player(name, color);
 	}
 	
 	public void stopThread() {

@@ -209,6 +209,14 @@ public class ClientPanel extends JPanel {
 			} else if (msg.equals("bye") || msg.equals("!quit")) {
 				printMessage(msg);
 				terminateClient();
+			} else if (msg.equals("!hookPlayer")) {
+				String[] temp = msg.split(" ");
+				int ID = Integer.parseInt(temp[1]);
+				String name = temp[2];
+				int color = Integer.parseInt(temp[3]);
+				if (ID == client.getID()) {
+					client.initPlayer(name, color);
+				}
 			} else {
 				printMessage(msg);
 			}	
