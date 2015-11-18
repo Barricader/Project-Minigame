@@ -23,6 +23,7 @@ public class ClientThread extends Thread {
 	private String name = null;
 	private int ID;
 	private boolean running = false;
+	private boolean validName = false;	// does client have a valid name?
 	private ClientPanel clientPanel = null;
 
 	private DataInputStream streamIn = null;
@@ -138,10 +139,18 @@ public class ClientThread extends Thread {
 		this.ID = ID;
 	}
 	
+	public void setHasValidName(boolean b) {
+		validName = b;
+	}
+	
 	// Accessor methods
 	
 	public int getID() {
 		return ID;
+	}
+	
+	public boolean hasValidName() {
+		return validName;
 	}
 
 }

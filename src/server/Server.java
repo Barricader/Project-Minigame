@@ -105,18 +105,6 @@ public class Server implements Runnable {
 	}
 	
 	/**
-	 * Returns the name of the client, if it isn't null, else it will return a string
-	 * of the client ID. Useful, for echoing stuff to other clients to determine which
-	 * client is the sender.
-	 * @param ID - ID of client to lookup
-	 * @return - Client name or client ID as a string
-	 */
-	public String getClientName(int ID) {
-		String name = clientMap.get(ID).getClientName() != null ? clientMap.get(ID).getClientName() : "" + ID;
-		return name;
-	}
-	
-	/**
 	 * Sends specified message to all clients.
 	 * @param msg - Message to send
 	 * @throws IOException
@@ -173,10 +161,6 @@ public class Server implements Runnable {
 		return false;
 	}
 	
-	public boolean clientExistsByID(int ID) {
-		return clientMap.containsKey(ID);
-	}
-	
 	/**
 	 * Add a thread for each client, and stores it in the client map.
 	 * @param sock - Socket of incoming client
@@ -199,11 +183,56 @@ public class Server implements Runnable {
 		}
 	}
 	
+	public void assignName(int clientID, String name) {
+		ServerThread client = clientMap.get(clientID);	// client we're targeting
+		
+		// check for duplicate names
+		boolean duplicateFound = false;
+		for (ServerThread c : clientMap.values()) {
+			if (c.getClientName() != null) {
+				if (c.getClientName().equalsIgnoreCase(name)) {
+					duplicateFound = true;
+					break;
+				}
+			}
+		}
+		
+		try {
+			if (duplicateFound) {
+				client.send("!invalidName!");
+				client.send("<Duplicate Name - No Assignment Made!>");
+			} else {
+				client.setClientName(name);
+				client.send("You will now be seen as: " + name);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) throws IOException {
 		Server s = new Server();
 	}
 	
+	// accessor methods
+	
 	public HashMap<Integer, ServerThread> getClientMap() {
 		return clientMap;
+	}
+	
+	/**
+	 * Returns the name of the client, if it isn't null, else it will return a string
+	 * of the client ID. Useful, for echoing stuff to other clients to determine which
+	 * client is the sender.
+	 * @param ID - ID of client to lookup
+	 * @return - Client name or client ID as a string
+	 */
+	public String getClientName(int ID) {
+		String name = clientMap.get(ID).getClientName() != null ? clientMap.get(ID).getClientName() : "" + ID;
+		return name;
+	}
+	
+	public boolean clientExistsByID(int ID) {
+		return clientMap.containsKey(ID);
 	}
 }

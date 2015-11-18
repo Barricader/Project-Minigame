@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -111,6 +110,7 @@ public class ClientPanel extends JPanel {
 	 * again later.
 	 */
 	public void terminateClient() throws IOException, InterruptedException {
+		isConnected = false;
 		connectBtn = connectAction();
 		// do everything to kill thread!
 		client.close();
@@ -167,9 +167,7 @@ public class ClientPanel extends JPanel {
 			int val = JOptionPane.showConfirmDialog(Main.getInstance(), "Are you sure you want to disconnect? "
 					, "Confirm Disconnect", JOptionPane.OK_CANCEL_OPTION);
 			
-			if (val == 0) {	// they hit OK button
-//				disconnect();
-//				send("bye");
+			if (val == 0) {
 				send("!quit " + client.getID());
 				connectBtn = connectAction();
 			}
@@ -206,6 +204,8 @@ public class ClientPanel extends JPanel {
 				System.out.println("SHould be assigning ID!");
 				String ID = msg.split("/ID/|/e/")[1].trim();
 				client.setID(Integer.parseInt(ID));
+			} else if (msg.equals("!invalidName!")) {
+				client.setHasValidName(false);
 			} else if (msg.equals("bye") || msg.equals("!quit")) {
 				printMessage(msg);
 				terminateClient();
@@ -233,6 +233,7 @@ public class ClientPanel extends JPanel {
 		String msgArea = chatArea.getText();
 		msgArea += msg + "\n";
 		chatArea.setText(msgArea);
+		chatArea.setCaretPosition(chatArea.getDocument().getLength());	// move scroll bar down to bottom
 	}
 	
 	/**
@@ -244,7 +245,6 @@ public class ClientPanel extends JPanel {
 		GridBagConstraints c = new GridBagConstraints();
 		
 		// connect / disconnect btn
-		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
 		c.gridwidth = 2;
@@ -296,17 +296,13 @@ public class ClientPanel extends JPanel {
 		chatArea.setLineWrap(true);
 		chatArea.setWrapStyleWord(true);
 		chatArea.setEditable(false);
+		chatArea.setCaretPosition(chatArea.getDocument().getLength());	// scroll down
 		
 //		chat scroll pane
 		chatScrollPane = new JScrollPane(chatArea);
 		chatScrollPane.setBackground(Color.BLACK);
 		chatScrollPane.setBorder(new LineBorder(Color.BLACK));
 		chatScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		chatScrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
-	        public void adjustmentValueChanged(AdjustmentEvent e) {  // auto scroll when text overflows viewable area
-	            e.getAdjustable().setValue(e.getAdjustable().getMaximum());  
-	        }
-	    });
 		
 		// text field
 		msgField = new JTextField(10);
@@ -322,11 +318,8 @@ public class ClientPanel extends JPanel {
 			}
 
 			// unused
-			public void keyPressed(KeyEvent e) {
-			}
-
-			public void keyReleased(KeyEvent e) {
-			}
+			public void keyPressed(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {}
 
 		});
 		

@@ -51,11 +51,9 @@ public class MessageParser {
 					if (parameters.size() >= 2) {
 						name = parameters.get(1);	
 					} else {
-						return INVALID_CMD;
+						return INVALID_PARAM_COUNT;
 					}
-					ServerThread client = server.getClientMap().get(ID);
-					client.setClientName(name);
-					client.send("You will now be seen as: " + name);
+					server.assignName(ID, name);
 					return VALID_CMD;
 				}
 			}

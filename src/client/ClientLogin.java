@@ -108,9 +108,8 @@ public class ClientLogin extends JFrame {
 		nameField.addKeyListener(new KeyListener() {
 
 			public void keyTyped(KeyEvent e) {
-				System.out.println("Name field key typed");
 				if (validateField()) {
-					if (e.getKeyChar() == '\n') {	// if enter and field is valid, try to connect
+					if (e.getKeyChar() == '\n') {	// if enter hit and field is valid, try to connect
 						connect();
 					}
 				}
@@ -142,8 +141,13 @@ public class ClientLogin extends JFrame {
 		ClientPanel c = new ClientPanel();
 		if (c.connect(ClientPanel.HOST, ClientPanel.PORT)) {
 			c.send("!name " + nameField.getText());
-			Main main = new Main(c);	// create main client window
-			createServerPlayer(main);
+			if (c.getClient().hasValidName()) {
+				Main main = new Main(c);	// create main client window
+				createServerPlayer(main);
+			} else {	// name is invalid
+				JOptionPane.showMessageDialog(this, "Invalid client name (duplicate). "
+						+ "Please try a different name!", "Invalid Name", JOptionPane.ERROR_MESSAGE);
+			}
 		} else {
 			JOptionPane.showMessageDialog(this, "Unable to connect! Server may have"
 					+ " not been started...", "Connection Error", JOptionPane.ERROR_MESSAGE);
