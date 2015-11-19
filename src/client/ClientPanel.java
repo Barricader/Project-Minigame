@@ -34,7 +34,7 @@ public class ClientPanel extends JPanel {
 	private static Dimension SIZE = new Dimension(250, 720);	// min size!
 	
 	// server info
-	public static final String HOST = "localhost";
+	public static final String HOST = "10.10.14.61";
 	// Ports: 7742 - 7745
 	public static final int PORT = 7742;
 	private ClientThread client;

@@ -35,6 +35,7 @@ public class Server implements Runnable {
 		serverSock = new ServerSocket(PORT);
 		clientMap = new HashMap<>();
 		System.out.println("Server started: " + serverSock);
+		System.out.println("IP: " + serverSock.getLocalSocketAddress());
 		t = new Thread(this);
 		t.start();
 		parser = new MessageParser(this);
@@ -211,6 +212,8 @@ public class Server implements Runnable {
 		}
 	}
 	
+	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException {
 		Server s = new Server();
 	}
