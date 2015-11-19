@@ -19,7 +19,6 @@ import input.Keyboard;
  * allows for chat, and connection to the server, as a sidebar.
  * @author David Kramer
  * @author JoJones
- *
  */
 public class Main extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -127,6 +126,7 @@ public class Main extends JFrame {
 	/**
 	 * Main method that starts the application.
 	 * @param args
+	 * @deprecated
 	 */
 	public static void main(String[] args) {
 		Main testScreen = new Main();

@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
@@ -31,6 +30,7 @@ import main.Main;
  *
  */
 public class ClientPanel extends JPanel {
+	private static final long serialVersionUID = 387131825632422737L;
 	private static Dimension SIZE = new Dimension(250, 720);	// min size!
 	
 	// server info
@@ -43,7 +43,7 @@ public class ClientPanel extends JPanel {
 	private JTextArea chatArea;
 	private JTextField msgField;
 	private JButton sendBtn;
-	private JButton collapseBtn; 	// TODO make the chat window able to collapse / expand
+	private JButton collapseBtn; 	// TODO fix collapsing, just fix it so the button shows when collapsed
 	private JButton connectBtn;		// connect or disconnect button
 	
 	private boolean isConnected;	// are we connected to the server?

@@ -210,6 +210,7 @@ public class Server implements Runnable {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException {
 		Server s = new Server();
 	}

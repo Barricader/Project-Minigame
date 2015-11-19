@@ -6,8 +6,6 @@ import states.MinigameState;
 import states.StartState;
 import states.State;
 
-// TODO: Make it output the player list sorting to test
-
 /**
  * 
  * Main class that will keep track of the game

@@ -28,6 +28,7 @@ import states.StartState;
  *
  */
 public class ClientLogin extends JFrame {
+	private static final long serialVersionUID = -7840356911382391248L;
 	private static final Dimension SIZE = new Dimension(300, 500);
 
 	private JPanel panel;
@@ -170,6 +171,7 @@ public class ClientLogin extends JFrame {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		ClientLogin login = new ClientLogin();
 	}

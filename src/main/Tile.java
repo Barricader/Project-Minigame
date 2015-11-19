@@ -7,8 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import screen.StatusPanel;
-
 /**
  * A tile is a rectangular shape that is contained within the grid of the board. A tile
  * has an (x,y) coordinate, a random color, and a random action or mini-game event. A tile

@@ -1,6 +1,5 @@
 package main;
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
