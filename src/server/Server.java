@@ -11,7 +11,8 @@ import java.util.HashMap;
  * @author JoJones
  */
 public class Server implements Runnable {
-	private static int PORT = 64837;
+	// Ports that are open: 7742 - 7745
+	private static int PORT = 7742;
 	private static final int MAX_CLIENTS = 4;
 	@Deprecated 
 	/*

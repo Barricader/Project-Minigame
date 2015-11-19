@@ -35,7 +35,8 @@ public class ClientPanel extends JPanel {
 	
 	// server info
 	public static final String HOST = "localhost";
-	public static final int PORT = 64837;
+	// Ports: 7742 - 7745
+	public static final int PORT = 7742;
 	private ClientThread client;
 	
 	// GUI components
