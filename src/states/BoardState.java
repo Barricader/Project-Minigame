@@ -95,6 +95,7 @@ public class BoardState extends State {
 	 *
 	 */
 	public class BoardPanel extends JPanel implements ComponentListener, MouseListener, MouseMotionListener {
+		private static final long serialVersionUID = -7658637279679249153L;
 		private ArrayList<Tile> tiles;
 		private Dice dice;
 		private Rectangle midRect;

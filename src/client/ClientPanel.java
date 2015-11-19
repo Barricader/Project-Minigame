@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
@@ -31,6 +30,8 @@ import main.Main;
  *
  */
 public class ClientPanel extends JPanel {
+	private static final long serialVersionUID = 387131825632422737L;
+
 	private static Dimension SIZE = new Dimension(250, 720);	// min size!
 	
 	// server info

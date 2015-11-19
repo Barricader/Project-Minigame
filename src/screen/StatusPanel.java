@@ -1,7 +1,6 @@
 package screen;
 
 import java.awt.Color;
-import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;

@@ -20,20 +20,17 @@ public class MessageParser {
 	
 	private String command;
 	private ArrayList<String> parameters;
-	private int paramCount;
 	private Server server;
 	
 	public MessageParser(Server server) {
 		command = "";
 		parameters = new ArrayList<String>();
-		paramCount = 0;
 		this.server = server;
 	}
 	
 	public int parse(String str, int ID) throws IOException, InterruptedException {
 		if (str.startsWith("!")) {	// potential command by using delim
 			reset();	// clear out before we process
-			String temp = str.replace(" ", "");	// remove space
 			String[] params = str.split(" ");
 			command = params[0];
 			
@@ -64,6 +61,5 @@ public class MessageParser {
 	private void reset() {
 		command = "";
 		parameters.clear();
-		paramCount = 0;
 	}
 }
