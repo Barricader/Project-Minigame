@@ -70,7 +70,7 @@ public class Main extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				if (clientPanel.isConnected()) {
-					clientPanel.send("!quit " + clientPanel.getClient().getID());
+					clientPanel.send("!quit");
 				}
 				setDefaultCloseOperation(EXIT_ON_CLOSE);
 				dispose();

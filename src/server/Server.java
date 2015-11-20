@@ -11,7 +11,8 @@ import java.util.HashMap;
  * @author JoJones
  */
 public class Server implements Runnable {
-	private static int PORT = 64837;
+	// Ports that are open: 7742 - 7745
+	private static int PORT = 7742;
 	private static final int MAX_CLIENTS = 4;
 	@Deprecated 
 	/*
@@ -34,6 +35,7 @@ public class Server implements Runnable {
 		serverSock = new ServerSocket(PORT);
 		clientMap = new HashMap<>();
 		System.out.println("Server started: " + serverSock);
+		System.out.println("IP: " + serverSock.getLocalSocketAddress());
 		t = new Thread(this);
 		t.start();
 		parser = new MessageParser(this);
