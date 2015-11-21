@@ -42,15 +42,60 @@ public class MessageParser {
 			if (server.clientExistsByID(ID)) {
 				if (command.equals("!quit")) {
 					server.remove(ID);
+					server.isConnected(ID);
 					return VALID_CMD;
-				} else if (command.equals("!name")) {
+				}
+				else if (command.equals("!name")) {
 					String name = null;
 					if (parameters.size() >= 2) {
 						name = parameters.get(1);	
-					} else {
+					}
+					else {
 						return INVALID_PARAM_COUNT;
 					}
 					server.assignName(ID, name);
+					server.isConnected(ID);
+					return VALID_CMD;
+				}
+				else if (command.equals("!move")) {
+					String spaceIndex = "";
+					if (parameters.size() >= 2) {
+						spaceIndex  = parameters.get(1);	
+					}
+					else {
+						return INVALID_PARAM_COUNT;
+					}
+					server.movePlayer(ID, spaceIndex);
+					server.isConnected(ID);
+					return VALID_CMD;
+				}
+				else if (command.equals("!ok")) {
+					if (parameters.size() == 2) {
+					}
+					else {
+						return INVALID_PARAM_COUNT;
+					}
+					server.isConnected(ID);
+					return VALID_CMD;
+				}
+				else if (command.equals("!placeholder")) {
+					if (parameters.size() >= 2) {
+						
+					}
+					else {
+						return INVALID_PARAM_COUNT;
+					}
+					server.isConnected(ID);
+					return VALID_CMD;
+				}
+				else if (command.equals("!placeholder2")) {
+					if (parameters.size() >= 2) {
+						
+					}
+					else {
+						return INVALID_PARAM_COUNT;
+					}
+					server.isConnected(ID);
 					return VALID_CMD;
 				}
 			}

@@ -212,6 +212,14 @@ public class Server implements Runnable {
 		}
 	}
 	
+	public void movePlayer(int clientID, String tileIndex) {
+		// Send message to move players here
+	}
+	
+	public void isConnected(int clientID) {
+		
+	}
+	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException {
 		Server s = new Server();
