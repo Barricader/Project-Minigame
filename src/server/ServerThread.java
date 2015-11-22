@@ -21,6 +21,9 @@ public class ServerThread extends Thread {
 	private String name = null;
 	private int color = 0;
 	private boolean running = false;
+	private int timeOutTimer = 0;
+	
+	private Thread test = null;
 	
 	private DataInputStream streamIn = null;
 	private DataOutputStream streamOut = null;
@@ -48,9 +51,50 @@ public class ServerThread extends Thread {
 			}
 		}
 		
+		try {
+			open();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		test = new Thread(new Runnable() {
+			public void run() {
+				boolean te = true;	
+				long startTime;
+				long elapsed;
+				long wait;
+				int targetTime = 1000 / 60;
+				
+				while (te) {
+					startTime = System.nanoTime();
+					elapsed = System.nanoTime() - startTime;
+					wait = targetTime - elapsed / 1000000;
+					if (wait < 0) {
+						wait = 5;
+					}
+					
+					try {
+						Thread.sleep(wait);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					timeOutTimer++;
+					System.out.println(timeOutTimer);
+					
+					// TODO: change me to a better value
+					if (timeOutTimer > 750) {
+						te = false;
+						// Timeout occurred, do something here
+					}
+				}
+			}
+		});
+		test.start();
+		
 		// Send message to create player on client
 		try {
-			send("!hookPlayer" + ID + " " + name + " " + color);
+			send("!hookPlayer " + ID + " " + name + " " + color);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -64,6 +108,7 @@ public class ServerThread extends Thread {
 	public void send(String msg) throws IOException {
 		streamOut.writeUTF(msg);
 		streamOut.flush();
+		timeOutTimer = 0;
 	}
 	
 	/**
@@ -77,6 +122,7 @@ public class ServerThread extends Thread {
 			try {
 				System.out.println("Server Thread:  checking input");
 				server.handle(ID, streamIn.readUTF());
+				timeOutTimer = 0;
 			} catch (SocketException e) {
 				running = false;	// socket streams are closed. stop running thread!
 			} catch (IOException e) {

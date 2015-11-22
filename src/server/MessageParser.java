@@ -70,7 +70,8 @@ public class MessageParser {
 					return VALID_CMD;
 				}
 				else if (command.equals("!ok")) {
-					if (parameters.size() == 2) {
+					if (parameters.size() == 1) {
+						// Do nothing for now
 					}
 					else {
 						return INVALID_PARAM_COUNT;

@@ -5,6 +5,13 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Class that parses JSONObjects
+ * 
+ * There is more to the JSONObject stuff that I haven't looked into yet
+ * so there is still some things to add
+ * @author Jo Jones
+ */
 public class JSONParser {
 	private ArrayList<JSONObject> objects;
 	
