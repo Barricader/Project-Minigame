@@ -18,7 +18,6 @@ import panels.BoardPanel;
 import panels.ChatPanel;
 import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
-import panels.DrawPanel;
 
 /**
  * This will be the new "MAIN" application that the client will run to use
