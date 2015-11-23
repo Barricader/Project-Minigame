@@ -14,6 +14,7 @@ import org.json.simple.parser.ParseException;
  * There is more to the JSONObject stuff that I haven't looked into yet
  * so there is still some things to add
  * @author Jo Jones
+ * @deprecated
  */
 public class JSONUtility {
 	// For decoding

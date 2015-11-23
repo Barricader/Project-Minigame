@@ -65,5 +65,36 @@ public class ExampleJSON {
 			System.out.println("pos: " + pe.getPosition());
 			System.out.println(pe);
 		}
+		
+		JSONObject testing = new JSONObject();
+		
+		JSONObject x = new JSONObject();
+		x.put("test", 32);
+		JSONObject y = new JSONObject();
+		y.put("dsaf", "DSKF");
+		
+		// EXAMPLE FOR PLAYER LIST
+//		ArrayList<JSONObject> al = new ArrayList<JSONObject>();
+//		for (int i = 0; i < players.size(); i++) {
+//			JSONObject temp = new JSONObject();
+//			temp.put("ID", i);
+//			temp.put("name", players.get(i).getName());
+//			...
+//		}
+		
+		Object[] testArray = { x, y };
+		
+//		testArray.add("hello");
+//		testArray.add("goodebye");
+		
+		testing.put("height", 66);
+		testing.put("test", false);
+		testing.put("UH", "nope");
+		//testing.put("testArray", testArray);
+		testing.put("otherArray", testArray);
+		
+		System.out.println();
+		System.out.println("JSON object to send");
+		System.out.println(testing);
 	}
 }
