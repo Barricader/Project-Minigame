@@ -3,7 +3,6 @@ package panels;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -18,7 +17,7 @@ import javax.swing.JPanel;
 import client.ClientApp;
 import gameobjects.Player;
 import gameobjects.Tile;
-import utils.GameUtils;
+import util.GameUtils;
 
 public class BoardPanel extends JPanel implements ComponentListener {
 	public static final int HORIZONTAL_TILE_COUNT = 10;

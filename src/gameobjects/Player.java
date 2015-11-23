@@ -17,7 +17,7 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import utils.Vector;
+import util.Vector;
 
 /**
  * A player should be created from the main start state. A player has a random name,

@@ -18,8 +18,8 @@ import javax.swing.border.LineBorder;
 import client.Client;
 import client.ClientApp;
 import client.IOHandler;
-import server.Server;
-import utils.GameUtils;
+import newserver.Server;
+import util.GameUtils;
 
 /**
  * Simple connection panel that allows the user to connect / disconnect and provides
