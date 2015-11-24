@@ -70,6 +70,11 @@ public class Server extends Thread {
 		serverSocket.close();
 	}
 	
+	/**
+	 * Adds a client to the clients map.
+	 * @param socket - Socket to allow server client to connect
+	 * @throws IOException
+	 */
 	public void addClient(Socket socket) throws IOException {
 		if (clients.size() < MAX_CLIENTS) {
 			int ID = rng.nextInt(5000);
@@ -85,6 +90,10 @@ public class Server extends Thread {
 		}
 	}
 	
+	/**
+	 * Removes client from clients map with specified ID.
+	 * @param clientID - ID of client to remove.
+	 */
 	public void removeClient(int clientID) {
 		ServerClient sc = clients.get(clientID);
 		if (sc != null) {
@@ -101,6 +110,10 @@ public class Server extends Thread {
 		}
 	}
 	
+	/**
+	 * Echoes string to all clients.
+	 * @param out - String to send to all clients.
+	 */
 	public void echoAll(String out) {
 		for (ServerClient sc : clients.values()) {
 			sc.getIOHandler().send(out);

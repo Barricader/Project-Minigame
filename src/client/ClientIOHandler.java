@@ -2,7 +2,7 @@ package client;
 
 import java.io.IOException;
 
-import gameobjects.Player;
+import gameobjects.NewPlayer;
 
 /**
  * This class provides implementation for handling input/output on the ClientSide.
@@ -50,8 +50,10 @@ public class ClientIOHandler extends IOHandler {
 		System.out.println("Player received!");
 		String[] params = in.split(" ");
 		String name = params[1];
-		int colorID = Integer.parseInt(params[2]);
-		Player p = new Player(name, colorID);
+		int ID = Integer.parseInt(params[2]);
+		int colorNum = Integer.parseInt(params[3]);
+		NewPlayer p = new NewPlayer(name, ID);
+		p.style(colorNum);
 		app.getBoardPanel().addPlayer(p);
 	}
 

@@ -18,6 +18,7 @@ import panels.BoardPanel;
 import panels.ChatPanel;
 import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
+import panels.LoginPanel;
 
 /**
  * This will be the new "MAIN" application that the client will run to use
@@ -27,7 +28,7 @@ import panels.ConnectionPanel.Controller;
  */
 public class ClientApp extends JFrame {
 	private static final String TITLE = "Project Mini-Game by Jo & Kramer";
-	private static final Dimension SIZE = new Dimension(800, 800);
+	private static final Dimension SIZE = new Dimension(960, 800);	// min size
 	private static ClientApp instance = null;
 	private Client client;
 	
@@ -37,6 +38,7 @@ public class ClientApp extends JFrame {
 	private ChatPanel chatPanel;
 	private BoardPanel boardPanel;
 	private ConnectionPanel connPanel;
+	private LoginPanel loginPanel;
 	
 	public ClientApp() {
 		client = new Client(this);
@@ -75,7 +77,7 @@ public class ClientApp extends JFrame {
 		c.weightx = 1.0;
 		c.gridy = 1;
 		c.gridheight = 5;
-		c.weighty = 1.0;
+		c.weighty = 0.8;
 		boardPanel = new BoardPanel();	// here to workaround first size glitch.
 		panel.add(boardPanel, c);
 		
@@ -102,6 +104,7 @@ public class ClientApp extends JFrame {
 		statePanel.setBorder(new LineBorder(Color.LIGHT_GRAY));
 		chatPanel = new ChatPanel(this);
 		connPanel = new ConnectionPanel(this);
+		loginPanel = new LoginPanel(this);
 	}
 	
 	/**
@@ -116,6 +119,10 @@ public class ClientApp extends JFrame {
 		setVisible(true);
 	}
 	
+	/**
+	 * 
+	 * @return Singleton instance of ClientApp
+	 */
 	public static ClientApp getInstance() {
 		if (instance == null) {
 			instance = new ClientApp();

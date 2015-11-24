@@ -36,6 +36,8 @@ public class ServerIOHandler extends IOHandler {
 		}
 		if (in.equals("!addPlayer")) {
 			serverClient.getServer().getServerDirector().addRandomPlayer();	// TEST
+		} else {
+			serverClient.getServer().echoAll(in);
 		}
 	}
 

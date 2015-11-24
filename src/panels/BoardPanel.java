@@ -3,58 +3,89 @@ package panels;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.JPanel;
 
 import client.ClientApp;
-import gameobjects.Player;
-import gameobjects.Tile;
+import gameobjects.NewPlayer;
+import gameobjects.NewTile;
+import main.Animator;
 import util.GameUtils;
 
 public class BoardPanel extends JPanel implements ComponentListener {
 	public static final int HORIZONTAL_TILE_COUNT = 10;
 	public static final byte VERTICAL_TILE_COUNT = HORIZONTAL_TILE_COUNT / 2;
 	
-	private ArrayList<Tile> tiles;
-	private ArrayList<Player> players;
-	private Rectangle midRect;
+	private ArrayList<NewTile> tiles;
+	private ArrayList<NewPlayer> players;
+	private NewPlayer activePlayer;
 	
 	public BoardPanel() {
 		init();
-		try {
-			Player.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		players = new ArrayList<>();
+		
+		// test players
 		addComponentListener(this);
 	}
 	
 	private void init() {
 		createTiles();
-		createMidRect();
 	}
 	
-	public void addPlayer(Player p) {
+	public void addPlayer(NewPlayer p) {
+		System.out.println("New Player " + p + ", added to board!");
 		players.add(p);
+		activePlayer = p;
+		
+		// test
+		activePlayer.setTile(tiles.get(0));	// start at 0
+		ArrayList<NewTile> movePath = createPathFromRoll(20);	// static roll
+		activePlayer.initMove(movePath);
+		Animator test = new Animator();
+		test.animatePlayer(this, activePlayer);
 		repaint();
 	}
 	
+	/**
+	 * Generates a movement path for the active player, based on the dice roll.
+	 * @param roll - Tiles to add from active player current position
+	 * @return - Array of tiles for movement
+	 */
+	public ArrayList<NewTile> createPathFromRoll(int roll) {
+		int curTileID = activePlayer.getTile().getID();
+		int newTileID = curTileID + roll;
+		
+		ArrayList<NewTile> movePath = new ArrayList<>();
+		for (int i = curTileID; i < newTileID; i++) {
+			if (i > tiles.size() - 1) {
+				movePath.add(tiles.get(i - tiles.size()));
+			} else {
+				movePath.add(tiles.get(i));
+			}
+		}
+		
+		if (newTileID >= tiles.size()) {
+			newTileID -= tiles.size();
+		}
+		return movePath;
+	}
+	
+	/**
+	 * Draws tiles and players to the screen.
+	 * @param g - Graphics context to draw to
+	 */
 	public void paintComponent(Graphics g) {
 		final Graphics2D g2d = (Graphics2D)g.create();
 		try {
 			g2d.setColor(GameUtils.colorFromHex("#2b2b2b"));
 			g2d.fillRect(0, 0, getWidth(), getHeight());
 			g2d.setColor(Color.CYAN);
-			g2d.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
 			drawTiles(g2d);
 			drawPlayers(g2d);
 		} finally {
@@ -62,14 +93,22 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		}
 	}
 	
+	/**
+	 * Draws tiles.
+	 * @param g - Graphics context to draw to
+	 */
 	private void drawTiles(Graphics g) {
-		for (Tile t : tiles) {
+		for (NewTile t : tiles) {
 			t.draw(g);
 		}
 	}
 	
+	/**
+	 * Draws players.
+	 * @param g - Graphics context to draw to
+	 */
 	private void drawPlayers(Graphics g) {
-		for (Player p : players) {
+		for (NewPlayer p : players) {
 			p.draw(g);
 		}
 	}
@@ -94,12 +133,13 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			e.printStackTrace();
 		}
 		
-		// size of this component is currently unknown, so we have to get content size from ClientApp!
+//		// size of this component is currently unknown, so we have to get content size from ClientApp!
 //		int width = ClientApp.getInstance().getStatePanel().getSize().width;
 //		int height = ClientApp.getInstance().getStatePanel().getSize().height;
 		
-		int width = 800;
-		int height = 400;
+		// despite being zero, the component is resized which fixes size issue.
+		int width = 0;
+		int height = 0;
 		
 		// use Math.ceil() to eliminate the small 1-2px gap that would occur around edges
 		int tileWidth = (int)Math.ceil((float)width / HORIZONTAL_TILE_COUNT);
@@ -107,8 +147,6 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		
 		// Set the tiles with our x's and y's from our file
 		for (int i = 0; i < coords.size(); i++) {
-			// tile ID's are being setup through a static variable in the tile class.
-			// whenever a new tile is created, the overall Tile ID is incremented.
 			String[] s = coords.get(i).split(",");
 			int x = Integer.parseInt(s[0]);
 			int y = Integer.parseInt(s[1]);
@@ -123,25 +161,10 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			}
 			else {
 				color = GameUtils.colorFromHex("#1DD147");	// green
-			}
-				
-			Tile t = new Tile(color, 0, Tile.TILE_ID, x, y, tileWidth, tileHeight);
-			tiles.add(t.getTileID(), t);
+			}	
+			NewTile t = new NewTile(color, 0, NewTile.TILE_COUNT, x, y, tileWidth, tileHeight);
+			tiles.add(t.getID(), t);
 		}
-	}
-	
-	private void createMidRect() {
-		int width = ClientApp.getInstance().getStatePanel().getSize().width;
-		int height = ClientApp.getInstance().getStatePanel().getSize().height;
-		
-		System.out.println("WIDTH: " + width + ", height: " + height);
-		
-		int rectWidth = 300;
-		int rectHeight = 150;
-		int x = (width - rectWidth) / 2;
-		int y = (height - rectHeight) / 2;
-		
-		midRect = new Rectangle(x, y, rectWidth, rectHeight);
 	}
 	
 	/**
@@ -151,23 +174,31 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		int tileWidth = (int)Math.ceil((float)getWidth() / HORIZONTAL_TILE_COUNT);
 		int tileHeight = (int)Math.ceil((float)getHeight() / VERTICAL_TILE_COUNT);
 		
-		for (Tile t : tiles) {
+		for (NewTile t : tiles) {
 			t.width = tileWidth;
 			t.height = tileHeight;
 		}
 	}
 	
 	/**
-	 * Resizes the midRect in response to the window being resized.
+	 * Updates all players positioning in response to a window resize event.
 	 */
-	private void resizeMidRect() {
-		midRect.x = (getWidth() - midRect.width) / 2;
-		midRect.y = (getHeight() - midRect.height) / 2;
+	private void resizePlayers() {
+		for (int i = 0; i < players.size(); i++) {
+			NewPlayer p = players.get(i);
+			System.out.println("should be resizing players!");
+			if (p.getTile() != null) {	// we can reassign location based on current tile
+				p.setLocation(p.getTile().getCellLocation(p.getID()));
+				System.out.println("Is player tile null? Shouldn't be if you're reading this!");
+			} 
+		}
 	}
 
 	public void componentResized(ComponentEvent e) {
 		resizeTiles();
-		resizeMidRect();
+		resizePlayers();
+		System.out.println(ClientApp.getInstance().getSize());
+		repaint();
 	}
 
 	// unused component listener methods

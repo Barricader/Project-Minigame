@@ -6,7 +6,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -183,10 +185,11 @@ public class ConnectionPanel extends JPanel {
 				try {
 					Client c = app.getClient();
 					c.terminate();
-					app.resetClient();
-					controller.updateStatus(STATUS_DISCONNECTED);
 				} catch (Exception e1) {
-					e1.printStackTrace();
+					
+				} finally {
+					controller.updateStatus(STATUS_DISCONNECTED);
+					app.resetClient();
 				}
 			});
 			return connectBtn;
