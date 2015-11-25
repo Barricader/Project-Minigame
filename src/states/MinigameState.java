@@ -2,7 +2,7 @@ package states;
 
 import java.util.Random;
 
-import main.NewDirector;
+import main.Director;
 import mini.Minigame;
 
 /**
@@ -20,7 +20,7 @@ public class MinigameState extends State {
 	private int curMinigame;
 	private boolean chosen;
 	
-	public MinigameState(NewDirector director) {
+	public MinigameState(Director director) {
 		super(director);
 		r = new Random();
 		curMinigame = 0;

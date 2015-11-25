@@ -1,6 +1,5 @@
-package states;
+package main;
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,14 +9,16 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
-import main.Dice;
-import main.NewDirector;
-import main.Player;
-import main.Tile;
+import states.BoardState;
 
+/**
+ * Player manager class that keeps track of all players in the game. 
+ * @author David Kramer
+ *
+ */
 public class PlayerManager {
-	private NewBoardState boardState;
-	private NewDirector director;
+	private BoardState boardState;
+	private Director director;
 	private ArrayList<Player> players;
 	private ArrayList<Player> tiedPlayers;	// keeping track of tied players
 	private Player activePlayer;
@@ -26,7 +27,7 @@ public class PlayerManager {
 	private JLabel statusLabel;
 	private Timer timer;	// timer for controlling delay for various events
 	
-	public PlayerManager(NewDirector director, NewBoardState boardState) {
+	public PlayerManager(Director director, BoardState boardState) {
 		this.director = director;
 		this.boardState = boardState;
 		this.players = director.getPlayers();
@@ -38,6 +39,10 @@ public class PlayerManager {
 		timer = new Timer(2000, null);
 	}
 	
+	/**
+	 * When the game is first launched, this method should be called to update 
+	 * the status and toggle the active player, to allow the game play to start.
+	 */
 	public void updateStatusOnLaunch() {
 		resetTimer(2000, false);
 		timer.start();
@@ -102,23 +107,6 @@ public class PlayerManager {
 			}
 		} else {
 			rollTies(dice);
-		}
-	}
-	
-	/**
-	 * Updates all players positioning in response to a window resize event.
-	 */
-	public void updatePlayersFromResize() {
-		for (int i = 0; i < players.size(); i++) {
-			Player p = players.get(i);
-			
-			if (p.getTile() != null) {	// we can reassign location based on current tile
-				p.setLocation(p.getTile().getLocation(p.getPlayerID()));
-			} else { // still in middle of screen, update relative to mid rect
-				Rectangle midRect = boardState.getBoard().getMidRect();
-				p.x = midRect.x + (p.width * i) + 100 + (i * 50);
-				p.y = midRect.y + 50;
-			}
 		}
 	}
 	
@@ -425,7 +413,6 @@ public class PlayerManager {
 	public ArrayList<Player> getPlayers() {
 		return players;
 	}
-	
 	
 	public Player getActivePlayer() {
 		return activePlayer;

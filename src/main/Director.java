@@ -3,10 +3,8 @@ import java.util.ArrayList;
 
 import states.BoardState;
 import states.MinigameState;
-import states.NewStartState;
+import states.StartState;
 import states.State;
-
-// TODO: Make it output the player list sorting to test
 
 /**
  * 
@@ -15,7 +13,7 @@ import states.State;
  * @author JoJones
  *
  */
-public class NewDirector implements Runnable {
+public class Director implements Runnable {
 	public static final int MAX_PLAYERS = 4;	// max players allowed
 	public static final int FPS = 60;
 	
@@ -36,9 +34,9 @@ public class NewDirector implements Runnable {
 	 * Create a NewDirector object that will hand stats for the whole game
 	 * @param m - An instance of Main to use in NewDirector
 	 */
-	public NewDirector (Main m) {
+	public Director (Main m) {
 		this.m = m;
-		this.curState = new NewStartState(this);
+		this.curState = new StartState(this);
 		this.boardState = new BoardState(this);
 		this.mgState = new MinigameState(this);
 		this.turn = 1;

@@ -15,6 +15,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import util.GameUtils;
+
 /**
  * This class provides controls for altering the amount of turns that the game 
  * will have. There are 3 possibilities: 10, 20 or a custom numeric value which

@@ -1,11 +1,11 @@
 package states;
 
-import main.NewDirector;
+import main.Director;
 
 public class EndState extends State {
 	private static final long serialVersionUID = 1L;
 
-	public EndState(NewDirector director) {
+	public EndState(Director director) {
 		super(director);
 	}
 

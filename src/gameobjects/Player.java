@@ -1,4 +1,4 @@
-package main;
+package gameobjects;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -11,6 +11,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -27,7 +28,7 @@ import util.Vector;
  * @author David Kramer
  *
  */
-public class Player extends Rectangle implements Comparable<Player> {
+public class Player extends Rectangle implements Comparable<Player>, Serializable {
 	private static final long serialVersionUID = 1L;
 	/* Size of players should be uniform for all */
 	public static final int WIDTH = 40;
@@ -134,21 +135,22 @@ public class Player extends Rectangle implements Comparable<Player> {
 		Random r = new Random();
 		Color myColor = new Color(0);
 		
-		if (!taken[colorNum]) {
-			boolean chosen = false;
-			int c = 0;
-			
-			// Get a random, not yet chosen, number
-			while (!chosen) {
-				// Change to 9 if you want teal
-				c = r.nextInt(8);
-				if (!taken[c]) {
-					taken[c] = true;
-					chosen = true;
-					colorNum = c;
-				}
-			}
-		}
+		// COMMENTED OUT FOR TESTING -> CREATING PLAYER FROM SERVER, WITH ALREADY SPECIFIED COLOR ID NUM.
+//		if (!taken[colorNum]) {
+//			boolean chosen = false;
+//			int c = 0;
+//			
+//			// Get a random, not yet chosen, number
+//			while (!chosen) {
+//				// Change to 9 if you want teal
+//				c = r.nextInt(8);
+//				if (!taken[c]) {
+//					taken[c] = true;
+//					chosen = true;
+//					colorNum = c;
+//				}
+//			}
+//		}
 		
 		// Choose color based on the random number
 		switch (colorNum) {

@@ -25,22 +25,23 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import main.NewDirector;
+import main.Director;
 import main.Player;
 import screen.GameButton;
-import screen.GameUtils;
 import screen.PlayerListCellRenderer;
 import screen.TurnControlPanel;
+import util.GameUtils;
 
 /**
  * This is the initial state of the application. The user is presented with the ability
  * to add or remove players, as well as control how many turns there will be in the game. After
  * all this information has been setup, the board state will be created and all newly created
  * players will be sent to the director.
+ * @deprecated
  * @author David Kramer
  *
  */
-public class NewStartState extends State {
+public class StartState extends State {
 	private static final long serialVersionUID = 1L;
 	
 	private NameField nameField;	// field for entering player name
@@ -55,7 +56,7 @@ public class NewStartState extends State {
 	private JLabel remainingLabel;
 	private int playersRemaining;	
 	
-	public NewStartState(NewDirector director) {
+	public StartState(Director director) {
 		super(director);
 		init();
 	}
@@ -77,7 +78,7 @@ public class NewStartState extends State {
 	 */
 	private void init() {
 		// create all GUI components first
-		playersRemaining = NewDirector.MAX_PLAYERS;
+		playersRemaining = Director.MAX_PLAYERS;
 		nameField = new NameField(10);	// player name field
 		playerList = new PlayerList<>();
 		turnCtrlPanel = new TurnControlPanel();
@@ -176,6 +177,7 @@ public class NewStartState extends State {
 		// start button
 		c.anchor = GridBagConstraints.SOUTH;
 		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(0, 0, 0, 0);	// clear out insets
 		c.gridx = 1;
 		c.gridwidth = 0;
 		c.weightx = 1.0;
@@ -236,13 +238,10 @@ public class NewStartState extends State {
 		
 		director.setPlayers(playerList.players);
 		director.setTurnCount(turnCtrlPanel.getTurnCount());
-//		director.setState(director.getBoardState());
-		
-		NewBoardState test = new NewBoardState(director);
-		test.init();
-		director.setState(test);
-//		director.getBoardState().init();
-//		director.setState(new BoardState(director));
+		// create board state
+		BoardState boardState = new BoardState(director);
+		boardState.init();
+		director.setState(boardState);
 	}
 	
 	/**
@@ -252,20 +251,20 @@ public class NewStartState extends State {
 		// game label
 		gameLabel = new JLabel("<Project Mini Game>");
 		gameLabel.setOpaque(false);
-		gameLabel = GameUtils.customizeLabel(gameLabel, null, new Color(0, 255, 255, 50), 50);
+		gameLabel = GameUtils.customizeLabel(gameLabel, null, new Color(0, 255, 255, 50), 40);
 		gameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		// title label
 		titleLabel = new JLabel("Add Players");
 		titleLabel.setOpaque(true);
-		titleLabel = GameUtils.customizeLabel(titleLabel, Color.BLACK, Color.CYAN, 35);
+		titleLabel = GameUtils.customizeLabel(titleLabel, Color.BLACK, Color.CYAN, 25);
 		titleLabel.setBorder(new LineBorder(Color.BLACK));
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		// players label
 		playersLabel = new JLabel("Players:");
 		playersLabel.setOpaque(true);
-		playersLabel = GameUtils.customizeLabel(playersLabel, Color.BLACK, Color.CYAN, 35);
+		playersLabel = GameUtils.customizeLabel(playersLabel, Color.BLACK, Color.CYAN, 25);
 		playersLabel.setBorder(new EmptyBorder(0, 20, 0, 0));
 		
 		// players remaining label
@@ -277,13 +276,17 @@ public class NewStartState extends State {
 		
 	}
 	
+	public PlayerList<Player> getPlayerList() {
+		return playerList;
+	}
+	
 	/**
 	 * Inner class for Player list, which is the list of players that the user can 
 	 * add to / delete, as necessary.
 	 * @author David Kramer
 	 *
 	 */
-	private class PlayerList<E> extends JList<E> {
+	public class PlayerList<E> extends JList<E> {
 		private static final long serialVersionUID = 1644702000601062587L;
 		private DefaultListModel<Player> listModel;
 		private ArrayList<Player> players;
@@ -363,8 +366,17 @@ public class NewStartState extends State {
 		 * Adds a player with a random color to the list and player array.
 		 */
 		public void addPlayer() {
-			//Player p = new Player(nameField.getText(), GameUtils.getBrightColor());
 			Player p = new Player(nameField.getText());
+			listModel.addElement(p);
+			players.add(p);
+			nameField.setText(""); // clear out
+			updateControls();
+			addBtn.setEnabled(false);
+			playerList.repaint();
+		}
+		
+		public void addPlayer(String name) {
+			Player p = new Player(name);
 			listModel.addElement(p);
 			players.add(p);
 			nameField.setText(""); // clear out
@@ -403,7 +415,7 @@ public class NewStartState extends State {
 		 * depending on how many players have been created.
 		 */
 		private void updateControls() {
-			playersRemaining = NewDirector.MAX_PLAYERS - players.size();
+			playersRemaining = Director.MAX_PLAYERS - players.size();
 			
 			if (playersRemaining == 0) {
 				addBtn.setEnabled(false);
@@ -486,7 +498,6 @@ public class NewStartState extends State {
 					playerList.addPlayer();
 				}
 			}
-			
 		}
 
 		/**
