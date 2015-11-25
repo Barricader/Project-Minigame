@@ -37,6 +37,7 @@ import util.GameUtils;
  * to add or remove players, as well as control how many turns there will be in the game. After
  * all this information has been setup, the board state will be created and all newly created
  * players will be sent to the director.
+ * @deprecated
  * @author David Kramer
  *
  */

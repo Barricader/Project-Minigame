@@ -17,6 +17,7 @@ import input.Keyboard;
  * contains the director of the application, and all content rendered to the screen is 
  * provided by the director object. This class also contains the ClientPanel sidebar which 
  * allows for chat, and connection to the server, as a sidebar.
+ * @deprecated
  * @author David Kramer
  * @author JoJones
  */

@@ -11,6 +11,7 @@ import java.util.Random;
 
 /**
  * Server thread base class
+ * @deprecated
  * @author JoJones
  */
 public class ServerThread extends Thread {

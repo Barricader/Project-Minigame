@@ -17,6 +17,7 @@ import main.Player;
  * independent process that actively runs to read in input that has been
  * received from its DataInputStream. In this thread, all of the processing
  * of incoming input, is handled by the clientPanel handle method.
+ * @deprecated
  * @author David Kramer
  * @author JoJones
  *

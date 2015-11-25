@@ -28,6 +28,11 @@ import main.Tile;
 import screen.StatusPanel;
 import util.GameUtils;
 
+/**
+ * @deprecated
+ * @author David Kramer
+ *
+ */
 public class BoardState extends State {
 	public static final byte HORIZONTAL_TILE_COUNT = 10;
 	public static final byte VERTICAL_TILE_COUNT = HORIZONTAL_TILE_COUNT / 2;

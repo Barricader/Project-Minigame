@@ -24,6 +24,7 @@ import states.StartState;
 /**
  * This is the login screen that will allow a client to connect to the game 
  * server with a specified name.
+ * @deprecated
  * @author David Kramer
  *
  */

@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 /**
  * Server wrapper
+ * @deprecated
  * @author JoJones
  */
 public class Server implements Runnable {
