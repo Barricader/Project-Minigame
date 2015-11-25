@@ -38,12 +38,7 @@ public class ServerClient extends Client {
 	 * @throws IOException
 	 */
 	public void echoID() throws IOException {
-		System.out.println("ECHO ID: " + ID);
-		ioHandler.send("/ID/ " + ID);
-	}
-	
-	public void ping() {
-		ioHandler.send("!ping");
+		//TODO implement using JSON
 	}
 	
 	public Server getServer() {

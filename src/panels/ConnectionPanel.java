@@ -17,6 +17,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
+import org.json.simple.JSONObject;
+
 import client.Client;
 import client.ClientApp;
 import client.IOHandler;
@@ -35,7 +37,6 @@ public class ConnectionPanel extends JPanel {
 	private Controller controller;
 	
 	private JButton connectBtn;
-	private JButton testAddPlayerBtn;		// TODO REMOVE ME. This is a test!
 	private JLabel statusLabel;
 	
 	public ConnectionPanel(ClientApp app) { 
@@ -62,18 +63,10 @@ public class ConnectionPanel extends JPanel {
 		c.weighty = 1.0;
 		add(statusLabel, c);
 		
-		// add player button
-		c.anchor = GridBagConstraints.NORTH;
-		c.gridx = 1;
-		c.weightx = 0.0;
-		c.gridy = 0;
-		c.weighty = 1.0;
-		add(testAddPlayerBtn, c);
-		
 		// connect button
 		c.anchor = GridBagConstraints.NORTHEAST;
 		c.fill = GridBagConstraints.BOTH;
-		c.gridx = 2;
+		c.gridx = 1;
 		c.ipadx = 100;
 		c.weightx = 0;
 		c.gridy = 0;
@@ -84,10 +77,6 @@ public class ConnectionPanel extends JPanel {
 	private void createComponents() {
 		connectBtn = new JButton("Connect");
 		connectBtn = controller.connect();
-		
-		// TEST -> Remove me later!
-		testAddPlayerBtn = new JButton("Test: Add Player");
-		testAddPlayerBtn = controller.addPlayer();
 		
 		statusLabel = new JLabel("Status: Not Connected!");
 		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -135,18 +124,12 @@ public class ConnectionPanel extends JPanel {
 			}
 		}	
 		
-		public void receive(String in) {
-			if (in.equals("!connection -1")) {
-				updateStatus(STATUS_ERROR);
-			} else if (in.equals("!connection 0")) {
-				updateStatus(STATUS_DISCONNECTED);
-			} else if (in.equals("!connection 1")) {
-				updateStatus(STATUS_CONNECTED);
-			}
+		public void receive(JSONObject in) {
+			
 		}
 
-		public void send(String out) {
-			app.getClient().getIOHandler().send(out);
+		public void send(JSONObject out) {
+			
 		}
 		
 		/**
@@ -193,25 +176,6 @@ public class ConnectionPanel extends JPanel {
 				}
 			});
 			return connectBtn;
-		}
-		
-		/**
-		 * TODO - This is a test! Remove this later!
-		 * @return testAddPlayerBtn with addPlayer functionality
-		 */
-		public JButton addPlayer() {
-			clearActions(testAddPlayerBtn);
-			testAddPlayerBtn.addActionListener( e-> {
-				IOHandler test = app.getClient().getIOHandler();
-				System.out.println("Should be sending addPlayer cmd: " + test);
-				if (test != null) {
-					System.out.println("Really should be sending!");
-					send("!addPlayer");
-				} else {
-					System.out.println("Problem when sending !addPlayer cmd!");
-				}
-			});
-			return testAddPlayerBtn;
 		}
 		
 		public void updateStatus(int statusCode) {

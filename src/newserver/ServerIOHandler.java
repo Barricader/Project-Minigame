@@ -2,10 +2,14 @@ package newserver;
 
 import java.io.IOException;
 
+import org.json.simple.JSONObject;
+
 import client.IOHandler;
 
 /**
- * This class provides implementation for handling input/output on ServerSide.
+ * This class provides implementation for handling JSON objects both sending
+ * and receiving from the connected ServerClient. This class is responsible for 
+ * sending and receiving JSON objects.
  * @author David Kramer
  *
  */
@@ -17,10 +21,11 @@ public class ServerIOHandler extends IOHandler {
 		this.serverClient = serverClient;
 	}
 
-	public void send(String out) {
+	public void send(JSONObject out) {
 		System.out.println("Should be sending: " + out);
+		// send JSON object through objectOutputStream
 		try {
-			serverClient.getOutputStream().writeUTF(out);
+			serverClient.getOutputStream().writeObject(out);
 			serverClient.getOutputStream().flush();
 			serverClient.getOutputStream().reset();
 		} catch (IOException e) {
@@ -28,17 +33,9 @@ public class ServerIOHandler extends IOHandler {
 		}
 	}
 
-	public void receive(String in) {
+	public void receive(JSONObject in) {
 		System.out.println("ServerIO Handler received: " + in);
-		// test
-		if (in.startsWith("!quit")) {
-			serverClient.getServer().removeClient(serverClient.getID());
-		}
-		if (in.equals("!addPlayer")) {
-			serverClient.getServer().getServerDirector().addRandomPlayer();	// TEST
-		} else {
-			serverClient.getServer().echoAll(in);
-		}
+		
 	}
 
 }

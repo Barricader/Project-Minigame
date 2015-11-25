@@ -15,6 +15,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
+import org.json.simple.JSONObject;
+
 import client.ClientApp;
 import client.IOHandler;
 
@@ -134,8 +136,6 @@ public class ChatPanel extends JPanel {
 					return;
 				}
 				
-				app.getClient().getIOHandler().send(text);
-				msgField.setText("");
 			}
 		}
 		
@@ -145,19 +145,12 @@ public class ChatPanel extends JPanel {
 			sendBtn.setEnabled(enabled);
 		}
 
-		public void receive(Object obj) {
-			printMessage(obj.toString());
+		public void send(JSONObject out) {
+			//TOOD implement using JSON
 		}
 
-		public void send(Object obj) {
-			sendMessage();
-		}
-
-		public void send(String out) {
-		}
-
-		public void receive(String in) {
-
+		public void receive(JSONObject in) {
+			//TOOD implement using JSON
 		}
 	}
 	
