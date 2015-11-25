@@ -12,7 +12,10 @@ import java.util.Scanner;
 
 import javax.swing.JPanel;
 
+import org.json.simple.JSONObject;
+
 import client.ClientApp;
+import client.IOHandler;
 import gameobjects.NewPlayer;
 import gameobjects.NewTile;
 import main.Animator;
@@ -22,13 +25,18 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	public static final int HORIZONTAL_TILE_COUNT = 10;
 	public static final byte VERTICAL_TILE_COUNT = HORIZONTAL_TILE_COUNT / 2;
 	
+	private ClientApp app;
+	private Controller controller;
+	
 	private ArrayList<NewTile> tiles;
 	private ArrayList<NewPlayer> players;
 	private NewPlayer activePlayer;
 	
-	public BoardPanel() {
+	public BoardPanel(ClientApp app) {
+		this.app = app;
 		init();
 		players = new ArrayList<>();
+		controller = new Controller();
 		
 		// test players
 		addComponentListener(this);
@@ -205,5 +213,20 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	public void componentMoved(ComponentEvent e) {}
 	public void componentShown(ComponentEvent e) {}
 	public void componentHidden(ComponentEvent e) {}
+	
+	public Controller getController() {
+		return controller;
+	}
 
+	
+	public class Controller extends IOHandler {
+
+		public void send(JSONObject out) {
+		}
+
+		@Override
+		public void receive(JSONObject in) {
+		}
+		
+	}
 }

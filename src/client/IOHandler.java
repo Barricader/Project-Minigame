@@ -18,7 +18,7 @@ public abstract class IOHandler {
 		objects = new ArrayList<>();
 	}
 	
-	public abstract void send(String out);
+	public abstract void send(JSONObject out);
 
-	public abstract void receive(String in);
+	public abstract void receive(JSONObject in);
 }

@@ -9,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 
+import org.json.simple.JSONObject;
+
 /**
  * A client that connects to the server and runs on its own thread. A client contains
  * Object Input/Output streams for passing data back and forth between the server
@@ -67,7 +69,7 @@ public class Client extends Thread {
 	public void run() {
 		while (running) {
 			try {
-				ioHandler.receive(streamIn.readUTF());
+				ioHandler.receive((JSONObject)streamIn.readObject());
 			} catch (EOFException | SocketException e) {
 				running = false;
 				try {
@@ -78,6 +80,9 @@ public class Client extends Thread {
 					e1.printStackTrace();
 				}
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -127,7 +132,7 @@ public class Client extends Thread {
 	 * @throws InterruptedException
 	 */
 	public void terminate() throws IOException, InterruptedException {
-		ioHandler.send("!quit " + ID);	
+		//TODO send terminate command using JSON
 		running = false;
 		connected = false;
 		interrupt();

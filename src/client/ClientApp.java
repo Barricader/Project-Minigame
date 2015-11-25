@@ -1,6 +1,5 @@
 package client;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,13 +11,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.border.LineBorder;
 
 import panels.BoardPanel;
 import panels.ChatPanel;
 import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
 import panels.LoginPanel;
+import panels.StatePanel;
 
 /**
  * This will be the new "MAIN" application that the client will run to use
@@ -34,7 +33,7 @@ public class ClientApp extends JFrame {
 	
 	// GUI stuff
 	private JPanel panel;	// main container panel for all other panels
-	private JPanel statePanel;
+	private StatePanel statePanel;	// render state view
 	private ChatPanel chatPanel;
 	private BoardPanel boardPanel;
 	private ConnectionPanel connPanel;
@@ -42,10 +41,10 @@ public class ClientApp extends JFrame {
 	
 	public ClientApp() {
 		client = new Client(this);
-		client.setIOHandler(new ClientIOHandler(this));
-		instance = this;
 		init();
 		createAndShowGUI();
+		client.setIOHandler(new ClientIOHandler(this));
+		instance = this;
 	}
 	
 	/**
@@ -78,8 +77,8 @@ public class ClientApp extends JFrame {
 		c.gridy = 1;
 		c.gridheight = 5;
 		c.weighty = 0.8;
-		boardPanel = new BoardPanel();	// here to workaround first size glitch.
-		panel.add(boardPanel, c);
+//		boardPanel = new BoardPanel(this);	// here to workaround first size glitch.
+		panel.add(statePanel, c);
 		
 		// chat panel
 		c.anchor = GridBagConstraints.SOUTH;
@@ -100,10 +99,10 @@ public class ClientApp extends JFrame {
 	 */
 	private void createComponents() {
 		panel = new JPanel();
-		statePanel = new JPanel();
-		statePanel.setBorder(new LineBorder(Color.LIGHT_GRAY));
+		statePanel = new StatePanel(this);
 		chatPanel = new ChatPanel(this);
 		connPanel = new ConnectionPanel(this);
+		boardPanel = new BoardPanel(this);
 		loginPanel = new LoginPanel(this);
 	}
 	
@@ -148,7 +147,7 @@ public class ClientApp extends JFrame {
 	}
 	
 	/**
-	 * Resets the client of this application, typically after a disconncetion.
+	 * Resets the client of this application, typically after a disconnection.
 	 */
 	public void resetClient() {
 		client = null;
@@ -168,7 +167,7 @@ public class ClientApp extends JFrame {
 		return client;
 	}
 	
-	public JPanel getStatePanel() {
+	public StatePanel getStatePanel() {
 		return statePanel;
 	}
 	
