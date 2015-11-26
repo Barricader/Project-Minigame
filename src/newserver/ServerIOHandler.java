@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 
 import client.IOHandler;
+import util.NewJSONObject;
 
 /**
  * This class provides implementation for handling JSON objects both sending
@@ -40,8 +41,18 @@ public class ServerIOHandler extends IOHandler {
 			int roll = (int) in.get("roll");
 			serverClient.getServer().getServerDirector().movePlayer(id, roll);
 		}
-		if (in.get("cmd") == "stopped") {
+		else if (in.get("cmd") == "stopped") {
 			serverClient.getServer().getServerDirector().isStopped();
+		}
+		else if (in.get("cmd") == "msg") {
+			int id = (int) in.get("id");
+			String text = (String) in.get("text");
+			
+			NewJSONObject k = new NewJSONObject(-1, "msg");
+			k.put("playerID", id);
+			k.put("text", text);
+			
+			serverClient.getServer().echoAll(k);
 		}
 	}
 

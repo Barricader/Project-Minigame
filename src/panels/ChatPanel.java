@@ -19,6 +19,7 @@ import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
+import util.NewJSONObject;
 
 public class ChatPanel extends JPanel {
 	public ClientApp app;
@@ -31,7 +32,7 @@ public class ChatPanel extends JPanel {
 	
 	public ChatPanel(ClientApp app) {
 		this.app = app;
-		controller = new Controller();
+		controller = new Controller(this);
 		init();
 	}
 	
@@ -123,8 +124,10 @@ public class ChatPanel extends JPanel {
 	}
 	
 	public class Controller extends IOHandler {
+		ChatPanel cp;
 		
-		public Controller() {
+		public Controller(ChatPanel cp) {
+			this.cp = cp;
 		}
 		
 		public void sendMessage() {
@@ -135,7 +138,10 @@ public class ChatPanel extends JPanel {
 					msgField.setText("");
 					return;
 				}
-				
+				else {
+					NewJSONObject k = new NewJSONObject(app.getClient().getID(), "msg", text);
+					send(k);
+				}
 			}
 		}
 		
@@ -146,11 +152,15 @@ public class ChatPanel extends JPanel {
 		}
 
 		public void send(JSONObject out) {
-			//TOOD implement using JSON
+			cp.app.getClient().getIOHandler().send(out);
 		}
 
 		public void receive(JSONObject in) {
-			//TOOD implement using JSON
+			if (in.get("cmd") == "msg") {
+				String text = (String) in.get("text");
+				int id = (int) in.get("playerID");
+				cp.printMessage(app.getBoardPanel().getPlayers().get(id).getName() + "> " + text);
+			}
 		}
 	}
 	
