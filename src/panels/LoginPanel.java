@@ -162,9 +162,10 @@ public class LoginPanel extends JPanel {
 		}
 
 		public void receive(JSONObject in) {
-			if (in.containsKey("addNewPlayer")) {
+			if (in.containsKey("addPlayer")) {
 				if (in.get("name").equals(clientPlayer.getName())) {	// player belongs to this client
-					NewPlayer.updateFromJSON(clientPlayer, in);
+					//NewPlayer.updateFromJSON(clientPlayer, in);
+					// TODO: Add player here
 					System.out.println("Client player was updated!");
 				}
 			}

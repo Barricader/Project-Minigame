@@ -34,6 +34,8 @@ public class ClientIOHandler extends IOHandler {
 		handlerMap.put("connection", app.getConnPanel().getController());
 		handlerMap.put("msg", app.getChatPanel().getController());
 		handlerMap.put("update", app.getBoardPanel().getController());
+		handlerMap.put("active", app.getBoardPanel().getController());
+		handlerMap.put("addPlayer", app.getLoginPanel().getController());
 	}
 
 	/**
@@ -62,5 +64,7 @@ public class ClientIOHandler extends IOHandler {
 				handlerMap.get(key).receive(in);
 			}
 		}
+		
+		
 	}
 }

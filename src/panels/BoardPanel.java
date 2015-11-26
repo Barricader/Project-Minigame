@@ -38,6 +38,8 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		players = new ArrayList<>();
 		controller = new Controller();
 		
+		controller.setBP(this);
+		
 		// test players
 		addComponentListener(this);
 	}
@@ -67,6 +69,31 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 */
 	public ArrayList<NewTile> createPathFromRoll(int roll) {
 		int curTileID = activePlayer.getTile().getID();
+		int newTileID = curTileID + roll;
+		
+		ArrayList<NewTile> movePath = new ArrayList<>();
+		for (int i = curTileID; i < newTileID; i++) {
+			if (i > tiles.size() - 1) {
+				movePath.add(tiles.get(i - tiles.size()));
+			} else {
+				movePath.add(tiles.get(i));
+			}
+		}
+		
+		if (newTileID >= tiles.size()) {
+			newTileID -= tiles.size();
+		}
+		return movePath;
+	}
+	
+	/**
+	 * Generates a movement path for the specified player, based on the dice roll.
+	 * @param index - Player to create path for
+	 * @param roll - Tiles to add from active player current position
+	 * @return - Array of tiles for movement
+	 */
+	public ArrayList<NewTile> createPathFromRoll(int index, int roll) { // TESTING
+		int curTileID = players.get(index).getTile().getID();
 		int newTileID = curTileID + roll;
 		
 		ArrayList<NewTile> movePath = new ArrayList<>();
@@ -217,15 +244,38 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	public Controller getController() {
 		return controller;
 	}
-
+	
+	public void setActive(int index) {
+		activePlayer = players.get(index);
+	}
 	
 	public class Controller extends IOHandler {
+		private BoardPanel bp;
+		
+		public void setBP(BoardPanel bp) {
+			this.bp = bp;
+		}
 
 		public void send(JSONObject out) {
 		}
 
 		@Override
 		public void receive(JSONObject in) {
+			if (in.get("cmd") == "update") {
+				int id = (int) in.get("playerID");
+				int roll = (int) in.get("roll");
+				players.get(id).setLastRoll(roll);
+				//players.get(id).initMove(createPathFromRoll(id, roll));
+				players.get(id).initMove(createPathFromRoll(roll));
+				Animator test = new Animator();
+				test.animatePlayer(bp, players.get(id));
+				bp.repaint();
+			}
+			else if (in.get("cmd") == "active") {
+				int id = (int) in.get("playerID");
+				
+				bp.setActive(id);
+			}
 		}
 		
 	}

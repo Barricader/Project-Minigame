@@ -189,8 +189,16 @@ public class NewPlayer extends GameObject {
 		return newLocation;
 	}
 	
+	public int getStyleID() {
+		return styleID;
+	}
+	
 	public String getName() {
 		return name;
+	}
+	
+	public void setLastRoll(int lr) {
+		lastRoll = lr;
 	}
 	
 	public JSONObject toJSONObject() {
