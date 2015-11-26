@@ -249,6 +249,10 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		activePlayer = players.get(index);
 	}
 	
+	public ArrayList<NewPlayer> getPlayers() {
+		return players;
+	}
+	
 	public class Controller extends IOHandler {
 		private BoardPanel bp;
 		
