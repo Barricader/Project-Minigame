@@ -35,7 +35,14 @@ public class ServerIOHandler extends IOHandler {
 
 	public void receive(JSONObject in) {
 		System.out.println("ServerIO Handler received: " + in);
-		
+		if (in.get("cmd") == "rolled") {
+			int id = (int) in.get("id");
+			int roll = (int) in.get("roll");
+			serverClient.getServer().getServerDirector().movePlayer(id, roll);
+		}
+		if (in.get("cmd") == "stopped") {
+			serverClient.getServer().getServerDirector().isStopped();
+		}
 	}
 
 }

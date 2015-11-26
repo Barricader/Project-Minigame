@@ -8,6 +8,10 @@ import java.net.SocketException;
 import java.security.SecureRandom;
 import java.util.HashMap;
 
+import org.json.simple.JSONObject;
+
+import util.NewJSONObject;
+
 public class Server extends Thread {
 	private static SecureRandom rng = new SecureRandom();	// ID generator
 	public static final String HOST = "localhost";
@@ -82,7 +86,10 @@ public class Server extends Thread {
 			sc.open();
 			sc.start();
 			sc.echoID(); // echo ID to main client thread
-			sc.getIOHandler().send("!connection 1");	// connection is good
+			//sc.getIOHandler().send("!connection 1");	// connection is good
+			NewJSONObject k = new NewJSONObject(-1, "addPlayer");
+			//k.put("connect", 1);		// I don't think this is needed
+			sc.getIOHandler().send(k);
 			clients.put(ID, sc);
 			System.out.println("client: " + ID + ", added!");
 		} else {
@@ -113,8 +120,15 @@ public class Server extends Thread {
 	/**
 	 * Echoes string to all clients.
 	 * @param out - String to send to all clients.
+	 * @Decrepated
 	 */
 	public void echoAll(String out) {
+		for (ServerClient sc : clients.values()) {
+			//sc.getIOHandler().send(out);
+		}
+	}
+	
+	public void echoAll(JSONObject out) {
 		for (ServerClient sc : clients.values()) {
 			sc.getIOHandler().send(out);
 		}

@@ -193,6 +193,10 @@ public class NewPlayer extends GameObject {
 		return name;
 	}
 	
+	public void setLastRoll(int lr) {
+		lastRoll = lr;
+	}
+	
 	public JSONObject toJSONObject() {
 		JSONObject root = new JSONObject();	// add everything to this
 		// player stuff

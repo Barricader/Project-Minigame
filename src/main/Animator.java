@@ -2,8 +2,10 @@ package main;
 
 import javax.swing.Timer;
 
+import client.ClientApp;
 import gameobjects.NewPlayer;
 import panels.BoardPanel;
+import util.NewJSONObject;
 
 /**
  * Utility class for animating player movement. Use this class to handle
@@ -33,6 +35,9 @@ public class Animator {
 					board.repaint();	
 				} else {
 					animateTimer.stop();
+					// update server here
+					NewJSONObject k = new NewJSONObject(player.getID(), "stopped");
+					ClientApp.getInstance().getClient().getIOHandler().send(k);
 				}
 			});
 			animateTimer.start();	
