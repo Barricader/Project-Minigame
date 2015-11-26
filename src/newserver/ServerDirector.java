@@ -29,6 +29,12 @@ public class ServerDirector {
 		if (players.size() < MAX_PLAYERS) {
 			players.add(p);
 			System.out.println("Player added to server director players!");
+			
+			NewJSONObject k = new NewJSONObject(-1, "addPlayer");
+			k.put("playerID", p.getID());
+			k.put("name", p.getName());
+			k.put("color", p.getStyleID());
+			server.echoAll(k);
 		}
 	}
 	
@@ -48,7 +54,7 @@ public class ServerDirector {
 		if (players.size() < MAX_PLAYERS) {
 //			System.out.println("Style NUm: " + playerStyles.getStyle());
 			addPlayer(p);
-			server.echoAll("!addPlayer " + p.getName() + " " + p.getID() + " " + colorNum);	
+			//server.echoAll("!addPlayer " + p.getName() + " " + p.getID() + " " + colorNum);	
 		}
 	}
 	
@@ -66,6 +72,7 @@ public class ServerDirector {
 	
 	public void movePlayer(int id, int roll) {
 		NewJSONObject k = new NewJSONObject(-1, "update");
+		k.put("playerID", id);
 		k.put("roll", roll);
 		server.echoAll(k);
 	}

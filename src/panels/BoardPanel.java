@@ -92,7 +92,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 * @param roll - Tiles to add from active player current position
 	 * @return - Array of tiles for movement
 	 */
-	public ArrayList<NewTile> createPathFromRoll(int index, int roll) {
+	public ArrayList<NewTile> createPathFromRoll(int index, int roll) { // TESTING
 		int curTileID = players.get(index).getTile().getID();
 		int newTileID = curTileID + roll;
 		
@@ -244,7 +244,10 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	public Controller getController() {
 		return controller;
 	}
-
+	
+	public void setActive(int index) {
+		activePlayer = players.get(index);
+	}
 	
 	public class Controller extends IOHandler {
 		private BoardPanel bp;
@@ -262,10 +265,16 @@ public class BoardPanel extends JPanel implements ComponentListener {
 				int id = (int) in.get("playerID");
 				int roll = (int) in.get("roll");
 				players.get(id).setLastRoll(roll);
-				players.get(id).initMove(createPathFromRoll(id, roll));
+				//players.get(id).initMove(createPathFromRoll(id, roll));
+				players.get(id).initMove(createPathFromRoll(roll));
 				Animator test = new Animator();
 				test.animatePlayer(bp, players.get(id));
 				bp.repaint();
+			}
+			else if (in.get("cmd") == "active") {
+				int id = (int) in.get("playerID");
+				
+				bp.setActive(id);
 			}
 		}
 		

@@ -183,6 +183,10 @@ public class ClientApp extends JFrame {
 		return boardPanel;
 	}
 	
+	public LoginPanel getLoginPanel() {
+		return loginPanel;
+	}
+	
 	public void setClient(Client client) {
 		this.client = client;
 	}

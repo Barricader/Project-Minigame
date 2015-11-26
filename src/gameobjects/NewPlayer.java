@@ -189,6 +189,10 @@ public class NewPlayer extends GameObject {
 		return newLocation;
 	}
 	
+	public int getStyleID() {
+		return styleID;
+	}
+	
 	public String getName() {
 		return name;
 	}
