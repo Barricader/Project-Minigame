@@ -125,7 +125,9 @@ public class ConnectionPanel extends JPanel {
 		}	
 		
 		public void receive(JSONObject in) {
-			
+			if (in.get("cmd").equals("connection")) {
+				// connect here
+			}
 		}
 
 		public void send(JSONObject out) {
