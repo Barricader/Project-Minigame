@@ -22,6 +22,7 @@ import org.json.simple.JSONObject;
 import client.Client;
 import client.ClientApp;
 import client.IOHandler;
+import newserver.Keys;
 import newserver.Server;
 import util.GameUtils;
 
@@ -96,7 +97,7 @@ public class ConnectionPanel extends JPanel {
 		return connectBtn;
 	}
 	
-	public JLabel statusLabel() {
+	public JLabel getStatusLabel() {
 		return statusLabel;
 	}
 	
@@ -125,7 +126,8 @@ public class ConnectionPanel extends JPanel {
 		}	
 		
 		public void receive(JSONObject in) {
-			
+			int status = (int) in.get(Keys.CONNECT_STATUS);
+			updateStatus(status);
 		}
 
 		public void send(JSONObject out) {
@@ -172,7 +174,7 @@ public class ConnectionPanel extends JPanel {
 					
 				} finally {
 					controller.updateStatus(STATUS_DISCONNECTED);
-					app.resetClient();
+					reset();
 				}
 			});
 			return connectBtn;
@@ -203,6 +205,13 @@ public class ConnectionPanel extends JPanel {
 			statusLabel.setText(status);
 			app.getChatPanel().getController().toggleUI(app.getClient().isConnected());
 			repaint();
+		}
+		
+		public void reset() {
+			app.resetClient();
+			app.getBoardPanel().getPlayers().clear();
+			app.getStatePanel().getLoginPanel().getLobbyPanel().getPlayerList().removeAll();
+			app.repaint();
 		}
 		
 		public IOHandler getIOHandler() {

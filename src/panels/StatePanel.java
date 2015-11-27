@@ -23,10 +23,14 @@ public class StatePanel extends JPanel {
 	private ClientApp app;
 	
 //	private JPanel view;	// content we want to display
+	private Controller controller;
+	private LoginPanel loginPanel;
 	
 	public StatePanel(ClientApp app) {
 		this.app = app;
-		updateView(new LoginPanel(app));
+		controller = new Controller();
+		loginPanel = new LoginPanel(app);
+		updateView(loginPanel);
 		setBorder(new LineBorder(Color.RED));
 	}
 	
@@ -44,14 +48,24 @@ public class StatePanel extends JPanel {
 		app.revalidate();
 	}
 	
+	public LoginPanel getLoginPanel() {
+		return loginPanel;
+	}
+	
+	public Controller getController() {
+		return controller;
+	}
+	
 	public class Controller extends IOHandler {
 
+		@Override
 		public void send(JSONObject out) {
+			// TODO Auto-generated method stub
 			
 		}
 
 		public void receive(JSONObject in) {
-		
+			// TODO change state stuff!
 		}
 		
 	}

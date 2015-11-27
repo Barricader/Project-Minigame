@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
+import newserver.Keys;
 import newserver.PlayerStyles;
 import util.Vector;
 
@@ -33,15 +34,41 @@ public class NewPlayer extends GameObject {
 	private boolean hasRolled = false;	// has player already rolled the current round?
 	
 	private int ID = -1;
-	private int styleID;	// style color num from PlayerStyles
+	private int styleID = 0;	// style color num from PlayerStyles
+	private int tileID = 0;
 	private int score = 0;
-	private int firstRoll = 0;	// initial roll
 	private int lastRoll = 0;
 	
 	public NewPlayer(String name, int ID) {
 		this.name = name;
 		this.ID = ID;
 		init();
+	}
+	
+	/**
+	 * Utility method that's used to update a player from a JSON object. Checks to make sure
+	 * that the JSON object contains the key, so that we don't overwrite a value.
+	 * @param player - Player to update
+	 * @param obj - JSONObject that contains values for player
+	 */
+	public static void updateFromJSON(NewPlayer player, JSONObject obj) {
+		System.out.println("Update from json: " + obj);
+		if (obj.containsKey(Keys.PLAYER)) {	// ensure we extract the player object from cmd
+			obj = (JSONObject) obj.get(Keys.PLAYER);
+		}
+		
+		player.name 	= obj.containsKey(Keys.NAME) 		? (String) obj.get(Keys.NAME) 	: player.name;
+		player.ID 		= obj.containsKey(Keys.ID) 			? (int) obj.get(Keys.ID) 		: player.ID;
+		player.score	= obj.containsKey(Keys.SCORE) 		? (int) obj.get(Keys.SCORE) 	: player.score;
+		player.tileID	= obj.containsKey(Keys.TILE_ID) 	? (int) obj.get(Keys.TILE_ID) 	: player.tileID;
+		player.styleID	= obj.containsKey(Keys.STYLE_ID) 	? (int) obj.get(Keys.STYLE_ID) 	: player.styleID;
+		player.lastRoll = obj.containsKey(Keys.LAST_ROLL) 	? (int) obj.get(Keys.LAST_ROLL) : player.lastRoll;
+	}
+	
+	public static NewPlayer fromJSON(JSONObject obj) {
+		NewPlayer p = new NewPlayer("", 0);	// empty player. Use update from JSON to get values from keys!
+		updateFromJSON(p, obj);
+		return p;
 	}
 	
 	/**
@@ -177,6 +204,14 @@ public class NewPlayer extends GameObject {
 		this.tile = tile;
 	}
 	
+	public void setID(int ID) {
+		this.ID = ID;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public int getID() {
 		return ID;
 	}
@@ -201,18 +236,19 @@ public class NewPlayer extends GameObject {
 		lastRoll = lr;
 	}
 	
+	public String toString() {
+		return ID + " " + name;
+	}
+	
 	public JSONObject toJSONObject() {
-		JSONObject root = new JSONObject();	// add everything to this
-		// player stuff
 		JSONObject player = new JSONObject();
-		player.put("id", ID);
-		player.put("name", name);
-		player.put("score", score);
-		player.put("tile", tile);
-		player.put("styleID", styleID);
-		player.put("lastRoll", lastRoll);
-		root.put("Player", player);
-		return root;
+		player.put(Keys.ID, ID);
+		player.put(Keys.NAME, name);
+		player.put(Keys.SCORE, score);
+		player.put(Keys.TILE_ID, tileID);
+		player.put(Keys.STYLE_ID, styleID);
+		player.put(Keys.LAST_ROLL, lastRoll);
+		return player;
 	}
 
 }

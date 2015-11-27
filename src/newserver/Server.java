@@ -81,14 +81,13 @@ public class Server extends Thread {
 	 */
 	public void addClient(Socket socket) throws IOException {
 		if (clients.size() < MAX_CLIENTS) {
-			int ID = rng.nextInt(5000);
+			int ID = serverDir.getPlayers().size();
 			ServerClient sc = new ServerClient(ID, socket, this);
 			sc.open();
 			sc.start();
 			sc.echoID(); // echo ID to main client thread
-			//sc.getIOHandler().send("!connection 1");	// connection is good
-			NewJSONObject k = new NewJSONObject(-1, "addPlayer");
-			//k.put("connect", 1);		// I don't think this is needed
+			NewJSONObject k = new NewJSONObject(ID, Keys.Commands.CONNECT);	// send connection status!
+			k.put(Keys.CONNECT_STATUS, 1);	// connection is good!
 			sc.getIOHandler().send(k);
 			clients.put(ID, sc);
 			System.out.println("client: " + ID + ", added!");

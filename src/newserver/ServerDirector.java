@@ -1,12 +1,13 @@
 package newserver;
 
 import java.util.ArrayList;
-import java.util.Random;
+
+import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
-import gameobjects.Player;
 import util.NewJSONObject;
 
+@SuppressWarnings({ "static-access", "unchecked" })	// hide stupid warnings!!
 public class ServerDirector {
 	private static final int MAX_PLAYERS = 4;
 	private Server server;
@@ -25,37 +26,73 @@ public class ServerDirector {
 		setActive();
 	}
 	
-	public void addPlayer(NewPlayer p) {
+	/**
+	 * Adds a player to the server array of players, from a JSONObject. Checks
+	 * to make sure that the player is valid (i.e. no duplicate name and we
+	 * haven't reached the max player limit.)
+	 * @param obj
+	 */
+	public void addPlayer(JSONObject obj) {
+		NewPlayer p = NewPlayer.fromJSON(obj);
+		NewJSONObject out = null;
+		JSONObject error = new JSONObject();	// for any errors that might occur
 		if (players.size() < MAX_PLAYERS) {
-			players.add(p);
-			System.out.println("Player added to server director players!");
-			
-			NewJSONObject k = new NewJSONObject(-1, "addPlayer");
-			k.put("playerID", p.getID());
-			k.put("name", p.getName());
-			k.put("color", p.getStyleID());
-			server.echoAll(k);
+			if (!checkDuplicate(p)) {
+				p.setID(players.size());
+				p.style(PlayerStyles.getInstance().getStyle());
+
+				players.add(p);
+				echoAllPlayers();	// update to all players
+			} else {
+				out = new NewJSONObject(p.getID(), Keys.Commands.ERROR);	// duplicate error
+				error.put(Keys.ERROR_TITLE, "Duplicate name!");
+				error.put(Keys.ERROR_MSG, "Another player already exists with name: " 
+						+ p.getName() + ". Try another name!");
+				out.put(Keys.Commands.ERROR, error);
+				server.echoAll(out);
+			}
+		} else {
+			out = new NewJSONObject(p.getID(), Keys.Commands.ERROR);	// max player limit error
+			error.put(Keys.ERROR_TITLE, "Player refused!");
+			error.put(Keys.ERROR_MSG, "Max player limit reached!");
+			out.put(Keys.Commands.ERROR, error);
+			server.echoAll(out);
 		}
+	}
+	
+	/**
+	 * Echoes all players that exist in the array, so that newly connected
+	 * clients receive them.
+	 */
+	private void echoAllPlayers() {
+		for (NewPlayer p : players) {
+			NewJSONObject out = new NewJSONObject(p.getID(), Keys.Commands.ADD_PLAYER);
+			out = new NewJSONObject(p.getID(), Keys.Commands.ADD_PLAYER);
+			out.put(Keys.ID, p.getID());
+			out.put(Keys.PLAYER, p.toJSONObject());	
+			server.echoAll(out);
+		}
+	}
+	
+	/**
+	 * Checks the specified player for duplicate names against the player
+	 * array.
+	 * @param p - Player name to check
+	 * @return true if duplicate found, false otherwise
+	 */
+	private boolean checkDuplicate(NewPlayer p) {
+		boolean duplicateName = false;
+		for (int i = 0; i < players.size(); i++) {
+			if (players.get(i).getName().equals(p.getName())) {
+				duplicateName = true;
+			}
+		}
+		System.out.println("duplicate? " + duplicateName);
+		return duplicateName;
 	}
 	
 	public ArrayList<NewPlayer> getPlayers() {
 		return players;
-	}
-	
-	// TESTING STUFF OUT. REMOVE THIS LATER PROBABLY
-	public void addRandomPlayer() {
-		String testName = "test";
-		int ID = players.size();	// get ID based off how many players are in array
-		int colorNum = PlayerStyles.getInstance().getStyle();
-		
-		NewPlayer p = new NewPlayer(testName, ID);
-		// send message to all clients about adding a player
-		
-		if (players.size() < MAX_PLAYERS) {
-//			System.out.println("Style NUm: " + playerStyles.getStyle());
-			addPlayer(p);
-			//server.echoAll("!addPlayer " + p.getName() + " " + p.getID() + " " + colorNum);	
-		}
 	}
 	
 //	public void setActive(int id) {

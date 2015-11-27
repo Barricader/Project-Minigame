@@ -5,6 +5,9 @@ import java.util.HashMap;
 
 import org.json.simple.JSONObject;
 
+import newserver.Keys;
+
+
 /**
  * This class provides implementation for handling JSON objects both sending
  * and receiving from the connected Client. This class is responsible for 
@@ -30,12 +33,13 @@ public class ClientIOHandler extends IOHandler {
 	 */
 	private void initHandlerMap() {
 		handlerMap = new HashMap<String, IOHandler>();
-		System.out.println("TEST" + app.getConnPanel().getController());
-		handlerMap.put("connection", app.getConnPanel().getController());
-		handlerMap.put("msg", app.getChatPanel().getController());
-		handlerMap.put("update", app.getBoardPanel().getController());
-		handlerMap.put("active", app.getBoardPanel().getController());
-		handlerMap.put("addPlayer", app.getLoginPanel().getController());
+		handlerMap.put(Keys.Commands.CONNECT,app.getConnPanel().getController());
+		handlerMap.put(Keys.Commands.MSG, app.getChatPanel().getController());
+		handlerMap.put(Keys.Commands.STATE_UPDATE, app.getStatePanel().getController());
+		handlerMap.put(Keys.Commands.UPDATE, app.getBoardPanel().getController());
+		handlerMap.put(Keys.Commands.ADD_PLAYER, app.getLoginPanel().getController());
+		handlerMap.put(Keys.Commands.ACTIVE, app.getBoardPanel().getController());
+		handlerMap.put(Keys.Commands.ERROR, app.getErrorHandler());
 	}
 
 	/**
@@ -58,13 +62,11 @@ public class ClientIOHandler extends IOHandler {
 	public void receive(JSONObject in) {
 		System.out.println("Client Handler received: " + in);
 		
-		for (Object key : in.keySet()) {
-			if (handlerMap.containsKey(key)) {
-				System.out.println("Routing action to : " + key);
-				handlerMap.get(key).receive(in);
-			}
+		String cmdKey = (String)in.get(Keys.CMD);
+		System.out.println("command key: " + cmdKey);
+		if (handlerMap.containsKey(cmdKey)) {
+			handlerMap.get(cmdKey).receive(in);
 		}
-		
 		
 	}
 }

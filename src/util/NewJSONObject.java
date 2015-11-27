@@ -2,30 +2,32 @@ package util;
 
 import org.json.simple.JSONObject;
 
+import newserver.Keys;
+
 public class NewJSONObject extends JSONObject {
 	private static final long serialVersionUID = -3684644029817668627L;
 
 	public NewJSONObject(int id, String cmd) {
-		put("id", id);
-		put("cmd", cmd);
-		put("log", false);
+		put(Keys.ID, id);
+		put(Keys.CMD, cmd);
+		put(Keys.LOG, false);
 		
 		checkDefaults();
 	}
 
 	public NewJSONObject(int id, String cmd, boolean log) {
-		put("id", id);
-		put("cmd", cmd);
-		put("log", log);
+		put(Keys.ID, id);
+		put(Keys.CMD, cmd);
+		put(Keys.LOG, log);
 		
 		checkDefaults();
 	}
 	
 	public NewJSONObject(int id, String cmd, String msg) {
-		put("id", id);
-		put("cmd", cmd);
-		put("log", false);
-		put("text", msg);
+		put(Keys.ID, id);
+		put(Keys.CMD, cmd);
+		put(Keys.LOG, false);
+		put(Keys.TEXT, msg);
 		
 		checkDefaults();
 	}

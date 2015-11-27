@@ -6,11 +6,12 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.ConnectException;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -24,7 +25,8 @@ import org.json.simple.JSONObject;
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
-import newserver.Server;
+import newserver.Keys;
+import util.NewJSONObject;
 
 /**
  * Login panel that allows the user to enter their name and connect to the server.
@@ -117,15 +119,18 @@ public class LoginPanel extends JPanel {
 		nameField.setFont(new Font("Courier New", Font.BOLD, 20));
 		nameField.addKeyListener(new KeyListener() {
 		
-			public void keyTyped(KeyEvent e) {
+			public void keyReleased(KeyEvent e) {
 				if (!nameField.getText().isEmpty()) {
 					joinBtn.setEnabled(true);
+					if (e.getKeyChar() == '\n') {
+						controller.joinPlayer();
+					}
 				} else {
 					joinBtn.setEnabled(false);
 				}
 			}
 			// unused
-			public void keyReleased(KeyEvent e) {}
+			public void keyTyped(KeyEvent e) {}
 			public void keyPressed(KeyEvent e) {}
 		});
 		
@@ -133,7 +138,7 @@ public class LoginPanel extends JPanel {
 		joinBtn.setFont(new Font("Courier New", Font.BOLD, 20));
 		joinBtn.setEnabled(false);
 		joinBtn.addActionListener( e -> {
-			controller.joinAction();
+			controller.joinPlayer();
 		});
 		
 		lobbyPanel = new LobbyPanel();
@@ -147,55 +152,102 @@ public class LoginPanel extends JPanel {
 		return lobbyPanel;
 	}
 	
+	public NewPlayer getClientPlayer() {
+		return clientPlayer;
+	}
+	
 	public class Controller extends IOHandler {
 		
-		public Controller() {
-			
-		}
+		public Controller() {}
 
 		public void send(JSONObject out) {
-			try {
-				app.getClient().getOutputStream().writeObject(out);
-			} catch (IOException e) {
-				System.out.println("failed to send. Client may not be connected!");
-			}
+			app.getClient().getIOHandler().send(out);
 		}
 
 		public void receive(JSONObject in) {
-			if (in.containsKey("addPlayer")) {
-				if (in.get("name").equals(clientPlayer.getName())) {	// player belongs to this client
-					//NewPlayer.updateFromJSON(clientPlayer, in);
-					// TODO: Add player here
-					System.out.println("Client player was updated!");
+			NewPlayer newPlayer = NewPlayer.fromJSON(in);
+			addPlayer(newPlayer);
+		}
+		
+		/**
+		 * Adds a new player to the player list / board, if possible.
+		 * @param newPlayer
+		 */
+		public void addPlayer(NewPlayer newPlayer) {
+			if (newPlayer.getID() == -1) {	// shouldn't add yet!
+				return;
+			}
+			
+			// new player belongs to this client!
+			if (newPlayer.getName().equals(clientPlayer.getName())) {
+				clientPlayer = newPlayer;
+				newPlayer = clientPlayer;
+				nameField.setText("");
+				nameField.setEnabled(false);
+				removeActionListeners(joinBtn);
+				joinBtn.setText("Disconnect");
+				joinBtn.addActionListener(e -> {
+					disconnectPlayer();
+				});
+				
+			}
+		
+			HashMap<String, NewPlayer> players = app.getBoardPanel().getPlayers();
+			boolean canAdd = true;
+			for (String name : players.keySet()) {
+				NewPlayer p = players.get(name);
+				if (p.getName().equals(newPlayer.getName())) {	// don't add duplicates!
+					canAdd = false;
 				}
+			}
+			if (canAdd) {
+				players.put(newPlayer.getName(), newPlayer);
+				lobbyPanel.addPlayerToList(newPlayer);
 			}
 		}
 		
-		public void joinAction() {
-			String name = nameField.getText();
+		/**
+		 * Joins the player to the server with the specified name.
+		 */
+		public void joinPlayer() {
 			if (!app.getClient().isConnected()) {
 				try {
-					app.getClient().connect(new Socket(Server.HOST, Server.PORT));
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					app.connectClient();
+				} catch (ConnectException e) {
+					app.getConnPanel().showConnectionError();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					app.getConnPanel().showConnectionError();
 				}
-				app.getClient().start();	
 			}
-			if (!name.isEmpty()) {
-				clientPlayer = new NewPlayer(name, -1);
-				send(clientPlayer.toJSONObject());
-				System.out.println("Should be sending >: " + clientPlayer.toJSONObject().toJSONString());
-			}
-		}
-		
-		public void nameFieldAction() {
 			
+			NewJSONObject obj = new NewJSONObject(app.getClient().getID(), Keys.Commands.ADD_PLAYER);
+			String name = nameField.getText();
+			clientPlayer = new NewPlayer(name, app.getClient().getID());
+			obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
+			send(obj);
 		}
 		
+		/**
+		 * Disconnects the player.
+		 */
+		public void disconnectPlayer() {
+			app.getConnPanel().getController().reset();
+			lobbyPanel.getPlayerList().removeAll();
+			removeActionListeners(joinBtn);
+			joinBtn.setText("Join Game");
+			joinBtn.addActionListener(e -> {
+				joinPlayer();
+			});
+		}
 		
+		/**
+		 * Remove action listeners from specified button
+		 * @param btn - Button to remove action listeners from.
+		 */
+		private void removeActionListeners(JButton btn) {
+			for (ActionListener a : btn.getActionListeners()) {
+				btn.removeActionListener(a);
+			}
+		}
 	}
 }

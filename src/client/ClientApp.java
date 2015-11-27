@@ -5,6 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.Socket;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -12,6 +14,10 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.json.simple.JSONObject;
+
+import newserver.Keys;
+import newserver.Server;
 import panels.BoardPanel;
 import panels.ChatPanel;
 import panels.ConnectionPanel;
@@ -37,10 +43,12 @@ public class ClientApp extends JFrame {
 	private ChatPanel chatPanel;
 	private BoardPanel boardPanel;
 	private ConnectionPanel connPanel;
-	private LoginPanel loginPanel;
+	
+	private ErrorHandler errorHandler;
 	
 	public ClientApp() {
 		client = new Client(this);
+		errorHandler = new ErrorHandler();
 		init();
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
@@ -103,7 +111,7 @@ public class ClientApp extends JFrame {
 		chatPanel = new ChatPanel(this);
 		connPanel = new ConnectionPanel(this);
 		boardPanel = new BoardPanel(this);
-		loginPanel = new LoginPanel(this);
+//		loginPanel = new LoginPanel(this);
 	}
 	
 	/**
@@ -130,6 +138,30 @@ public class ClientApp extends JFrame {
 	}
 	
 	/**
+	 * Establishes a Client-Server connection if the client isn't connected.
+	 * @throws ConnectException
+	 * @throws IOException
+	 */
+	public void connectClient() throws ConnectException, IOException {
+		if (client == null) {
+			resetClient();
+		}
+		if (!client.isConnected()) {
+			client.connect(new Socket(Server.HOST, Server.PORT));
+			client.start();	
+		}
+	}
+	
+	/**
+	 * Resets the client of this application, typically after a disconnection.
+	 */
+	public void resetClient() {
+		client = null;
+		client = new Client(this);
+		client.setIOHandler(new ClientIOHandler(this));
+	}
+	
+	/**
 	 * Closes out the client if a time out has occurred.
 	 */
 	public void timeout() {
@@ -144,15 +176,6 @@ public class ClientApp extends JFrame {
 			connPanel.getController().updateStatus(Controller.STATUS_ERROR);
 			showTimeOutError();
 		}
-	}
-	
-	/**
-	 * Resets the client of this application, typically after a disconnection.
-	 */
-	public void resetClient() {
-		client = null;
-		client = new Client(this);
-		client.setIOHandler(new ClientIOHandler(this));
 	}
 	
 	/**
@@ -184,11 +207,37 @@ public class ClientApp extends JFrame {
 	}
 	
 	public LoginPanel getLoginPanel() {
-		return loginPanel;
+		return statePanel.getLoginPanel();
 	}
 	
 	public void setClient(Client client) {
 		this.client = client;
+	}
+	
+	public ErrorHandler getErrorHandler() {
+		return errorHandler;
+	}
+	
+	public class ErrorHandler extends IOHandler {
+		
+		public void send(JSONObject out) {}
+
+		public void receive(JSONObject in) {
+			System.out.println("error handler received: " + in.toJSONString());
+			JSONObject error = (JSONObject) in.get(Keys.Commands.ERROR);
+			int id = (int)in.get(Keys.ID);
+			
+			if (id != getLoginPanel().getClientPlayer().getID()) {	// only show to this client!
+				String errorMsg = (String) error.get(Keys.ERROR_MSG);
+				String errorTitle = (String) error.get(Keys.ERROR_TITLE);
+				showErrorDialog(errorMsg, errorTitle);	
+			}
+		}
+		
+		public void showErrorDialog(String msg, String title) {
+			JOptionPane.showMessageDialog(ClientApp.this, msg, title, JOptionPane.ERROR_MESSAGE);
+		}
+			
 	}
 	
 	/**

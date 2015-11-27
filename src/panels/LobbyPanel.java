@@ -29,12 +29,6 @@ public class LobbyPanel extends JPanel {
 	private void init() {
 		createComponents();
 		
-//		TEST -> REMOVE ME LATER AND GET FROM SERVER
-		NewPlayer test1 = new NewPlayer("TEST", 1);
-		test1.style(4);
-		addPlayerToList(test1);
-		addPlayerToList(new NewPlayer("Player3", 3));
-		
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.NORTH;
@@ -46,6 +40,9 @@ public class LobbyPanel extends JPanel {
 		add(playerList, c);
 	}
 	
+	/**
+	 * Create gui components for lobby.
+	 */
 	private void createComponents() {
 		listRenderer = new PlayerListCellRenderer();
 		listModel = new DefaultListModel<>();
@@ -54,13 +51,21 @@ public class LobbyPanel extends JPanel {
 		setBorder(new LineBorder(Color.LIGHT_GRAY));
 	}
 	
+	/**
+	 * Adds player to list.
+	 * @param p - Player to add to list
+	 */
 	public void addPlayerToList(NewPlayer p) {
 		listModel.addElement(p);
-		playerList.repaint();
+		repaint();
 	}
 	
 	public Controller getController() {
 		return controller;
+	}
+	
+	public JList<NewPlayer> getPlayerList() {
+		return playerList;
 	}
 	
 	public class Controller extends IOHandler {

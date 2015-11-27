@@ -8,6 +8,8 @@ import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.JPanel;
@@ -19,6 +21,7 @@ import client.IOHandler;
 import gameobjects.NewPlayer;
 import gameobjects.NewTile;
 import main.Animator;
+import newserver.Keys;
 import util.GameUtils;
 
 public class BoardPanel extends JPanel implements ComponentListener {
@@ -29,13 +32,15 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	private Controller controller;
 	
 	private ArrayList<NewTile> tiles;
-	private ArrayList<NewPlayer> players;
+//	private ArrayList<NewPlayer> players;
+	private HashMap<String, NewPlayer> players;
 	private NewPlayer activePlayer;
 	
 	public BoardPanel(ClientApp app) {
 		this.app = app;
 		init();
-		players = new ArrayList<>();
+//		players = new ArrayList<>();
+		players = new HashMap<>();
 		controller = new Controller();
 		
 		controller.setBP(this);
@@ -48,18 +53,24 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		createTiles();
 	}
 	
+//	public void addPlayer(NewPlayer p) {
+//		System.out.println("New Player " + p + ", added to board!");
+//		players.add(p);
+//		activePlayer = p;
+//		
+//		// test
+//		activePlayer.setTile(tiles.get(0));	// start at 0
+//		ArrayList<NewTile> movePath = createPathFromRoll(20);	// static roll
+//		activePlayer.initMove(movePath);
+//		Animator test = new Animator();
+//		test.animatePlayer(this, activePlayer);
+//		repaint();
+//	}
+	
 	public void addPlayer(NewPlayer p) {
-		System.out.println("New Player " + p + ", added to board!");
-		players.add(p);
-		activePlayer = p;
-		
-		// test
-		activePlayer.setTile(tiles.get(0));	// start at 0
-		ArrayList<NewTile> movePath = createPathFromRoll(20);	// static roll
-		activePlayer.initMove(movePath);
-		Animator test = new Animator();
-		test.animatePlayer(this, activePlayer);
-		repaint();
+//		players.add(p);
+		p.setTile(tiles.get(0));
+		players.put(p.getName(), p);
 	}
 	
 	/**
@@ -143,7 +154,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 * @param g - Graphics context to draw to
 	 */
 	private void drawPlayers(Graphics g) {
-		for (NewPlayer p : players) {
+		for (NewPlayer p : players.values()) {
 			p.draw(g);
 		}
 	}
@@ -249,7 +260,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		activePlayer = players.get(index);
 	}
 	
-	public ArrayList<NewPlayer> getPlayers() {
+	public HashMap<String, NewPlayer> getPlayers() {
 		return players;
 	}
 	
@@ -263,9 +274,19 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		public void send(JSONObject out) {
 		}
 
-		@Override
 		public void receive(JSONObject in) {
-			if (in.get("cmd") == "update") {
+			String cmdKey = (String)in.get("cmd");
+			
+			switch (cmdKey) {
+			case Keys.Commands.UPDATE:
+				// update stuff
+				break;
+			case Keys.Commands.ACTIVE:
+				// active stuff
+				break;
+			}
+			
+			if (in.get("cmd") == Keys.Commands.UPDATE) {
 				int id = (int) in.get("playerID");
 				int roll = (int) in.get("roll");
 				players.get(id).setLastRoll(roll);
