@@ -32,13 +32,17 @@ public class ClientIOHandler extends IOHandler {
 	 * nested inside and can be further processed by the specified controller.
 	 */
 	private void initHandlerMap() {
-		handlerMap = new HashMap<String, IOHandler>();
+		handlerMap = new HashMap<>();
 		handlerMap.put(Keys.Commands.CONNECT,app.getConnPanel().getController());
 		handlerMap.put(Keys.Commands.MSG, app.getChatPanel().getController());
 		handlerMap.put(Keys.Commands.STATE_UPDATE, app.getStatePanel().getController());
 		handlerMap.put(Keys.Commands.UPDATE, app.getBoardPanel().getController());
+		handlerMap.put(Keys.Commands.MOVE, app.getBoardPanel().getController());
 		handlerMap.put(Keys.Commands.ADD_PLAYER, app.getLoginPanel().getController());
+		handlerMap.put(Keys.Commands.REM_PLAYER, app.getLoginPanel().getController());
+		handlerMap.put(Keys.Commands.TIMER, app.getLoginPanel().getController());
 		handlerMap.put(Keys.Commands.ACTIVE, app.getBoardPanel().getController());
+		handlerMap.put(Keys.Commands.ROLL, app.getDicePanel().getController());
 		handlerMap.put(Keys.Commands.ERROR, app.getErrorHandler());
 	}
 

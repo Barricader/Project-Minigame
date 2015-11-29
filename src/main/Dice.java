@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -12,6 +13,8 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
+
+import panels.DicePanel;
 
 /**
  * A dice object that renders the dice and randomly rolls when asked
@@ -30,9 +33,11 @@ public class Dice extends Rectangle implements ActionListener {
 	private Timer animationTimer;	// timer to control dice animation
 	private boolean isEnabled;	
 	private Random r;
+	private DicePanel dicePanel;
 	
-	public Dice(int x, int y) {
+	public Dice(int x, int y, DicePanel dicePanel) {
 		super(x, y, WIDTH, HEIGHT);	// build rectangle
+		this.dicePanel = dicePanel;
 		this.value = 1;
 		this.imgs = new Image[] {null, null, null, null, null, null, null};
 		r = new Random();
@@ -45,7 +50,7 @@ public class Dice extends Rectangle implements ActionListener {
 		
 		isRolling = false;
 		isEnabled = true;
-		animationTimer = new Timer(1000, this);
+		animationTimer = new Timer(20, this);
 	}
 	
 	/**
@@ -60,6 +65,11 @@ public class Dice extends Rectangle implements ActionListener {
 		} else {
 			g.drawImage(imgs[value], x, y, width, height, null);	
 		}	
+		
+		if (!isEnabled) {	// gray out
+			g.setColor(new Color(85, 85, 85, 200));
+			g.fillRect(x, y, width, height);
+		}
 	}
 	
 	/**
@@ -75,7 +85,6 @@ public class Dice extends Rectangle implements ActionListener {
 			animationTimer.start();
 		}
 		value = r.nextInt(size) + 1;
-		//System.out.println("DICE ROLLED: " + value);
 		return value;
 	}
 	
@@ -83,6 +92,7 @@ public class Dice extends Rectangle implements ActionListener {
 	 * Method for animation timer. Stops the dice rolling animation timer.
 	 */
 	public void actionPerformed(ActionEvent e) {
+		dicePanel.repaint();
 		if (animationTimer.isRunning()) {
 			isRolling = false;
 			animationTimer.stop();
@@ -108,6 +118,10 @@ public class Dice extends Rectangle implements ActionListener {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public void setEnabled(boolean b) {
+		isEnabled = b;
+	}
 
 	// Accessor methods
 	
@@ -117,6 +131,10 @@ public class Dice extends Rectangle implements ActionListener {
 	
 	public boolean isRolling() {
 		return isRolling;
+	}
+	
+	public boolean isEnabled() {
+		return isEnabled;
 	}
 
 }

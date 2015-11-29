@@ -1,6 +1,10 @@
 package newserver;
 
-import java.util.ArrayList;
+import java.awt.event.ActionListener;
+import java.security.SecureRandom;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.swing.Timer;
 
 import org.json.simple.JSONObject;
 
@@ -9,16 +13,22 @@ import util.NewJSONObject;
 
 @SuppressWarnings({ "static-access", "unchecked" })	// hide stupid warnings!!
 public class ServerDirector {
+	private static SecureRandom rng = new SecureRandom();	// might not need this?
 	private static final int MAX_PLAYERS = 4;
+	private static final int WAIT_TIME = 3;	// TODO change back to 20 secs
+	private int timeLeft = WAIT_TIME;	// time remaining
 	private Server server;
-	private ArrayList<NewPlayer> players;
+	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
+	private NewPlayer activePlayer;		// we will probably need this. Haven't used it yet though.
 	
 	private int activeIndex;
 	private int stopped;
 	
+	private Timer timer;
+	
 	public ServerDirector(Server server) {
 		this.server = server;
-		players = new ArrayList<>();
+		players = new ConcurrentHashMap<>();
 		
 		activeIndex = 0;
 		stopped = 0;
@@ -40,8 +50,7 @@ public class ServerDirector {
 			if (!checkDuplicate(p)) {
 				p.setID(players.size());
 				p.style(PlayerStyles.getInstance().getStyle());
-
-				players.add(p);
+				players.put(p.getName(), p);
 				echoAllPlayers();	// update to all players
 			} else {
 				out = new NewJSONObject(p.getID(), Keys.Commands.ERROR);	// duplicate error
@@ -58,6 +67,95 @@ public class ServerDirector {
 			out.put(Keys.Commands.ERROR, error);
 			server.echoAll(out);
 		}
+		
+		checkCountdown();
+	}
+	
+	/**
+	 * Checks the countdown for starting the game.
+	 */
+	private void checkCountdown() {
+		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.TIMER);
+		JSONObject timerObj = new JSONObject();
+		if (players.size() >= 2) {
+			timeLeft = WAIT_TIME;
+			resetTimer();
+			
+			if (players.size() == 4) {
+				timeLeft = 5;	// shorten time, we have reached player limit
+			}
+			timer = new Timer(1000, e -> {
+				
+				if (timeLeft == 0) {
+					timer.stop();
+					System.out.println("OK. CHANGE ALL CLIENTS STATE TO BOARD!!!!");
+					changeClientState("board");
+				} else {
+					timeLeft--;
+					// create timer packet and send to all clients.
+					timerObj.put(Keys.TIME, timeLeft);
+					obj.put(Keys.Commands.TIMER, timerObj);
+					server.echoAll(obj);
+				}
+		
+			});
+			timer.start();	
+		} else {
+			resetTimer();
+			timerObj.put(Keys.TIME, "reset");
+			obj.put(Keys.Commands.TIMER, timerObj);
+			server.echoAll(obj);
+		}
+	}
+	
+	/**
+	 * Sends a command to client to change to a new state.
+	 * @param state - Name of state to change to.
+	 */
+	private void changeClientState(String state) {
+		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
+		JSONObject stateObj = new JSONObject();
+		stateObj.put(Keys.STATE, state);
+		server.echoAll(obj);
+		nextPlayer();	// assign next player
+	}
+	
+	/**
+	 * Resets the timer.
+	 */
+	private void resetTimer() {
+		if (timer != null) {
+			timer.stop();
+			for (ActionListener a : timer.getActionListeners()) {
+				timer.removeActionListener(a);
+			}
+		}
+	}
+	
+	/**
+	 * Removes a player, and resets the countdown timer.
+	 * @param obj - JSONObject containing the player to remove.
+	 */
+	public void removePlayer(JSONObject obj) {
+		NewPlayer p = NewPlayer.fromJSON(obj);
+		NewJSONObject out = null;
+		
+		if (players.containsKey(p.getName())) {
+			players.remove(p.getName());
+			// echo to other clients to remove player!
+			out = new NewJSONObject(p.getID(), Keys.Commands.REM_PLAYER);
+			out.put(Keys.PLAYER, p.toJSONObject());
+			server.echoAll(out);
+		}
+		checkCountdown();
+	}
+	
+	/**
+	 * Updates a player from a JSONObject.
+	 * @param obj - JSONObject containing player
+	 */
+	public void updatePlayer(JSONObject obj) {
+		//TODO update player objects
 	}
 	
 	/**
@@ -65,7 +163,7 @@ public class ServerDirector {
 	 * clients receive them.
 	 */
 	private void echoAllPlayers() {
-		for (NewPlayer p : players) {
+		for (NewPlayer p : players.values()) {
 			NewJSONObject out = new NewJSONObject(p.getID(), Keys.Commands.ADD_PLAYER);
 			out = new NewJSONObject(p.getID(), Keys.Commands.ADD_PLAYER);
 			out.put(Keys.ID, p.getID());
@@ -81,17 +179,10 @@ public class ServerDirector {
 	 * @return true if duplicate found, false otherwise
 	 */
 	private boolean checkDuplicate(NewPlayer p) {
-		boolean duplicateName = false;
-		for (int i = 0; i < players.size(); i++) {
-			if (players.get(i).getName().equals(p.getName())) {
-				duplicateName = true;
-			}
-		}
-		System.out.println("duplicate? " + duplicateName);
-		return duplicateName;
+		return players.containsKey(p.getName());
 	}
 	
-	public ArrayList<NewPlayer> getPlayers() {
+	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
 		return players;
 	}
 	
@@ -107,11 +198,34 @@ public class ServerDirector {
 		server.echoAll(k);
 	}
 	
-	public void movePlayer(int id, int roll) {
-		NewJSONObject k = new NewJSONObject(-1, "update");
-		k.put("playerID", id);
-		k.put("roll", roll);
-		server.echoAll(k);
+	public void nextPlayer() {
+		for (NewPlayer p : players.values()) {
+			if (!p.hasRolled()) {
+				p.setActive(true);
+				p.setHasRolled(true);
+				NewJSONObject obj = new NewJSONObject(p.getID(), Keys.Commands.ROLL);
+				obj.put(Keys.PLAYER, p.toJSONObject());
+				server.echoAll(obj);
+				break;	// don't go any further!
+			}
+		}
+	}
+	
+	/**
+	 * Sends move command, to move players.
+	 * @param in - JSONObject containing a player.
+	 */
+	public void movePlayer(JSONObject in) {
+		NewPlayer p = NewPlayer.fromJSON(in);
+		System.out.println("Has rolled? " + p.hasRolled());
+		players.put(p.getName(), p);
+		
+		NewJSONObject obj = new NewJSONObject(p.getID(), Keys.Commands.MOVE);
+		obj.put(Keys.ROLL_AMT, p.getLastRoll());
+		obj.put(Keys.PLAYER, p.toJSONObject());
+		server.echoAll(obj);
+		
+		nextPlayer();	// go to next player
 	}
 	
 	public void isStopped() {

@@ -2,6 +2,7 @@ package gameobjects;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -89,6 +90,7 @@ public class NewPlayer extends GameObject {
 	@SuppressWarnings("static-access")	// it lies!
 	public void style(int colorNum) {
 		img = PlayerStyles.getInstance().imgs[colorNum];
+		System.out.println("pImg: [" + colorNum + "] " + img);
 		color = PlayerStyles.getInstance().colors[colorNum];
 		styleID = colorNum;
 	}
@@ -114,12 +116,14 @@ public class NewPlayer extends GameObject {
 			g2d.setStroke(new BasicStroke());	// default
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_OFF); // smooth off
 			g2d.drawImage(img, x, y, null);
-			
+			g2d.setColor(Color.WHITE);
+			g2d.setFont(new Font("Tahoma", Font.BOLD, 10));
+			int w = g2d.getFontMetrics().stringWidth(name);	// width of name string
 			// draw player name
 			if (tile != null && tile.y == 4) {	
-				g2d.drawString(name, x, y - 20);	// on top tile
+				g2d.drawString(name, x + (w / 2), y - 20);	// on top tile
 			} else {
-				g2d.drawString(name, x, y + 50);	// on bottom tile	
+				g2d.drawString(name, x + (w / 2), y + 50);	// on bottom tile	
 			}
 			
 		} finally {
@@ -153,7 +157,6 @@ public class NewPlayer extends GameObject {
 	 * handled here, but is called by animatePlayer() in the Animator class.
 	 */
 	public void move() {
-		System.out.println("move() from player!");
 		if (!isMoving && movePath.size() > 0) {
 			isMoving = true;
 			newLocation = movePath.get(0).getCellLocation(ID);
@@ -212,8 +215,32 @@ public class NewPlayer extends GameObject {
 		this.name = name;
 	}
 	
+	public void setActive(boolean b) {
+		isActive = b;
+	}
+	
+	public void setLastRoll(int lr) {
+		lastRoll = lr;
+	}
+	
+	public void setHasRolled(boolean b) {
+		hasRolled = b;
+	}
+	
 	public int getID() {
 		return ID;
+	}
+	
+	public int getTileID() {
+		return tile.getID();
+	}
+	
+	public boolean hasRolled() {
+		return hasRolled;
+	}
+	
+	public boolean isMoving() {
+		return isMoving;
 	}
 	
 	public NewTile getTile() {
@@ -232,8 +259,8 @@ public class NewPlayer extends GameObject {
 		return name;
 	}
 	
-	public void setLastRoll(int lr) {
-		lastRoll = lr;
+	public int getLastRoll() {
+		return lastRoll;
 	}
 	
 	public String toString() {

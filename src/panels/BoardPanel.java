@@ -8,9 +8,8 @@ import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JPanel;
 
@@ -23,6 +22,7 @@ import gameobjects.NewTile;
 import main.Animator;
 import newserver.Keys;
 import util.GameUtils;
+import util.NewJSONObject;
 
 public class BoardPanel extends JPanel implements ComponentListener {
 	public static final int HORIZONTAL_TILE_COUNT = 10;
@@ -32,20 +32,16 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	private Controller controller;
 	
 	private ArrayList<NewTile> tiles;
-//	private ArrayList<NewPlayer> players;
-	private HashMap<String, NewPlayer> players;
+	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private NewPlayer activePlayer;
 	
 	public BoardPanel(ClientApp app) {
 		this.app = app;
 		init();
-//		players = new ArrayList<>();
-		players = new HashMap<>();
+		players = new ConcurrentHashMap<>();
 		controller = new Controller();
 		
 		controller.setBP(this);
-		
-		// test players
 		addComponentListener(this);
 	}
 	
@@ -53,23 +49,15 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		createTiles();
 	}
 	
-//	public void addPlayer(NewPlayer p) {
-//		System.out.println("New Player " + p + ", added to board!");
-//		players.add(p);
-//		activePlayer = p;
-//		
-//		// test
-//		activePlayer.setTile(tiles.get(0));	// start at 0
-//		ArrayList<NewTile> movePath = createPathFromRoll(20);	// static roll
-//		activePlayer.initMove(movePath);
-//		Animator test = new Animator();
-//		test.animatePlayer(this, activePlayer);
-//		repaint();
-//	}
-	
+	/**
+	 * Adds a player to the board at the default location (0,0).1
+	 * @param p - Player to add
+	 */
 	public void addPlayer(NewPlayer p) {
-//		players.add(p);
+		System.out.println("board addplayer!");
+		p.style(p.getStyleID());	// make sure player is styled!
 		p.setTile(tiles.get(0));
+		p.setLocation(tiles.get(0).getCellLocation(p.getID()));
 		players.put(p.getName(), p);
 	}
 	
@@ -99,13 +87,13 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	
 	/**
 	 * Generates a movement path for the specified player, based on the dice roll.
-	 * @param index - Player to create path for
+	 * @param player - Player to create path for
 	 * @param roll - Tiles to add from active player current position
 	 * @return - Array of tiles for movement
 	 */
-	public ArrayList<NewTile> createPathFromRoll(int index, int roll) { // TESTING
-		int curTileID = players.get(index).getTile().getID();
-		int newTileID = curTileID + roll;
+	public ArrayList<NewTile> createPathFromRoll(NewPlayer player, int roll) {
+		int curTileID = player.getTileID();
+		int newTileID = curTileID + roll + 1;	// add 1 to fix glitch!
 		
 		ArrayList<NewTile> movePath = new ArrayList<>();
 		for (int i = curTileID; i < newTileID; i++) {
@@ -179,11 +167,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			e.printStackTrace();
 		}
 		
-//		// size of this component is currently unknown, so we have to get content size from ClientApp!
-//		int width = ClientApp.getInstance().getStatePanel().getSize().width;
-//		int height = ClientApp.getInstance().getStatePanel().getSize().height;
-		
-		// despite being zero, the component is resized which fixes size issue.
+		// even though these are zero, tiles will be properly sized when component resizes!
 		int width = 0;
 		int height = 0;
 		
@@ -230,16 +214,16 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 * Updates all players positioning in response to a window resize event.
 	 */
 	private void resizePlayers() {
-		for (int i = 0; i < players.size(); i++) {
-			NewPlayer p = players.get(i);
-			System.out.println("should be resizing players!");
-			if (p.getTile() != null) {	// we can reassign location based on current tile
+		for (NewPlayer p : players.values()) {
+			if (p.getTile() != null && !p.isMoving()) {	// we can reassign location based on current tile
 				p.setLocation(p.getTile().getCellLocation(p.getID()));
-				System.out.println("Is player tile null? Shouldn't be if you're reading this!");
-			} 
+			}
 		}
 	}
 
+	/**
+	 * Resize any GUI elements.
+	 */
 	public void componentResized(ComponentEvent e) {
 		resizeTiles();
 		resizePlayers();
@@ -256,12 +240,22 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		return controller;
 	}
 	
-	public void setActive(int index) {
-		activePlayer = players.get(index);
+	public void setActive(String name) {
+		activePlayer = players.get(name);
+		activePlayer.setActive(true);
+		repaint();
 	}
 	
-	public HashMap<String, NewPlayer> getPlayers() {
+	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
 		return players;
+	}
+	
+	public ArrayList<NewTile> getTiles() {
+		return tiles;
+	}
+	
+	public NewPlayer getActivePlayer() {
+		return activePlayer;
 	}
 	
 	public class Controller extends IOHandler {
@@ -272,34 +266,30 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		}
 
 		public void send(JSONObject out) {
+			app.getClient().getIOHandler().send(out);
 		}
 
 		public void receive(JSONObject in) {
 			String cmdKey = (String)in.get("cmd");
+			NewPlayer p = NewPlayer.fromJSON(in);
+			p = players.get(p.getName());	// reference this player from board
 			
 			switch (cmdKey) {
+			case Keys.Commands.MOVE:
+				System.out.println("SHOULD BE MOVING PLAYER: " + p);
+				Animator test = new Animator();
+				setActive(p.getName());
+				activePlayer.initMove(createPathFromRoll(p, (int)in.get(Keys.ROLL_AMT)));
+				test.animatePlayer(BoardPanel.this, activePlayer);
+				players.put(activePlayer.getName(), activePlayer);
+				repaint();
+				break;
 			case Keys.Commands.UPDATE:
 				// update stuff
 				break;
 			case Keys.Commands.ACTIVE:
 				// active stuff
 				break;
-			}
-			
-			if (in.get("cmd") == Keys.Commands.UPDATE) {
-				int id = (int) in.get("playerID");
-				int roll = (int) in.get("roll");
-				players.get(id).setLastRoll(roll);
-				//players.get(id).initMove(createPathFromRoll(id, roll));
-				players.get(id).initMove(createPathFromRoll(roll));
-				Animator test = new Animator();
-				test.animatePlayer(bp, players.get(id));
-				bp.repaint();
-			}
-			else if (in.get("cmd") == "active") {
-				int id = (int) in.get("playerID");
-				
-				bp.setActive(id);
 			}
 		}
 		

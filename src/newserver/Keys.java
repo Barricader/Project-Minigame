@@ -28,9 +28,19 @@ public final class Keys {
 	public static final String TEXT = "text";
 	
 	/**
+	 * Key indicating the value of time, typically from a timer countdown.
+	 */
+	public static final String TIME = "time";
+	
+	/**
 	 * Key indicating the connection status that coincides with CommandKey.CONNECT.
 	 */
 	public static final String CONNECT_STATUS = "connectStatus";
+	
+	/**
+	 * Key indicating the state a client should be at.
+	 */
+	public static final String STATE = "state";
 	
 	/**
 	 * Key indicating the string value that coincides with CommandKey.ERROR.
@@ -86,7 +96,7 @@ public final class Keys {
 	/**
 	 * Key indicating the player roll amount.
 	 */
-	public static final String ROLL = "roll";
+	public static final String ROLL_AMT = "rollAmt";
 	
 	/**
 	 * Key indicating the last roll that the player has completed.
@@ -115,6 +125,16 @@ public final class Keys {
 		 * Key indicating that a player should be added and send to all clients.
 		 */
 		public static final String ADD_PLAYER = "addPlayer";
+		
+		/**
+		 * Key indicating that a player should be removed and updated on all clients.
+		 */
+		public static final String REM_PLAYER = "remPlayer";
+		
+		/**
+		 * Key indicating the command for a timer countdown.
+		 */
+		public static final String TIMER = "timer";
 		
 		/**
 		 * Key indicating an update of some sort.
@@ -146,6 +166,11 @@ public final class Keys {
 		 * Key indicating that a player should move.
 		 */
 		public static final String MOVE = "move";
+		
+		/**
+		 * Key indicating a player should roll.
+		 */
+		public static final String ROLL = "roll";
 		
 		/**
 		 * Key indicating that a player has rolled.

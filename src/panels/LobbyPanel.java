@@ -3,6 +3,8 @@ package panels;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -11,23 +13,29 @@ import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
+import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import screen.PlayerListCellRenderer;
 
 public class LobbyPanel extends JPanel {
+	private ClientApp app;
 	private Controller controller;
 	private DefaultListModel<NewPlayer> listModel;
 	private PlayerListCellRenderer listRenderer;
+	private ConcurrentHashMap<String, NewPlayer> playerMap;
 	private JList<NewPlayer> playerList;
 	
-	public LobbyPanel() {
+	public LobbyPanel(ClientApp app) {
+		this.app = app;
 		controller = new Controller();
 		init();
 	}
 	
 	private void init() {
 		createComponents();
+		setBackground(Color.BLACK);
+		playerList.setBackground(Color.BLACK);
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -54,9 +62,20 @@ public class LobbyPanel extends JPanel {
 	/**
 	 * Adds player to list.
 	 * @param p - Player to add to list
+	 * @deprecated 
+	 * Use updateList(), to retrieve values from board player map.
 	 */
 	public void addPlayerToList(NewPlayer p) {
 		listModel.addElement(p);
+		repaint();
+	}
+	
+	public void updateList() {
+		playerMap = app.getBoardPanel().getPlayers();
+		listModel.removeAllElements();
+		for (NewPlayer p : playerMap.values()) {
+			listModel.addElement(p);
+		}
 		repaint();
 	}
 	

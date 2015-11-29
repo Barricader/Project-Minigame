@@ -1,6 +1,7 @@
 package panels;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -31,7 +32,6 @@ public class StatePanel extends JPanel {
 		controller = new Controller();
 		loginPanel = new LoginPanel(app);
 		updateView(loginPanel);
-		setBorder(new LineBorder(Color.RED));
 	}
 	
 	public void updateView(JPanel newView) {
@@ -65,7 +65,19 @@ public class StatePanel extends JPanel {
 		}
 
 		public void receive(JSONObject in) {
-			// TODO change state stuff!
+			System.out.println("view should be at board panel!");
+			System.out.println("received on state panel: " + in.toJSONString());
+			app.getConnPanel().setVisible(true);
+			app.getDicePanel().setVisible(true);
+			updateView(app.getBoardPanel());	// test
+			
+			// board rendering glitch fix
+			Dimension size = app.getSize();
+			size.width += 1;
+			size.height += 1;
+			app.setSize(size);
+			
+			app.repaint();
 		}
 		
 	}

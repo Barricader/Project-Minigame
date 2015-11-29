@@ -38,6 +38,9 @@ public class ChatPanel extends JPanel {
 		init();
 	}
 	
+	/**
+	 * Initializes all GUI components and lays them out using GridBagLayout.
+	 */
 	private void init() {
 		createComponents();
 		
@@ -75,6 +78,9 @@ public class ChatPanel extends JPanel {
 		add(sendBtn, c);
 	}
 	
+	/**
+	 * Creates GUI components.
+	 */
 	private void createComponents() {
 		chatArea = new JTextArea();
 		chatArea.setEditable(false);
@@ -125,6 +131,11 @@ public class ChatPanel extends JPanel {
 		chatArea.setCaretPosition(chatArea.getDocument().getLength());	// move scroll bar down to bottom
 	}
 	
+	/**
+	 * IOHandler for handling chat messages.
+	 * @author David Kramer
+	 *
+	 */
 	public class Controller extends IOHandler {
 		ChatPanel cp;
 		
@@ -150,6 +161,10 @@ public class ChatPanel extends JPanel {
 			}
 		}
 		
+		/**
+		 * Toggles the chat UI, based on boolean value.
+		 * @param enabled
+		 */
 		public void toggleUI(boolean enabled) {
 			chatArea.setEnabled(enabled);
 			msgField.setEnabled(enabled);
@@ -163,8 +178,7 @@ public class ChatPanel extends JPanel {
 		public void receive(JSONObject in) {
 			String text = (String)in.get(Keys.TEXT);
 			String name = (String)in.get(Keys.NAME);
-			int id = (int)in.get(Keys.ID);
-			cp.printMessage(name + ">: " + text);
+			cp.printMessage(name + " >: " + text);
 		}
 	}
 	

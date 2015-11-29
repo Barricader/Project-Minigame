@@ -6,15 +6,15 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.ConnectException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -26,6 +26,7 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import newserver.Keys;
+import util.GameUtils;
 import util.NewJSONObject;
 
 /**
@@ -42,6 +43,7 @@ public class LoginPanel extends JPanel {
 	private LobbyPanel lobbyPanel;	// show waiting players when we login
 	private JLabel titleLabel;
 	private JLabel nameLabel;
+	private JLabel timerLabel;
 	private JButton joinBtn;
 	private JTextField nameField;
 	private NewPlayer clientPlayer;	// the player that is created by the client
@@ -52,6 +54,9 @@ public class LoginPanel extends JPanel {
 		init();
 	}
 	
+	/**
+	 * Lays out GUI components using GridBagLayout.
+	 */
 	private void init() {
 		createComponents();
 		setBorder(new LineBorder(Color.LIGHT_GRAY));
@@ -69,13 +74,19 @@ public class LoginPanel extends JPanel {
 		c.weighty = 0.4;
 		add(titleLabel, c);
 		
+		// countdown timer
+		c.gridx = 0;
+		c.gridy = 1;
+		c.ipady = 0;
+		add(timerLabel, c);
+		
 		// name label
 		c.insets = new Insets(20, 20, 20, 20);	// margin
 		c.anchor = GridBagConstraints.CENTER;
 		c.gridx = 0;
 		c.gridwidth = 1;
 		c.weightx = 0.0;
-		c.gridy = 1;
+		c.gridy = 2;
 		c.weighty = 0.0;
 		add(nameLabel, c);
 
@@ -83,7 +94,7 @@ public class LoginPanel extends JPanel {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 1;
 		c.weightx = 1.0;
-		c.gridy = 1;
+		c.gridy = 2;
 		c.ipady = 20;
 		add(nameField, c);
 		
@@ -91,7 +102,7 @@ public class LoginPanel extends JPanel {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 3;
 		c.weightx = 0.1;
-		c.gridy = 1;
+		c.gridy = 2;
 		add(joinBtn, c);
 		
 		// player lobby
@@ -100,12 +111,15 @@ public class LoginPanel extends JPanel {
 		c.gridx = 0;
 		c.weightx = 1.0;
 		c.gridwidth = 4;
-		c.gridy = 2;
+		c.gridy = 3;
 		c.weighty = 10.0;
 		add(lobbyPanel, c);
 		
 	}
 	
+	/**
+	 * Creates GUI components.
+	 */
 	private void createComponents() {
 		titleLabel = new JLabel("<Project Mini-Game>");
 		titleLabel.setFont(new Font("Courier New", Font.BOLD, 20));
@@ -114,6 +128,12 @@ public class LoginPanel extends JPanel {
 		nameLabel = new JLabel("Enter Player Name: ");
 		nameLabel.setFont(new Font("Courier New", Font.BOLD, 20));
 		nameLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		
+		timerLabel = new JLabel("Start Timer: XX");
+		timerLabel.setVisible(false);
+		timerLabel.setFont(new Font("Courier New", Font.BOLD, 20));
+		timerLabel.setForeground(Color.RED);
+		timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		nameField = new JTextField(10);
 		nameField.setFont(new Font("Courier New", Font.BOLD, 20));
@@ -141,7 +161,7 @@ public class LoginPanel extends JPanel {
 			controller.joinPlayer();
 		});
 		
-		lobbyPanel = new LobbyPanel();
+		lobbyPanel = new LobbyPanel(app);
 	}
 	
 	public Controller getController() {
@@ -156,6 +176,12 @@ public class LoginPanel extends JPanel {
 		return clientPlayer;
 	}
 	
+	/**
+	 * IOHandler for handling player add/remove as well as updating the countdown
+	 * timer.
+	 * @author David Kramer
+	 *
+	 */
 	public class Controller extends IOHandler {
 		
 		public Controller() {}
@@ -165,8 +191,31 @@ public class LoginPanel extends JPanel {
 		}
 
 		public void receive(JSONObject in) {
-			NewPlayer newPlayer = NewPlayer.fromJSON(in);
-			addPlayer(newPlayer);
+			System.out.println("login panel received: " + in.toJSONString());
+			String cmd = (String) in.get(Keys.CMD);	
+			NewPlayer player = NewPlayer.fromJSON(in);
+			
+			switch (cmd) {
+			case Keys.Commands.ADD_PLAYER:
+				addPlayer(player);
+				break;
+			case Keys.Commands.REM_PLAYER:
+				removePlayer(player);
+				break;
+			case Keys.Commands.TIMER:
+				JSONObject timer = (JSONObject) in.get(cmd);
+				boolean reset = false;
+				int timeLeft = 0;
+				
+				// did we reset?
+				if (timer.get(Keys.TIME).equals("reset")) {
+					reset = true;
+				} else {
+					timeLeft = Integer.parseInt(timer.get(Keys.TIME).toString());	
+				}
+				updateTimer(reset, timeLeft);
+			}
+			
 		}
 		
 		/**
@@ -184,7 +233,7 @@ public class LoginPanel extends JPanel {
 				newPlayer = clientPlayer;
 				nameField.setText("");
 				nameField.setEnabled(false);
-				removeActionListeners(joinBtn);
+				GameUtils.clearActions(joinBtn);
 				joinBtn.setText("Disconnect");
 				joinBtn.addActionListener(e -> {
 					disconnectPlayer();
@@ -192,7 +241,7 @@ public class LoginPanel extends JPanel {
 				
 			}
 		
-			HashMap<String, NewPlayer> players = app.getBoardPanel().getPlayers();
+			ConcurrentHashMap<String, NewPlayer> players = app.getBoardPanel().getPlayers();
 			boolean canAdd = true;
 			for (String name : players.keySet()) {
 				NewPlayer p = players.get(name);
@@ -201,9 +250,18 @@ public class LoginPanel extends JPanel {
 				}
 			}
 			if (canAdd) {
-				players.put(newPlayer.getName(), newPlayer);
-				lobbyPanel.addPlayerToList(newPlayer);
+				app.getBoardPanel().addPlayer(newPlayer);
+				lobbyPanel.updateList();
 			}
+		}
+		
+		/**
+		 * Removes player from board and player list.
+		 * @param player - Player to remove
+		 */
+		public void removePlayer(NewPlayer player) {
+			app.getBoardPanel().getPlayers().remove(player.getName());
+			lobbyPanel.updateList();
 		}
 		
 		/**
@@ -223,31 +281,67 @@ public class LoginPanel extends JPanel {
 			NewJSONObject obj = new NewJSONObject(app.getClient().getID(), Keys.Commands.ADD_PLAYER);
 			String name = nameField.getText();
 			clientPlayer = new NewPlayer(name, app.getClient().getID());
+			// setup location for board
 			obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
 			send(obj);
+			nameField.setText(""); 	// clear out
 		}
 		
 		/**
-		 * Disconnects the player.
+		 * Disconnects a player and clears them out from server.
 		 */
 		public void disconnectPlayer() {
-			app.getConnPanel().getController().reset();
-			lobbyPanel.getPlayerList().removeAll();
-			removeActionListeners(joinBtn);
-			joinBtn.setText("Join Game");
-			joinBtn.addActionListener(e -> {
-				joinPlayer();
-			});
+			if (showWarningDisconnect()) {
+				NewJSONObject obj = new NewJSONObject(app.getClient().getID(), Keys.Commands.REM_PLAYER);
+				obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
+				send(obj);
+				
+				// clear out old players
+				clientPlayer = null;
+				app.resetClient();
+				app.getStatePanel().getLoginPanel().getLobbyPanel().getPlayerList().removeAll();
+				app.getBoardPanel().getPlayers().clear();
+				app.repaint();
+				// setup to join again
+				GameUtils.clearActions(joinBtn);
+				nameField.setEnabled(true);
+				joinBtn.setText("Join Game");
+				joinBtn.setEnabled(false);
+				joinBtn.addActionListener(e -> {
+					joinPlayer();
+				});
+			}
 		}
 		
 		/**
-		 * Remove action listeners from specified button
-		 * @param btn - Button to remove action listeners from.
+		 * Updates the time on the countdown timer
+		 * @param reset - flag to show / hide the timer
+		 * @param timeLeft - Time remaining
 		 */
-		private void removeActionListeners(JButton btn) {
-			for (ActionListener a : btn.getActionListeners()) {
-				btn.removeActionListener(a);
+		private void updateTimer(boolean reset, int timeLeft) {
+			if (reset) {
+				timerLabel.setVisible(false);
+			} else {
+				timerLabel.setVisible(true);
+				String endStr = " seconds";
+				
+				if (timeLeft == 1) {	// sec instead of secs
+					endStr = " second";
+				}
+				
+				timerLabel.setText("Starting in: " + timeLeft + endStr);	
 			}
+		}
+		
+		/**
+		 * Shows a confirm dialog to ensure the player wants to disconnect
+		 * @return true if they hit ok, false if they hit cancel.
+		 */
+		private boolean showWarningDisconnect() {
+			int choice = JOptionPane.showConfirmDialog(app, "Are you sure you want to leave?",
+					"Confirm", JOptionPane.OK_CANCEL_OPTION);
+			
+			return choice == 0;	// they hit ok
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
@@ -22,6 +24,7 @@ import panels.BoardPanel;
 import panels.ChatPanel;
 import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
+import panels.DicePanel;
 import panels.LoginPanel;
 import panels.StatePanel;
 
@@ -42,6 +45,7 @@ public class ClientApp extends JFrame {
 	private StatePanel statePanel;	// render state view
 	private ChatPanel chatPanel;
 	private BoardPanel boardPanel;
+	private DicePanel dicePanel;
 	private ConnectionPanel connPanel;
 	
 	private ErrorHandler errorHandler;
@@ -69,7 +73,7 @@ public class ClientApp extends JFrame {
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
-		c.gridwidth = 5;
+		c.gridwidth = 10;
 		c.weightx = 1.0;
 		c.gridy = 0;
 		c.ipady = 10;
@@ -85,19 +89,25 @@ public class ClientApp extends JFrame {
 		c.gridy = 1;
 		c.gridheight = 5;
 		c.weighty = 0.8;
-//		boardPanel = new BoardPanel(this);	// here to workaround first size glitch.
 		panel.add(statePanel, c);
 		
 		// chat panel
 		c.anchor = GridBagConstraints.SOUTH;
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
-		c.weightx = 1.0;
+		c.weightx = 0.9;
 		c.gridwidth = 8;
 		c.gridy = 6;
 		c.gridheight = 4;
 		c.weighty = 0.4;
 		panel.add(chatPanel, c);
+		
+		// dice panel
+		c.anchor = GridBagConstraints.SOUTHEAST;
+		c.gridx = 8;
+		c.gridwidth = 2;
+		c.weightx = 0.2;
+		panel.add(dicePanel, c);
 		
 		add(panel);
 	}
@@ -110,8 +120,10 @@ public class ClientApp extends JFrame {
 		statePanel = new StatePanel(this);
 		chatPanel = new ChatPanel(this);
 		connPanel = new ConnectionPanel(this);
+		connPanel.setVisible(false);
 		boardPanel = new BoardPanel(this);
-//		loginPanel = new LoginPanel(this);
+		dicePanel = new DicePanel(this);
+		dicePanel.setVisible(false);
 	}
 	
 	/**
@@ -159,6 +171,8 @@ public class ClientApp extends JFrame {
 		client = null;
 		client = new Client(this);
 		client.setIOHandler(new ClientIOHandler(this));
+		
+		chatPanel.getController().toggleUI(client.isConnected());
 	}
 	
 	/**
@@ -208,6 +222,10 @@ public class ClientApp extends JFrame {
 	
 	public LoginPanel getLoginPanel() {
 		return statePanel.getLoginPanel();
+	}
+	
+	public DicePanel getDicePanel() {
+		return dicePanel;
 	}
 	
 	public void setClient(Client client) {
