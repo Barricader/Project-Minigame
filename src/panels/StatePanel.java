@@ -1,17 +1,17 @@
 package panels;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
+import newserver.Keys;
+import newserver.ServerDirector;
 
 /**
  * This panel will be a container for any state that changes more frequently. This
@@ -23,10 +23,14 @@ import client.IOHandler;
 public class StatePanel extends JPanel {
 	private ClientApp app;
 	
-//	private JPanel view;	// content we want to display
+	// initial login components
 	private Controller controller;
 	private LoginPanel loginPanel;
 	
+	/**
+	 * Constructs a new StatePanel with the default view set to login.
+	 * @param app
+	 */
 	public StatePanel(ClientApp app) {
 		this.app = app;
 		controller = new Controller();
@@ -34,6 +38,10 @@ public class StatePanel extends JPanel {
 		updateView(loginPanel);
 	}
 	
+	/**
+	 * Updates the active state view (either between board or mini-game).
+	 * @param newView - View to change.
+	 */
 	public void updateView(JPanel newView) {
 		removeAll();
 		setLayout(new GridBagLayout());
@@ -65,18 +73,40 @@ public class StatePanel extends JPanel {
 		}
 
 		public void receive(JSONObject in) {
-			System.out.println("view should be at board panel!");
-			System.out.println("received on state panel: " + in.toJSONString());
+			JSONObject state = (JSONObject) in.get(Keys.CMD);
+			int stateType = (int) state.get(Keys.STATE);
+			
+			switch (stateType) {
+			case (ServerDirector.BOARD):	// board state
+				updateBoard();
+				break;
+			case (ServerDirector.MINI):		// mini state
+				updateMiniState();
+				break;
+				
+			}
+		}
+		
+		/**
+		 * Updates to board view.
+		 */
+		public void updateBoard() {
+			System.out.println("view should be at board panel");
 			app.getConnPanel().setVisible(true);
 			app.getDicePanel().setVisible(true);
-			updateView(app.getBoardPanel());	// test
+			updateView(app.getBoardPanel());
 			
 			// board rendering glitch fix
 			Dimension size = app.getSize();
-			size.width += 1;
-			size.height += 1;
 			app.setSize(size);
-			
+			app.repaint();
+		}
+		
+		/**
+		 * Updates to mini game view.
+		 */
+		public void updateMiniState() {
+			updateView(app.getMiniPanel());
 			app.repaint();
 		}
 		
