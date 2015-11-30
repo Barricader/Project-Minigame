@@ -53,7 +53,6 @@ public class NewPlayer extends GameObject {
 	 * @param obj - JSONObject that contains values for player
 	 */
 	public static void updateFromJSON(NewPlayer player, JSONObject obj) {
-		System.out.println("Update from json: " + obj);
 		if (obj.containsKey(Keys.PLAYER)) {	// ensure we extract the player object from cmd
 			obj = (JSONObject) obj.get(Keys.PLAYER);
 		}
@@ -64,6 +63,7 @@ public class NewPlayer extends GameObject {
 		player.tileID	= obj.containsKey(Keys.TILE_ID) 	? (int) obj.get(Keys.TILE_ID) 	: player.tileID;
 		player.styleID	= obj.containsKey(Keys.STYLE_ID) 	? (int) obj.get(Keys.STYLE_ID) 	: player.styleID;
 		player.lastRoll = obj.containsKey(Keys.LAST_ROLL) 	? (int) obj.get(Keys.LAST_ROLL) : player.lastRoll;
+		player.isActive = obj.containsKey(Keys.ACTIVE)		? (boolean) obj.get(Keys.ACTIVE): player.isActive;
 	}
 	
 	public static NewPlayer fromJSON(JSONObject obj) {
@@ -90,7 +90,6 @@ public class NewPlayer extends GameObject {
 	@SuppressWarnings("static-access")	// it lies!
 	public void style(int colorNum) {
 		img = PlayerStyles.getInstance().imgs[colorNum];
-		System.out.println("pImg: [" + colorNum + "] " + img);
 		color = PlayerStyles.getInstance().colors[colorNum];
 		styleID = colorNum;
 	}
@@ -223,6 +222,10 @@ public class NewPlayer extends GameObject {
 		lastRoll = lr;
 	}
 	
+	public void setTileID(int tileID) {
+		this.tileID = tileID;
+	}
+	
 	public void setHasRolled(boolean b) {
 		hasRolled = b;
 	}
@@ -232,7 +235,7 @@ public class NewPlayer extends GameObject {
 	}
 	
 	public int getTileID() {
-		return tile.getID();
+		return tileID;
 	}
 	
 	public boolean hasRolled() {
@@ -275,6 +278,7 @@ public class NewPlayer extends GameObject {
 		player.put(Keys.TILE_ID, tileID);
 		player.put(Keys.STYLE_ID, styleID);
 		player.put(Keys.LAST_ROLL, lastRoll);
+		player.put(Keys.ACTIVE, isActive);
 		return player;
 	}
 

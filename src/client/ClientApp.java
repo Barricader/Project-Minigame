@@ -106,7 +106,7 @@ public class ClientApp extends JFrame {
 		c.anchor = GridBagConstraints.SOUTHEAST;
 		c.gridx = 8;
 		c.gridwidth = 2;
-		c.weightx = 0.2;
+		c.weightx = 0.1;
 		panel.add(dicePanel, c);
 		
 		add(panel);

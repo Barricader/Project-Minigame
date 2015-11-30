@@ -89,6 +89,11 @@ public final class Keys {
 	public static final String STYLE_ID = "styleID";
 	
 	/**
+	 * Key indicating if player is active or not.
+	 */
+	public static final String ACTIVE = "active";
+	
+	/**
 	 * Key indicating the PlayerID that the player has been assigned.
 	 */
 	public static final String PLAYER_ID = "playerID";

@@ -227,19 +227,13 @@ public class LoginPanel extends JPanel {
 				return;
 			}
 			
-			// new player belongs to this client!
-			if (newPlayer.getName().equals(clientPlayer.getName())) {
-				clientPlayer = newPlayer;
-				newPlayer = clientPlayer;
-				nameField.setText("");
-				nameField.setEnabled(false);
-				GameUtils.clearActions(joinBtn);
-				joinBtn.setText("Disconnect");
-				joinBtn.addActionListener(e -> {
-					disconnectPlayer();
-				});
-				
-			}
+			nameField.setText("");
+			nameField.setEnabled(false);
+			GameUtils.clearActions(joinBtn);
+			joinBtn.setText("Disconnect");
+			joinBtn.addActionListener(e -> {
+				disconnectPlayer();
+			});
 		
 			ConcurrentHashMap<String, NewPlayer> players = app.getBoardPanel().getPlayers();
 			boolean canAdd = true;
@@ -250,6 +244,10 @@ public class LoginPanel extends JPanel {
 				}
 			}
 			if (canAdd) {
+				if (newPlayer.getName().equals(clientPlayer.getName())) {	// player belongs to this client!
+					clientPlayer = newPlayer;
+					app.getBoardPanel().setClientPlayer(clientPlayer);
+				}
 				app.getBoardPanel().addPlayer(newPlayer);
 				lobbyPanel.updateList();
 			}

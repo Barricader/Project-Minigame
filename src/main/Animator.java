@@ -2,8 +2,10 @@ package main;
 
 import javax.swing.Timer;
 
-import client.ClientApp;
+import org.json.simple.JSONObject;
+
 import gameobjects.NewPlayer;
+import newserver.Keys;
 import panels.BoardPanel;
 import util.NewJSONObject;
 
@@ -35,9 +37,10 @@ public class Animator {
 					board.repaint();	
 				} else {
 					animateTimer.stop();
-					// update server here
-					NewJSONObject k = new NewJSONObject(player.getID(), "stopped");
-					ClientApp.getInstance().getClient().getIOHandler().send(k);
+					// send command to server that client has finished animating player!
+					board.getController().update();
+					NewJSONObject obj = new NewJSONObject(player.getID(), Keys.Commands.STOPPED);
+					board.getController().send(obj);
 				}
 			});
 			animateTimer.start();	

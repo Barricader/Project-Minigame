@@ -19,21 +19,23 @@ public class ServerDirector {
 	private int timeLeft = WAIT_TIME;	// time remaining
 	private Server server;
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
+	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;	// players that have rolled;
 	private NewPlayer activePlayer;		// we will probably need this. Haven't used it yet though.
 	
-	private int activeIndex;
+//	private int activeIndex;
 	private int stopped;
+	private int turnCount;	// how many turns are we in?
 	
-	private Timer timer;
+	private Timer timer;	// timer for controlling events
 	
 	public ServerDirector(Server server) {
 		this.server = server;
 		players = new ConcurrentHashMap<>();
-		
-		activeIndex = 0;
+		rolledPlayers = new ConcurrentHashMap<>();
+//		activeIndex = 0;
 		stopped = 0;
-		
-		setActive();
+		turnCount = 0;
+//		setActive();
 	}
 	
 	/**
@@ -67,7 +69,6 @@ public class ServerDirector {
 			out.put(Keys.Commands.ERROR, error);
 			server.echoAll(out);
 		}
-		
 		checkCountdown();
 	}
 	
@@ -155,7 +156,13 @@ public class ServerDirector {
 	 * @param obj - JSONObject containing player
 	 */
 	public void updatePlayer(JSONObject obj) {
-		//TODO update player objects
+		NewPlayer p = NewPlayer.fromJSON(obj);
+		players.put(p.getName(), p);
+		System.out.println("SERVER UPDATE PLAYER RECEIVED: " + p.toJSONObject().toJSONString());
+		// echo back
+		NewJSONObject update = new NewJSONObject(p.getID(), Keys.Commands.UPDATE);
+		update.put(Keys.PLAYER, p.toJSONObject());
+		server.echoAll(update);
 	}
 	
 	/**
@@ -192,55 +199,67 @@ public class ServerDirector {
 //		server.echoAll(k);
 //	}
 	
-	public void setActive() {
-		NewJSONObject k = new NewJSONObject(-1, "active");
-		k.put("playerID", activeIndex);
-		server.echoAll(k);
-	}
+//	public void setActive() {
+//		NewJSONObject k = new NewJSONObject(-1, "active");
+//		k.put("playerID", activeIndex);
+//		server.echoAll(k);
+//	}
 	
+	/**
+	 * Selects the next active player and sends a request for the player 
+	 * to roll the dice.
+	 */
 	public void nextPlayer() {
 		for (NewPlayer p : players.values()) {
-			if (!p.hasRolled()) {
-				p.setActive(true);
-				p.setHasRolled(true);
-				NewJSONObject obj = new NewJSONObject(p.getID(), Keys.Commands.ROLL);
-				obj.put(Keys.PLAYER, p.toJSONObject());
+			if (!rolledPlayers.containsKey(p.getName())) {
+				rolledPlayers.put(p.getName(), p);
+				activePlayer = p;
+				activePlayer.setActive(true);
+				NewJSONObject obj = new NewJSONObject(activePlayer.getID(), Keys.Commands.ROLL);
+				obj.put(Keys.PLAYER, activePlayer.toJSONObject());
 				server.echoAll(obj);
-				break;	// don't go any further!
+				break;
 			}
 		}
 	}
 	
 	/**
-	 * Sends move command, to move players.
-	 * @param in - JSONObject containing a player.
+	 * Resets players back to not having rolled, typically after a new round.
+	 */
+	private void reset() {
+		activePlayer.setHasRolled(false);
+		rolledPlayers.clear();
+	}
+	
+	/**
+	 * Sends a request to all clients to animate and move the player.
+	 * @param in - Player JSONObject that is the active player to move
 	 */
 	public void movePlayer(JSONObject in) {
 		NewPlayer p = NewPlayer.fromJSON(in);
-		System.out.println("Has rolled? " + p.hasRolled());
-		players.put(p.getName(), p);
-		
+		p.setLastRoll((int)in.get(Keys.ROLL_AMT));
+		p.setHasRolled(true);
 		NewJSONObject obj = new NewJSONObject(p.getID(), Keys.Commands.MOVE);
-		obj.put(Keys.ROLL_AMT, p.getLastRoll());
 		obj.put(Keys.PLAYER, p.toJSONObject());
+		obj.put(Keys.ROLL_AMT, p.getLastRoll());
+		players.put(p.getName(), p);	// update player map
 		server.echoAll(obj);
-		
-		nextPlayer();	// go to next player
 	}
 	
+	/**
+	 * Called when a client sends a stopped command. If all players have finished
+	 * animating the current player, we need to move onto the next player and/or
+	 * change to a mini-game state.
+	 */
 	public void isStopped() {
 		stopped++;
 		if (stopped == players.size()) {
-			// DO STUFF
-			if (activeIndex == players.size()) {
-				activeIndex = 0;
-				setActive();
-			}
-			else {
-				activeIndex++;
-				setActive();
-			}
 			stopped = 0;
+			activePlayer.setHasRolled(true);			
+			if (rolledPlayers.size() == players.size()) {
+				reset();
+			}
+			nextPlayer();
 		}
 	}
 }

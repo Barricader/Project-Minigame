@@ -22,7 +22,7 @@ public class ServerIOHandler extends IOHandler {
 	}
 
 	public void send(JSONObject out) {
-		System.out.println("ServerClient should be sending: " + out);
+//		System.out.println("ServerClient should be sending: " + out);
 		// send JSON object through objectOutputStream
 		try {
 			serverClient.getOutputStream().writeObject(out);
@@ -49,6 +49,9 @@ public class ServerIOHandler extends IOHandler {
 			break;
 		case Keys.Commands.ROLLED:
 			dir.movePlayer(in);
+			break;
+		case Keys.Commands.STOPPED:
+			dir.isStopped();
 			break;
 		case Keys.Commands.MSG:
 			serverClient.getServer().echoAll(in);	// echo to all other clients

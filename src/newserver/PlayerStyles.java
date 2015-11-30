@@ -45,11 +45,10 @@ public class PlayerStyles {
 			"res/pGreen.png",
 			"res/pBlue.png",
 			"res/pYellow.png",
-			"res/pPink.png",
 			"res/pCyan.png",
 			"res/pOrange.png",
 			"res/pPurple.png",
-			"res/pTeal.png" 
+			"res/pPink.png",
 		};
 	
 	// player colors
@@ -60,8 +59,8 @@ public class PlayerStyles {
 		 	new Color(255, 255, 0),
 		 	new Color(0, 255, 255),
 		 	new Color(255, 127, 0),
-		 	new Color(127, 0, 255),
-		 	new Color(0, 255, 127),
+		 	new Color(127, 0, 255),	
+		 	new Color(255, 0, 255),
 		};
 	
 	/**
