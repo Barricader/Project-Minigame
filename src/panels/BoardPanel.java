@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.json.simple.JSONObject;
@@ -19,7 +21,9 @@ import client.IOHandler;
 import gameobjects.NewPlayer;
 import gameobjects.NewTile;
 import main.Animator;
+import newserver.Keys;
 import util.GameUtils;
+import util.NewJSONObject;
 
 public class BoardPanel extends JPanel implements ComponentListener {
 	public static final int HORIZONTAL_TILE_COUNT = 10;
@@ -29,18 +33,17 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	private Controller controller;
 	
 	private ArrayList<NewTile> tiles;
-	private ArrayList<NewPlayer> players;
+	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
+	private NewPlayer clientPlayer;	// the player that belong to this client!
 	private NewPlayer activePlayer;
 	
 	public BoardPanel(ClientApp app) {
 		this.app = app;
 		init();
-		players = new ArrayList<>();
+		players = new ConcurrentHashMap<>();
 		controller = new Controller();
 		
 		controller.setBP(this);
-		
-		// test players
 		addComponentListener(this);
 	}
 	
@@ -48,18 +51,16 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		createTiles();
 	}
 	
+	/**
+	 * Adds a player to the board at the default location (0,0).1
+	 * @param p - Player to add
+	 */
 	public void addPlayer(NewPlayer p) {
-		System.out.println("New Player " + p + ", added to board!");
-		players.add(p);
-		activePlayer = p;
-		
-		// test
-		activePlayer.setTile(tiles.get(0));	// start at 0
-		ArrayList<NewTile> movePath = createPathFromRoll(20);	// static roll
-		activePlayer.initMove(movePath);
-		Animator test = new Animator();
-		test.animatePlayer(this, activePlayer);
-		repaint();
+		System.out.println("board addplayer!");
+		p.style(p.getStyleID());	// make sure player is styled!
+		p.setTile(tiles.get(0));	// default starting location!
+		p.setLocation(tiles.get(0).getCellLocation(p.getID()));
+		players.put(p.getName(), p);
 	}
 	
 	/**
@@ -88,13 +89,13 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	
 	/**
 	 * Generates a movement path for the specified player, based on the dice roll.
-	 * @param index - Player to create path for
+	 * @param player - Player to create path for
 	 * @param roll - Tiles to add from active player current position
 	 * @return - Array of tiles for movement
 	 */
-	public ArrayList<NewTile> createPathFromRoll(int index, int roll) { // TESTING
-		int curTileID = players.get(index).getTile().getID();
-		int newTileID = curTileID + roll;
+	public ArrayList<NewTile> createPathFromRoll(NewPlayer player, int roll) {
+		int curTileID = player.getTileID();
+		int newTileID = curTileID + roll + 1;	// adding 1 fixes glitch, and is intentional!
 		
 		ArrayList<NewTile> movePath = new ArrayList<>();
 		for (int i = curTileID; i < newTileID; i++) {
@@ -108,6 +109,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		if (newTileID >= tiles.size()) {
 			newTileID -= tiles.size();
 		}
+		player.setTileID(newTileID);
 		return movePath;
 	}
 	
@@ -143,7 +145,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 * @param g - Graphics context to draw to
 	 */
 	private void drawPlayers(Graphics g) {
-		for (NewPlayer p : players) {
+		for (NewPlayer p : players.values()) {
 			p.draw(g);
 		}
 	}
@@ -168,11 +170,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			e.printStackTrace();
 		}
 		
-//		// size of this component is currently unknown, so we have to get content size from ClientApp!
-//		int width = ClientApp.getInstance().getStatePanel().getSize().width;
-//		int height = ClientApp.getInstance().getStatePanel().getSize().height;
-		
-		// despite being zero, the component is resized which fixes size issue.
+		// even though these are zero, tiles will be properly sized when component resizes!
 		int width = 0;
 		int height = 0;
 		
@@ -219,16 +217,20 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 * Updates all players positioning in response to a window resize event.
 	 */
 	private void resizePlayers() {
-		for (int i = 0; i < players.size(); i++) {
-			NewPlayer p = players.get(i);
-			System.out.println("should be resizing players!");
-			if (p.getTile() != null) {	// we can reassign location based on current tile
-				p.setLocation(p.getTile().getCellLocation(p.getID()));
-				System.out.println("Is player tile null? Shouldn't be if you're reading this!");
-			} 
+		for (NewPlayer p : players.values()) {
+			if (!p.isMoving()) {
+				if (p.getTileID() > 0) {
+					p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));	
+				} else {
+					p.setLocation(tiles.get(p.getTileID()).getCellLocation(p.getID()));
+				}
+			}
 		}
 	}
 
+	/**
+	 * Resize any GUI elements.
+	 */
 	public void componentResized(ComponentEvent e) {
 		resizeTiles();
 		resizePlayers();
@@ -245,12 +247,31 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		return controller;
 	}
 	
-	public void setActive(int index) {
-		activePlayer = players.get(index);
+	public void setActive(String name) {
+		activePlayer = players.get(name);
+		activePlayer.setActive(true);	// draw the active indicator!
+		repaint();
 	}
 	
-	public ArrayList<NewPlayer> getPlayers() {
+	public void setClientPlayer(NewPlayer player) {
+		this.clientPlayer = player;
+//		controller.firstUpdate();
+	}
+	
+	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
 		return players;
+	}
+	
+	public ArrayList<NewTile> getTiles() {
+		return tiles;
+	}
+	
+	public NewPlayer getActivePlayer() {
+		return activePlayer;
+	}
+	
+	public NewPlayer getClientPlayer() {
+		return clientPlayer;
 	}
 	
 	public class Controller extends IOHandler {
@@ -261,25 +282,71 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		}
 
 		public void send(JSONObject out) {
+			app.getClient().getIOHandler().send(out);
 		}
 
-		@Override
 		public void receive(JSONObject in) {
-			if (in.get("cmd") == "update") {
-				int id = (int) in.get("playerID");
-				int roll = (int) in.get("roll");
-				players.get(id).setLastRoll(roll);
-				//players.get(id).initMove(createPathFromRoll(id, roll));
-				players.get(id).initMove(createPathFromRoll(roll));
-				Animator test = new Animator();
-				test.animatePlayer(bp, players.get(id));
-				bp.repaint();
+			String cmdKey = (String)in.get(Keys.CMD);
+			NewPlayer p = NewPlayer.fromJSON(in);
+//			players.put(p.getName(), p);
+			p.style(p.getStyleID());	// make sure player is always styled!
+			System.out.println("board panel received: " + p.toJSONObject().toJSONString());
+			
+			switch (cmdKey) {
+			case Keys.Commands.MOVE:
+				System.out.println("Should be moving player!");
+				movePlayer(in, p);
+				break;
+			case Keys.Commands.UPDATE:
+				updatePlayer(p);
+				break;
+			case Keys.Commands.ACTIVE:
+				// active stuff
+				break;
 			}
-			else if (in.get("cmd") == "active") {
-				int id = (int) in.get("playerID");
-				
-				bp.setActive(id);
+		}
+		
+		public void movePlayer(JSONObject in, NewPlayer p) {
+			Animator animator = new Animator();
+//			p.setLocation(tiles.get(p.getTileID()).getCellLocation(p.getID()));
+			players.put(p.getName(), p);
+			setActive(p.getName());
+			System.out.println("ACTIVE PLAYER TILE NUM: " + p.getTileID());
+			if (p.getTileID() > 0) {
+				p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));	
+			} else {
+				p.setLocation(tiles.get(p.getTileID()).getCellLocation(p.getID()));
 			}
+			activePlayer.initMove(createPathFromRoll(p, (int)in.get(Keys.ROLL_AMT)));
+			animator.animatePlayer(BoardPanel.this, p);
+		}
+		
+		public void updatePlayer(NewPlayer p) {
+			System.out.println("updating player: " + p.toJSONObject().toJSONString() + ", on board panel!");
+			p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));
+			players.put(p.getName(), p);
+			repaint();
+		}
+		
+		public void update() {
+			if (activePlayer.getName().equals(clientPlayer.getName())) {
+				System.out.println("SHOULD BE SENDING UPDATE!");
+				activePlayer.setActive(false);
+				NewJSONObject update = new NewJSONObject(activePlayer.getID(), Keys.Commands.UPDATE);
+				update.put(Keys.PLAYER, activePlayer.toJSONObject());
+				send(update);
+			}
+		}
+		
+		/**
+		 * First update to server that syncs tile info. *NOTE: This should
+		 * only ever be called once. Use the other update method for handling
+		 * player updates between the server and client.
+		 */
+		public void firstUpdate() {
+//			NewJSONObject update = new NewJSONObject(clientPlayer.getID(), Keys.Commands.UPDATE);
+//			update.put(Keys.PLAYER, clientPlayer.toJSONObject());
+//			send(update);
 		}
 		
 	}

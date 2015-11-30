@@ -1,21 +1,30 @@
 package client;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.Socket;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.LineBorder;
 
+import org.json.simple.JSONObject;
+
+import newserver.Keys;
+import newserver.Server;
 import panels.BoardPanel;
 import panels.ChatPanel;
 import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
+import panels.DicePanel;
 import panels.LoginPanel;
 import panels.StatePanel;
 
@@ -36,11 +45,14 @@ public class ClientApp extends JFrame {
 	private StatePanel statePanel;	// render state view
 	private ChatPanel chatPanel;
 	private BoardPanel boardPanel;
+	private DicePanel dicePanel;
 	private ConnectionPanel connPanel;
-	private LoginPanel loginPanel;
+	
+	private ErrorHandler errorHandler;
 	
 	public ClientApp() {
 		client = new Client(this);
+		errorHandler = new ErrorHandler();
 		init();
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
@@ -61,7 +73,7 @@ public class ClientApp extends JFrame {
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
-		c.gridwidth = 5;
+		c.gridwidth = 10;
 		c.weightx = 1.0;
 		c.gridy = 0;
 		c.ipady = 10;
@@ -77,19 +89,25 @@ public class ClientApp extends JFrame {
 		c.gridy = 1;
 		c.gridheight = 5;
 		c.weighty = 0.8;
-//		boardPanel = new BoardPanel(this);	// here to workaround first size glitch.
 		panel.add(statePanel, c);
 		
 		// chat panel
 		c.anchor = GridBagConstraints.SOUTH;
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
-		c.weightx = 1.0;
+		c.weightx = 0.9;
 		c.gridwidth = 8;
 		c.gridy = 6;
 		c.gridheight = 4;
 		c.weighty = 0.4;
 		panel.add(chatPanel, c);
+		
+		// dice panel
+		c.anchor = GridBagConstraints.SOUTHEAST;
+		c.gridx = 8;
+		c.gridwidth = 2;
+		c.weightx = 0.1;
+		panel.add(dicePanel, c);
 		
 		add(panel);
 	}
@@ -102,8 +120,10 @@ public class ClientApp extends JFrame {
 		statePanel = new StatePanel(this);
 		chatPanel = new ChatPanel(this);
 		connPanel = new ConnectionPanel(this);
+		connPanel.setVisible(false);
 		boardPanel = new BoardPanel(this);
-		loginPanel = new LoginPanel(this);
+		dicePanel = new DicePanel(this);
+		dicePanel.setVisible(false);
 	}
 	
 	/**
@@ -130,6 +150,32 @@ public class ClientApp extends JFrame {
 	}
 	
 	/**
+	 * Establishes a Client-Server connection if the client isn't connected.
+	 * @throws ConnectException
+	 * @throws IOException
+	 */
+	public void connectClient() throws ConnectException, IOException {
+		if (client == null) {
+			resetClient();
+		}
+		if (!client.isConnected()) {
+			client.connect(new Socket(Server.HOST, Server.PORT));
+			client.start();	
+		}
+	}
+	
+	/**
+	 * Resets the client of this application, typically after a disconnection.
+	 */
+	public void resetClient() {
+		client = null;
+		client = new Client(this);
+		client.setIOHandler(new ClientIOHandler(this));
+		
+		chatPanel.getController().toggleUI(client.isConnected());
+	}
+	
+	/**
 	 * Closes out the client if a time out has occurred.
 	 */
 	public void timeout() {
@@ -144,15 +190,6 @@ public class ClientApp extends JFrame {
 			connPanel.getController().updateStatus(Controller.STATUS_ERROR);
 			showTimeOutError();
 		}
-	}
-	
-	/**
-	 * Resets the client of this application, typically after a disconnection.
-	 */
-	public void resetClient() {
-		client = null;
-		client = new Client(this);
-		client.setIOHandler(new ClientIOHandler(this));
 	}
 	
 	/**
@@ -184,11 +221,41 @@ public class ClientApp extends JFrame {
 	}
 	
 	public LoginPanel getLoginPanel() {
-		return loginPanel;
+		return statePanel.getLoginPanel();
+	}
+	
+	public DicePanel getDicePanel() {
+		return dicePanel;
 	}
 	
 	public void setClient(Client client) {
 		this.client = client;
+	}
+	
+	public ErrorHandler getErrorHandler() {
+		return errorHandler;
+	}
+	
+	public class ErrorHandler extends IOHandler {
+		
+		public void send(JSONObject out) {}
+
+		public void receive(JSONObject in) {
+			System.out.println("error handler received: " + in.toJSONString());
+			JSONObject error = (JSONObject) in.get(Keys.Commands.ERROR);
+			int id = (int)in.get(Keys.ID);
+			
+			if (id != getLoginPanel().getClientPlayer().getID()) {	// only show to this client!
+				String errorMsg = (String) error.get(Keys.ERROR_MSG);
+				String errorTitle = (String) error.get(Keys.ERROR_TITLE);
+				showErrorDialog(errorMsg, errorTitle);	
+			}
+		}
+		
+		public void showErrorDialog(String msg, String title) {
+			JOptionPane.showMessageDialog(ClientApp.this, msg, title, JOptionPane.ERROR_MESSAGE);
+		}
+			
 	}
 	
 	/**

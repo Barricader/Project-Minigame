@@ -3,8 +3,10 @@ package util;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 
 /**
@@ -94,11 +96,29 @@ public class GameUtils {
 		return label;
 	}
 	
+	/**
+	 * Customizes any component with specified colors and font size.
+	 * @param c - Component to customize
+	 * @param bgColor - background color
+	 * @param fgColor - foreground color
+	 * @param fontSize - size of font
+	 * @return
+	 */
 	public static Component customizeComp(Component c, Color bgColor, Color fgColor, int fontSize) {
 		c.setFont(new Font("Courier New", Font.BOLD, fontSize));
 		c.setBackground(bgColor);
 		c.setForeground(fgColor);
 		return c;
+	}
+	
+	/**
+	 * Clears any actions on a JButton.
+	 * @param btnToReset - The JButton to remove actions from.
+	 */
+	public static void clearActions(JButton btnToReset) {
+		for (ActionListener a : btnToReset.getActionListeners()) {
+			btnToReset.removeActionListener(a);
+		}
 	}
 	
 }

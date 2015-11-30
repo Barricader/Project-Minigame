@@ -27,7 +27,7 @@ public class Client extends Thread {
 	protected ObjectOutputStream streamOut;
 	protected ObjectInputStream streamIn;
 	
-	protected IOHandler ioHandler;	// handles input/ouput data
+	protected IOHandler ioHandler;	// handles input/output data
 	protected int ID;
 	
 	/**

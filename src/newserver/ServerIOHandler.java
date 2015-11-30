@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 
 import client.IOHandler;
-import util.NewJSONObject;
 
 /**
  * This class provides implementation for handling JSON objects both sending
@@ -23,7 +22,7 @@ public class ServerIOHandler extends IOHandler {
 	}
 
 	public void send(JSONObject out) {
-		System.out.println("Should be sending: " + out);
+//		System.out.println("ServerClient should be sending: " + out);
 		// send JSON object through objectOutputStream
 		try {
 			serverClient.getOutputStream().writeObject(out);
@@ -35,25 +34,54 @@ public class ServerIOHandler extends IOHandler {
 	}
 
 	public void receive(JSONObject in) {
-		System.out.println("ServerIO Handler received: " + in);
-		if (in.get("cmd") == "rolled") {
-			int id = (int) in.get("id");
-			int roll = (int) in.get("roll");
-			serverClient.getServer().getServerDirector().movePlayer(id, roll);
+		String cmd = (String) in.get(Keys.CMD);
+		
+		ServerDirector dir = serverClient.getServer().getServerDirector();
+		switch (cmd) {
+		case Keys.Commands.ADD_PLAYER:
+			dir.addPlayer(in);
+			break;
+		case Keys.Commands.REM_PLAYER:
+			dir.removePlayer(in);
+			break;
+		case Keys.Commands.UPDATE:
+			dir.updatePlayer(in);
+			break;
+		case Keys.Commands.ROLLED:
+			dir.movePlayer(in);
+			break;
+		case Keys.Commands.STOPPED:
+			dir.isStopped();
+			break;
+		case Keys.Commands.MSG:
+			serverClient.getServer().echoAll(in);	// echo to all other clients
+			break;
 		}
-		else if (in.get("cmd") == "stopped") {
-			serverClient.getServer().getServerDirector().isStopped();
-		}
-		else if (in.get("cmd") == "msg") {
-			int id = (int) in.get("id");
-			String text = (String) in.get("text");
-			
-			NewJSONObject k = new NewJSONObject(-1, "msg");
-			k.put("playerID", id);
-			k.put("text", text);
-			
-			serverClient.getServer().echoAll(k);
-		}
+		
+		
+//		if (in.get(Keys.CMD).equals(Keys.Commands.ADD_PLAYER)) {
+//			System.out.println("should be adding player on server!");
+//			serverClient.getServer().getServerDirector().addPlayer(in);
+//		}
+//		
+//		if (in.get(Keys.CMD).equals(Keys.Commands.ROLLED)) {
+//			int id = (int) in.get(Keys.ID);
+//			int roll = (int) in.get(Keys.ROLL);
+//			serverClient.getServer().getServerDirector().movePlayer(id, roll);
+//		}
+//		else if (in.get(Keys.CMD).equals(Keys.Commands.STOPPED)) {
+//			serverClient.getServer().getServerDirector().isStopped();
+//		}
+//		else if (in.get(Keys.CMD).equals(Keys.Commands.MSG)) {
+//			int id = (int) in.get(Keys.ID);
+//			String text = (String) in.get(Keys.TEXT);
+//			
+//			NewJSONObject k = new NewJSONObject(-1, Keys.Commands.MSG);
+//			k.put(Keys.PLAYER_ID, id);
+//			k.put(Keys.TEXT, text);
+//			System.out.println("echoing: " + k.toJSONString());
+//			serverClient.getServer().echoAll(k);
+//		}
 	}
 
 }

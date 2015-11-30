@@ -31,7 +31,7 @@ public class NewTile extends GameObject {
 		this.width = width;
 		this.height = height;
 		TILE_COUNT++;
-		createPlayerRects();
+		createPlayerCells();
 	}
 	
 	/**
@@ -39,7 +39,7 @@ public class NewTile extends GameObject {
 	 * location that players will move to, based on their ID, when they land on
 	 * a tile.
 	 */
-	public void createPlayerRects() {
+	public void createPlayerCells() {
 		playerCells = new Rectangle[4];
 		
 		int w = 40;	// width of player rect
@@ -84,19 +84,21 @@ public class NewTile extends GameObject {
 	 * @param g2d - Graphics context to draw to
 	 */
 	private void drawPlayerCells(Graphics2D g2d) {	
-		createPlayerRects();
-		char[] letters = {'a', 'b', 'c', 'd'};
+		createPlayerCells();
+//		char[] letters = {'a', 'b', 'c', 'd'};	// cell letters, (DEBUG STUFF)
 
 		for (int i = 0; i < playerCells.length; i++) {
 			Rectangle r = playerCells[i];
 			g2d.setColor(new Color(0, 0, 0, 50));
 			g2d.fillRect(r.x, r.y, r.width, r.height);
+			
+			// DEBUG STUFF - Probably don't need, but keep for now.
 			// draw location ID
-			String locID = ID + "" + letters[i];
-			int w = g2d.getFontMetrics().stringWidth(locID);
-			Point midPt = new Point(r.x + ((r.width + w) / 2) - w, r.y + (r.height / 2));
-			g2d.setColor(Color.WHITE);
-			g2d.drawString(locID , midPt.x, midPt.y);
+//			String locID = ID + "" + letters[i];
+//			int w = g2d.getFontMetrics().stringWidth(locID);
+//			Point midPt = new Point(r.x + ((r.width + w) / 2) - w, r.y + (r.height / 2));	// pt to draw quad cell letter
+//			g2d.setColor(Color.WHITE);
+//			g2d.drawString(locID , midPt.x, midPt.y);
 		}
 	}
 	

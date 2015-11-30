@@ -19,6 +19,8 @@ import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
+import gameobjects.NewPlayer;
+import newserver.Keys;
 import util.NewJSONObject;
 
 public class ChatPanel extends JPanel {
@@ -36,6 +38,9 @@ public class ChatPanel extends JPanel {
 		init();
 	}
 	
+	/**
+	 * Initializes all GUI components and lays them out using GridBagLayout.
+	 */
 	private void init() {
 		createComponents();
 		
@@ -73,6 +78,9 @@ public class ChatPanel extends JPanel {
 		add(sendBtn, c);
 	}
 	
+	/**
+	 * Creates GUI components.
+	 */
 	private void createComponents() {
 		chatArea = new JTextArea();
 		chatArea.setEditable(false);
@@ -123,6 +131,11 @@ public class ChatPanel extends JPanel {
 		chatArea.setCaretPosition(chatArea.getDocument().getLength());	// move scroll bar down to bottom
 	}
 	
+	/**
+	 * IOHandler for handling chat messages.
+	 * @author David Kramer
+	 *
+	 */
 	public class Controller extends IOHandler {
 		ChatPanel cp;
 		
@@ -133,18 +146,25 @@ public class ChatPanel extends JPanel {
 		public void sendMessage() {
 			String text = msgField.getText();
 			if (!text.isEmpty() && app.getClient().isConnected()) {
+				msgField.setText("");
 				if (text.equals("cls")) {	// clear chat area
 					chatArea.setText("");
-					msgField.setText("");
 					return;
 				}
 				else {
-					NewJSONObject k = new NewJSONObject(app.getClient().getID(), "msg", text);
+					NewJSONObject k = new NewJSONObject(app.getClient().getID(), Keys.Commands.MSG, text);
+					NewPlayer player = app.getLoginPanel().getClientPlayer();
+					k.put(Keys.NAME, player.getName());
+					System.out.println("sending: " + k);
 					send(k);
 				}
 			}
 		}
 		
+		/**
+		 * Toggles the chat UI, based on boolean value.
+		 * @param enabled
+		 */
 		public void toggleUI(boolean enabled) {
 			chatArea.setEnabled(enabled);
 			msgField.setEnabled(enabled);
@@ -156,11 +176,9 @@ public class ChatPanel extends JPanel {
 		}
 
 		public void receive(JSONObject in) {
-			if (in.get("cmd") == "msg") {
-				String text = (String) in.get("text");
-				int id = (int) in.get("playerID");
-				cp.printMessage(app.getBoardPanel().getPlayers().get(id).getName() + "> " + text);
-			}
+			String text = (String)in.get(Keys.TEXT);
+			String name = (String)in.get(Keys.NAME);
+			cp.printMessage(name + " >: " + text);
 		}
 	}
 	

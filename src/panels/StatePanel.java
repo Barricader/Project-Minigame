@@ -1,6 +1,7 @@
 package panels;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -23,11 +24,14 @@ public class StatePanel extends JPanel {
 	private ClientApp app;
 	
 //	private JPanel view;	// content we want to display
+	private Controller controller;
+	private LoginPanel loginPanel;
 	
 	public StatePanel(ClientApp app) {
 		this.app = app;
-		updateView(new LoginPanel(app));
-		setBorder(new LineBorder(Color.RED));
+		controller = new Controller();
+		loginPanel = new LoginPanel(app);
+		updateView(loginPanel);
 	}
 	
 	public void updateView(JPanel newView) {
@@ -44,14 +48,36 @@ public class StatePanel extends JPanel {
 		app.revalidate();
 	}
 	
+	public LoginPanel getLoginPanel() {
+		return loginPanel;
+	}
+	
+	public Controller getController() {
+		return controller;
+	}
+	
 	public class Controller extends IOHandler {
 
+		@Override
 		public void send(JSONObject out) {
+			// TODO Auto-generated method stub
 			
 		}
 
 		public void receive(JSONObject in) {
-		
+			System.out.println("view should be at board panel!");
+			System.out.println("received on state panel: " + in.toJSONString());
+			app.getConnPanel().setVisible(true);
+			app.getDicePanel().setVisible(true);
+			updateView(app.getBoardPanel());	// test
+			
+			// board rendering glitch fix
+			Dimension size = app.getSize();
+			size.width += 1;
+			size.height += 1;
+			app.setSize(size);
+			
+			app.repaint();
 		}
 		
 	}

@@ -2,6 +2,7 @@ package gameobjects;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
+import newserver.Keys;
 import newserver.PlayerStyles;
 import util.Vector;
 
@@ -33,15 +35,41 @@ public class NewPlayer extends GameObject {
 	private boolean hasRolled = false;	// has player already rolled the current round?
 	
 	private int ID = -1;
-	private int styleID;	// style color num from PlayerStyles
+	private int styleID = 0;	// style color num from PlayerStyles
+	private int tileID = 0;
 	private int score = 0;
-	private int firstRoll = 0;	// initial roll
 	private int lastRoll = 0;
 	
 	public NewPlayer(String name, int ID) {
 		this.name = name;
 		this.ID = ID;
 		init();
+	}
+	
+	/**
+	 * Utility method that's used to update a player from a JSON object. Checks to make sure
+	 * that the JSON object contains the key, so that we don't overwrite a value.
+	 * @param player - Player to update
+	 * @param obj - JSONObject that contains values for player
+	 */
+	public static void updateFromJSON(NewPlayer player, JSONObject obj) {
+		if (obj.containsKey(Keys.PLAYER)) {	// ensure we extract the player object from cmd
+			obj = (JSONObject) obj.get(Keys.PLAYER);
+		}
+		
+		player.name 	= obj.containsKey(Keys.NAME) 		? (String) obj.get(Keys.NAME) 	: player.name;
+		player.ID 		= obj.containsKey(Keys.ID) 			? (int) obj.get(Keys.ID) 		: player.ID;
+		player.score	= obj.containsKey(Keys.SCORE) 		? (int) obj.get(Keys.SCORE) 	: player.score;
+		player.tileID	= obj.containsKey(Keys.TILE_ID) 	? (int) obj.get(Keys.TILE_ID) 	: player.tileID;
+		player.styleID	= obj.containsKey(Keys.STYLE_ID) 	? (int) obj.get(Keys.STYLE_ID) 	: player.styleID;
+		player.lastRoll = obj.containsKey(Keys.LAST_ROLL) 	? (int) obj.get(Keys.LAST_ROLL) : player.lastRoll;
+		player.isActive = obj.containsKey(Keys.ACTIVE)		? (boolean) obj.get(Keys.ACTIVE): player.isActive;
+	}
+	
+	public static NewPlayer fromJSON(JSONObject obj) {
+		NewPlayer p = new NewPlayer("", 0);	// empty player. Use update from JSON to get values from keys!
+		updateFromJSON(p, obj);
+		return p;
 	}
 	
 	/**
@@ -87,12 +115,14 @@ public class NewPlayer extends GameObject {
 			g2d.setStroke(new BasicStroke());	// default
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_OFF); // smooth off
 			g2d.drawImage(img, x, y, null);
-			
+			g2d.setColor(Color.WHITE);
+			g2d.setFont(new Font("Tahoma", Font.BOLD, 10));
+			int w = g2d.getFontMetrics().stringWidth(name);	// width of name string
 			// draw player name
 			if (tile != null && tile.y == 4) {	
-				g2d.drawString(name, x, y - 20);	// on top tile
+				g2d.drawString(name, x + (w / 2), y - 20);	// on top tile
 			} else {
-				g2d.drawString(name, x, y + 50);	// on bottom tile	
+				g2d.drawString(name, x + (w / 2), y + 50);	// on bottom tile	
 			}
 			
 		} finally {
@@ -126,7 +156,6 @@ public class NewPlayer extends GameObject {
 	 * handled here, but is called by animatePlayer() in the Animator class.
 	 */
 	public void move() {
-		System.out.println("move() from player!");
 		if (!isMoving && movePath.size() > 0) {
 			isMoving = true;
 			newLocation = movePath.get(0).getCellLocation(ID);
@@ -177,8 +206,44 @@ public class NewPlayer extends GameObject {
 		this.tile = tile;
 	}
 	
+	public void setID(int ID) {
+		this.ID = ID;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public void setActive(boolean b) {
+		isActive = b;
+	}
+	
+	public void setLastRoll(int lr) {
+		lastRoll = lr;
+	}
+	
+	public void setTileID(int tileID) {
+		this.tileID = tileID;
+	}
+	
+	public void setHasRolled(boolean b) {
+		hasRolled = b;
+	}
+	
 	public int getID() {
 		return ID;
+	}
+	
+	public int getTileID() {
+		return tileID;
+	}
+	
+	public boolean hasRolled() {
+		return hasRolled;
+	}
+	
+	public boolean isMoving() {
+		return isMoving;
 	}
 	
 	public NewTile getTile() {
@@ -197,22 +262,24 @@ public class NewPlayer extends GameObject {
 		return name;
 	}
 	
-	public void setLastRoll(int lr) {
-		lastRoll = lr;
+	public int getLastRoll() {
+		return lastRoll;
+	}
+	
+	public String toString() {
+		return ID + " " + name;
 	}
 	
 	public JSONObject toJSONObject() {
-		JSONObject root = new JSONObject();	// add everything to this
-		// player stuff
 		JSONObject player = new JSONObject();
-		player.put("id", ID);
-		player.put("name", name);
-		player.put("score", score);
-		player.put("tile", tile);
-		player.put("styleID", styleID);
-		player.put("lastRoll", lastRoll);
-		root.put("Player", player);
-		return root;
+		player.put(Keys.ID, ID);
+		player.put(Keys.NAME, name);
+		player.put(Keys.SCORE, score);
+		player.put(Keys.TILE_ID, tileID);
+		player.put(Keys.STYLE_ID, styleID);
+		player.put(Keys.LAST_ROLL, lastRoll);
+		player.put(Keys.ACTIVE, isActive);
+		return player;
 	}
 
 }

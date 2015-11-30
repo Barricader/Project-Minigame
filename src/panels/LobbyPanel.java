@@ -3,6 +3,8 @@ package panels;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -11,29 +13,29 @@ import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
+import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import screen.PlayerListCellRenderer;
 
 public class LobbyPanel extends JPanel {
+	private ClientApp app;
 	private Controller controller;
 	private DefaultListModel<NewPlayer> listModel;
 	private PlayerListCellRenderer listRenderer;
+	private ConcurrentHashMap<String, NewPlayer> playerMap;
 	private JList<NewPlayer> playerList;
 	
-	public LobbyPanel() {
+	public LobbyPanel(ClientApp app) {
+		this.app = app;
 		controller = new Controller();
 		init();
 	}
 	
 	private void init() {
 		createComponents();
-		
-//		TEST -> REMOVE ME LATER AND GET FROM SERVER
-		NewPlayer test1 = new NewPlayer("TEST", 1);
-		test1.style(4);
-		addPlayerToList(test1);
-		addPlayerToList(new NewPlayer("Player3", 3));
+		setBackground(Color.BLACK);
+		playerList.setBackground(Color.BLACK);
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -46,6 +48,9 @@ public class LobbyPanel extends JPanel {
 		add(playerList, c);
 	}
 	
+	/**
+	 * Create gui components for lobby.
+	 */
 	private void createComponents() {
 		listRenderer = new PlayerListCellRenderer();
 		listModel = new DefaultListModel<>();
@@ -54,13 +59,32 @@ public class LobbyPanel extends JPanel {
 		setBorder(new LineBorder(Color.LIGHT_GRAY));
 	}
 	
+	/**
+	 * Adds player to list.
+	 * @param p - Player to add to list
+	 * @deprecated 
+	 * Use updateList(), to retrieve values from board player map.
+	 */
 	public void addPlayerToList(NewPlayer p) {
 		listModel.addElement(p);
-		playerList.repaint();
+		repaint();
+	}
+	
+	public void updateList() {
+		playerMap = app.getBoardPanel().getPlayers();
+		listModel.removeAllElements();
+		for (NewPlayer p : playerMap.values()) {
+			listModel.addElement(p);
+		}
+		repaint();
 	}
 	
 	public Controller getController() {
 		return controller;
+	}
+	
+	public JList<NewPlayer> getPlayerList() {
+		return playerList;
 	}
 	
 	public class Controller extends IOHandler {
