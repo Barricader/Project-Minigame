@@ -92,7 +92,7 @@ public class ServerDirector {
 				if (timeLeft == 0) {
 					timer.stop();
 					System.out.println("OK. CHANGE ALL CLIENTS STATE TO BOARD!!!!");
-					changeClientState("board");
+					changeClientState(BOARD);
 				} else {
 					timeLeft--;
 					// create timer packet and send to all clients.
@@ -115,10 +115,11 @@ public class ServerDirector {
 	 * Sends a command to client to change to a new state.
 	 * @param state - Name of state to change to.
 	 */
-	private void changeClientState(String state) {
+	private void changeClientState(int state) {
 		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
-		JSONObject stateObj = new JSONObject();
-		stateObj.put(Keys.STATE, state);
+		obj.put(Keys.STATE, state);
+//		JSONObject stateObj = new JSONObject();
+//		stateObj.put(Keys.STATE, state);
 		server.echoAll(obj);
 		nextPlayer();	// assign next player
 	}

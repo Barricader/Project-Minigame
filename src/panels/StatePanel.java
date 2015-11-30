@@ -73,9 +73,7 @@ public class StatePanel extends JPanel {
 		}
 
 		public void receive(JSONObject in) {
-			JSONObject state = (JSONObject) in.get(Keys.CMD);
-			int stateType = (int) state.get(Keys.STATE);
-			
+			int stateType = (int) in.get(Keys.STATE);
 			switch (stateType) {
 			case (ServerDirector.BOARD):	// board state
 				updateBoard();
@@ -83,7 +81,6 @@ public class StatePanel extends JPanel {
 			case (ServerDirector.MINIGAME):		// mini state
 				updateMiniState();
 				break;
-				
 			}
 		}
 		
