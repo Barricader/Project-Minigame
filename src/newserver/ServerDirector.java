@@ -13,7 +13,9 @@ import util.NewJSONObject;
 
 @SuppressWarnings({ "static-access", "unchecked" })	// hide stupid warnings!!
 public class ServerDirector {
-	private static SecureRandom rng = new SecureRandom();	// might not need this?
+	public static final int BOARD = 0;
+	public static final int MINIGAME = 1;
+	//private static SecureRandom rng = new SecureRandom();	// might not need this?
 	private static final int MAX_PLAYERS = 4;
 	private static final int WAIT_TIME = 3;	// TODO change back to 20 secs
 	private int timeLeft = WAIT_TIME;	// time remaining
@@ -247,6 +249,16 @@ public class ServerDirector {
 	}
 	
 	/**
+	 * Changes the state and lets the clients know
+	 * @param state - State to change to
+	 */
+	public void changeState(int state) {
+		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
+		k.put("state", state);
+		server.echoAll(k);
+	}
+	
+	/**
 	 * Called when a client sends a stopped command. If all players have finished
 	 * animating the current player, we need to move onto the next player and/or
 	 * change to a mini-game state.
@@ -258,6 +270,7 @@ public class ServerDirector {
 			activePlayer.setHasRolled(true);			
 			if (rolledPlayers.size() == players.size()) {
 				reset();
+				changeState(MINIGAME);
 			}
 			nextPlayer();
 		}

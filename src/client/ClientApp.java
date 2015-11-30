@@ -1,6 +1,5 @@
 package client;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,7 +13,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
@@ -26,6 +24,7 @@ import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
 import panels.DicePanel;
 import panels.LoginPanel;
+import panels.MiniPanel;
 import panels.StatePanel;
 
 /**
@@ -47,6 +46,7 @@ public class ClientApp extends JFrame {
 	private BoardPanel boardPanel;
 	private DicePanel dicePanel;
 	private ConnectionPanel connPanel;
+	private MiniPanel mp;
 	
 	private ErrorHandler errorHandler;
 	
@@ -222,6 +222,10 @@ public class ClientApp extends JFrame {
 	
 	public LoginPanel getLoginPanel() {
 		return statePanel.getLoginPanel();
+	}
+	
+	public MiniPanel getMiniPanel() {
+		return mp;
 	}
 	
 	public DicePanel getDicePanel() {
