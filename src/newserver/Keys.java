@@ -152,6 +152,10 @@ public final class Keys {
 		 */
 		public static final String STATE_UPDATE = "stateUpdate";
 		
+		public static final String MINI_UPDATE = "miniUpdate";
+		
+		public static final String MINI_STOPPED = "miniStopped";
+		
 		/**
 		 * Key indicating an active player.
 		 */

@@ -26,6 +26,7 @@ public class ServerDirector {
 	
 //	private int activeIndex;
 	private int stopped;
+	private int over;
 	private int turnCount;	// how many turns are we in?
 	
 	private Timer timer;	// timer for controlling events
@@ -274,6 +275,18 @@ public class ServerDirector {
 				changeState(MINIGAME);
 			}
 			nextPlayer();
+		}
+	}
+	
+	/**
+	 * Called when a client is finished with a minigame. If all players have finished
+	 * the minigame, we need to move onto the board state
+	 */
+	public void isMinigameOver() {
+		over++;
+		if (over == players.size()) {
+			over = 0;
+			changeState(BOARD);
 		}
 	}
 }

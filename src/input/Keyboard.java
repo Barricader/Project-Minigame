@@ -3,6 +3,8 @@ package input;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import panels.MiniPanel;
+
 /**
  * Basic keyboard class that listens to and keeps track of keyboard input.
  * @author David Kramer
@@ -16,10 +18,13 @@ public class Keyboard implements KeyListener {
 	
 	public boolean[] keys; // encompasses most used keys
 	
+	MiniPanel mp;
+	
 	private int lastKey;	// key code of last key press
 	public boolean spacePressed = false;
+	public boolean enterPressed = false;
 	
-	public Keyboard() {
+	public Keyboard(MiniPanel mp) {
 		shiftFlag = false;
 		altFlag = false;
 		ctrlFlag = false;
@@ -27,6 +32,7 @@ public class Keyboard implements KeyListener {
 
 		keys = new boolean[120];
 		//System.out.println("UUUUUUUUUUUUUUUH");
+		this.mp = mp;
 	}
 
 	/**
@@ -51,6 +57,10 @@ public class Keyboard implements KeyListener {
 		if (!spacePressed && e.getKeyCode() == KeyEvent.VK_SPACE) {
 			spacePressed = true;
 		}
+		if (!enterPressed && e.getKeyCode() == KeyEvent.VK_ENTER) {
+			enterPressed = true;
+			mp.playerPressed();
+		}
 	}
 
 	/**
@@ -70,6 +80,9 @@ public class Keyboard implements KeyListener {
 		
 		if (spacePressed && e.getKeyCode() == KeyEvent.VK_SPACE) {
 			spacePressed = false;
+		}
+		if (enterPressed && e.getKeyCode() == KeyEvent.VK_ENTER) {
+			enterPressed = false;
 		}
 		
 		keys[e.getKeyCode()] = false;

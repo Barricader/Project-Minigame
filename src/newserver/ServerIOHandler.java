@@ -53,35 +53,12 @@ public class ServerIOHandler extends IOHandler {
 		case Keys.Commands.STOPPED:
 			dir.isStopped();
 			break;
+		case Keys.Commands.MINI_STOPPED:
+			dir.isMinigameOver();
+			break;
 		case Keys.Commands.MSG:
 			serverClient.getServer().echoAll(in);	// echo to all other clients
 			break;
 		}
-		
-		
-//		if (in.get(Keys.CMD).equals(Keys.Commands.ADD_PLAYER)) {
-//			System.out.println("should be adding player on server!");
-//			serverClient.getServer().getServerDirector().addPlayer(in);
-//		}
-//		
-//		if (in.get(Keys.CMD).equals(Keys.Commands.ROLLED)) {
-//			int id = (int) in.get(Keys.ID);
-//			int roll = (int) in.get(Keys.ROLL);
-//			serverClient.getServer().getServerDirector().movePlayer(id, roll);
-//		}
-//		else if (in.get(Keys.CMD).equals(Keys.Commands.STOPPED)) {
-//			serverClient.getServer().getServerDirector().isStopped();
-//		}
-//		else if (in.get(Keys.CMD).equals(Keys.Commands.MSG)) {
-//			int id = (int) in.get(Keys.ID);
-//			String text = (String) in.get(Keys.TEXT);
-//			
-//			NewJSONObject k = new NewJSONObject(-1, Keys.Commands.MSG);
-//			k.put(Keys.PLAYER_ID, id);
-//			k.put(Keys.TEXT, text);
-//			System.out.println("echoing: " + k.toJSONString());
-//			serverClient.getServer().echoAll(k);
-//		}
 	}
-
 }

@@ -6,13 +6,17 @@ import java.awt.Graphics2D;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
+import input.Keyboard;
+import newserver.Keys;
 import util.GameUtils;
+import util.NewJSONObject;
 
 public class MiniPanel extends JPanel {
 	private ClientApp app;
@@ -20,16 +24,30 @@ public class MiniPanel extends JPanel {
 
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private NewPlayer clientPlayer;	// the player that belong to this client!
+	private Timer t;
+	private Keyboard key;
 	
 	public MiniPanel(ClientApp app) {
 		this.app = app;
 		init();
 		players = new ConcurrentHashMap<>();
 		controller = new Controller(this);
+		
+		key = new Keyboard(this);
+		
+		addKeyListener(key);
 	}
 	
 	private void init() {
 		
+	}
+	
+	public void playerPressed() {
+		// Send JSON here
+		// must put name key with player name
+		NewJSONObject k = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_STOPPED);
+		k.put(Keys.NAME, clientPlayer.getName());
+		controller.send(k);
 	}
 	
 	/**
