@@ -1,7 +1,8 @@
 package input;
 
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import panels.MiniPanel;
 
@@ -10,11 +11,12 @@ import panels.MiniPanel;
  * @author David Kramer
  * @author Joseph Jones
  */
-public class Keyboard implements KeyListener {
+public class Keyboard implements KeyEventDispatcher {
 	// Modifier key flags
 	private boolean shiftFlag;
 	private boolean altFlag;
 	private boolean ctrlFlag;
+	private KeyboardFocusManager kfm;
 	
 	public boolean[] keys; // encompasses most used keys
 	
@@ -40,7 +42,7 @@ public class Keyboard implements KeyListener {
 	 */
 	public void keyPressed(KeyEvent e) {
 		lastKey = e.getKeyCode();
-		//System.out.println(e.getKeyCode());
+		System.out.println(e.getKeyCode());
 
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_ALT:
@@ -132,5 +134,22 @@ public class Keyboard implements KeyListener {
 	 */
 	public boolean isCtrl() {
 		return ctrlFlag;
+	}
+	
+	public void setKFM(KeyboardFocusManager kfm) {
+		this.kfm = kfm;
+		kfm.addKeyEventDispatcher(this);
+	}
+
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent e) {
+		if (e.getID() == KeyEvent.KEY_PRESSED) {
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+				if (mp.isActive()) {
+					mp.playerPressed();	
+				}
+			}
+		}
+		return false;
 	}
 }

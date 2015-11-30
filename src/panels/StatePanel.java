@@ -103,6 +103,7 @@ public class StatePanel extends JPanel {
 		 * Updates to mini game view.
 		 */
 		public void updateMiniState() {
+			app.getMiniPanel().setActive(true);
 			updateView(app.getMiniPanel());
 			app.repaint();
 		}

@@ -1,6 +1,7 @@
 package panels;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +14,6 @@ import org.json.simple.JSONObject;
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
-import input.Keyboard;
 import newserver.Keys;
 import util.GameUtils;
 import util.NewJSONObject;
@@ -21,11 +21,11 @@ import util.NewJSONObject;
 public class MiniPanel extends JPanel {
 	private ClientApp app;
 	private Controller controller;
-
+	private boolean isActive;
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private NewPlayer clientPlayer;	// the player that belong to this client!
 	private Timer t;
-	private Keyboard key;
+//	private Keyboard key;
 	
 	public MiniPanel(ClientApp app) {
 		this.app = app;
@@ -33,9 +33,9 @@ public class MiniPanel extends JPanel {
 		players = new ConcurrentHashMap<>();
 		controller = new Controller(this);
 		
-		key = new Keyboard(this);
-		
-		addKeyListener(key);
+//		key = new Keyboard(this);
+//		
+//		addKeyListener(key);
 	}
 	
 	private void init() {
@@ -45,9 +45,14 @@ public class MiniPanel extends JPanel {
 	public void playerPressed() {
 		// Send JSON here
 		// must put name key with player name
-		NewJSONObject k = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_STOPPED);
-		k.put(Keys.NAME, clientPlayer.getName());
-		controller.send(k);
+		if (isActive) {
+			System.out.println("Player pressed!");
+			clientPlayer = app.getBoardPanel().getClientPlayer();
+			NewJSONObject k = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_STOPPED);
+			k.put(Keys.NAME, clientPlayer.getName());
+			controller.send(k);
+			isActive = false;
+		}
 	}
 	
 	/**
@@ -61,6 +66,8 @@ public class MiniPanel extends JPanel {
 			g2d.fillRect(0, 0, getWidth(), getHeight());
 			g2d.setColor(GameUtils.getRandomColor());
 			g2d.fillOval(40, 40, 20, 60);
+			g2d.setFont(new Font("Courier New", Font.BOLD, 50));
+			g2d.drawString("MINI-GAME, YAY!!!!", getWidth() / 3, getHeight() / 3);
 			g2d.setColor(Color.CYAN);
 			drawPlayers(g2d);
 		} finally {
@@ -82,6 +89,11 @@ public class MiniPanel extends JPanel {
 		return controller;
 	}
 	
+	public void setActive(boolean b) {
+		isActive = b;
+	}
+	
+	
 	public void setClientPlayer(NewPlayer player) {
 		this.clientPlayer = player;
 	}
@@ -92,6 +104,10 @@ public class MiniPanel extends JPanel {
 	
 	public NewPlayer getClientPlayer() {
 		return clientPlayer;
+	}
+	
+	public boolean isActive() {
+		return isActive;
 	}
 	
 	public class Controller extends IOHandler {

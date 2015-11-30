@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -16,6 +18,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.json.simple.JSONObject;
 
+import input.Keyboard;
 import newserver.Keys;
 import newserver.Server;
 import panels.BoardPanel;
@@ -39,6 +42,8 @@ public class ClientApp extends JFrame {
 	private static ClientApp instance = null;
 	private Client client;
 	
+	private Keyboard key;
+	
 	// GUI stuff
 	private JPanel panel;	// main container panel for all other panels
 	private StatePanel statePanel;	// render state view
@@ -57,6 +62,10 @@ public class ClientApp extends JFrame {
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
 		instance = this;
+		key = new Keyboard(mp);
+		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
+		setFocusable(true);
+		requestFocus();
 	}
 	
 	/**
