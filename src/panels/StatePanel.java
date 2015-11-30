@@ -80,7 +80,7 @@ public class StatePanel extends JPanel {
 			case (ServerDirector.BOARD):	// board state
 				updateBoard();
 				break;
-			case (ServerDirector.MINI):		// mini state
+			case (ServerDirector.MINIGAME):		// mini state
 				updateMiniState();
 				break;
 				
