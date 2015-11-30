@@ -122,6 +122,7 @@ public class ClientApp extends JFrame {
 		connPanel = new ConnectionPanel(this);
 		connPanel.setVisible(false);
 		boardPanel = new BoardPanel(this);
+		mp = new MiniPanel(this);
 		dicePanel = new DicePanel(this);
 		dicePanel.setVisible(false);
 	}
