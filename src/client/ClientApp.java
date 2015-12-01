@@ -139,7 +139,7 @@ public class ClientApp extends JFrame {
 		dicePanel = new DicePanel(this);
 		dicePanel.setVisible(false);
 		minis = new ConcurrentHashMap<>();
-		// init minis with references to 
+		// init minis with references to the minigame classes
 		minis.put("enter", new MiniPanel(this));
 	}
 	

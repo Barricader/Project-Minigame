@@ -25,7 +25,7 @@ public class ServerDirector {
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;	// players that have rolled;
 	private NewPlayer activePlayer;		// we will probably need this. Haven't used it yet though.
-	private String curMini = "";
+	private String curMini = "null";
 	private String[] nameMinis = {"enter"};
 	
 //	private int activeIndex;
@@ -262,7 +262,7 @@ public class ServerDirector {
 	public void changeState(int state) {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
 		k.put("state", state);
-		if (state == BOARD) {
+		if (state == MINIGAME) {
 			int ranNum = new Random().nextInt(nameMinis.length);
 			curMini = nameMinis[ranNum];
 			k.put("mini", nameMinis[ranNum]);
