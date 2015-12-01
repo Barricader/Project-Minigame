@@ -26,7 +26,7 @@ public abstract class BaseMiniPanel extends JPanel {
 		init();
 		players = new ConcurrentHashMap<>();
 		controller = new Controller(this);
-		Timer t = new Timer(16, null);
+		Timer t = new Timer(16, e -> update());
 	}
 	
 	protected abstract void init();

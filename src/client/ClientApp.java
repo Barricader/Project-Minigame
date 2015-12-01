@@ -53,9 +53,9 @@ public class ClientApp extends JFrame {
 	private BoardPanel boardPanel;
 	private DicePanel dicePanel;
 	private ConnectionPanel connPanel;
-	private MiniPanel mp;
+	//private MiniPanel mp;
 	private ConcurrentHashMap<String, BaseMiniPanel> minis;
-	private int curMini = 0;
+	private String curMini = "null";
 	
 	private ErrorHandler errorHandler;
 	
@@ -66,7 +66,7 @@ public class ClientApp extends JFrame {
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
 		instance = this;
-		key = new Keyboard(mp);
+		key = new Keyboard((MiniPanel) minis.get("enter"));
 		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
 		setFocusable(true);
 		requestFocus();
@@ -135,11 +135,12 @@ public class ClientApp extends JFrame {
 		connPanel = new ConnectionPanel(this);
 		connPanel.setVisible(false);
 		boardPanel = new BoardPanel(this);
-		mp = new MiniPanel(this);
+		//mp = new MiniPanel(this);
 		dicePanel = new DicePanel(this);
 		dicePanel.setVisible(false);
 		minis = new ConcurrentHashMap<>();
 		// init minis with references to 
+		minis.put("enter", new MiniPanel(this));
 	}
 	
 	/**
@@ -240,9 +241,9 @@ public class ClientApp extends JFrame {
 		return statePanel.getLoginPanel();
 	}
 	
-	public MiniPanel getMiniPanel() {
-		return mp;
-	}
+//	public MiniPanel getMiniPanel() {
+//		return mp;
+//	}
 	
 	public DicePanel getDicePanel() {
 		return dicePanel;
@@ -256,7 +257,7 @@ public class ClientApp extends JFrame {
 		return errorHandler;
 	}
 	
-	public void setMini(int curMini) {
+	public void setMini(String curMini) {
 		this.curMini = curMini;
 	}
 	

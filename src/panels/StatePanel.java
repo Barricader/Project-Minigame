@@ -79,8 +79,8 @@ public class StatePanel extends JPanel {
 				updateBoard();
 				break;
 			case (ServerDirector.MINIGAME):		// mini state
-				updateMiniState((int)in.get("mini"));
-				ClientApp.getInstance().setMini((int)in.get("mini"));
+				updateMiniState((String)in.get("mini"));
+				app.setMini((String)in.get("mini"));
 				break;
 			}
 		}
@@ -103,7 +103,7 @@ public class StatePanel extends JPanel {
 		/**
 		 * Updates to mini game view.
 		 */
-		public void updateMiniState(int curMini) {
+		public void updateMiniState(String curMini) {
 			//app.getMiniPanel().setActive(true);
 			app.getMinis().get(curMini).setActive(true);
 			updateView(app.getMinis().get(curMini));

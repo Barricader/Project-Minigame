@@ -10,13 +10,14 @@ import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
 import panels.BaseMiniPanel;
+import panels.MiniPanel;
 import util.NewJSONObject;
 
 @SuppressWarnings({ "static-access", "unchecked" })	// hide stupid warnings!!
 public class ServerDirector {
 	public static final int BOARD = 0;
 	public static final int MINIGAME = 1;
-	//private static SecureRandom rng = new SecureRandom();	// might not need this?
+	
 	private static final int MAX_PLAYERS = 4;
 	private static final int WAIT_TIME = 3;	// TODO change back to 20 secs
 	private int timeLeft = WAIT_TIME;	// time remaining
@@ -24,8 +25,8 @@ public class ServerDirector {
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;	// players that have rolled;
 	private NewPlayer activePlayer;		// we will probably need this. Haven't used it yet though.
-	private ConcurrentHashMap<String, BaseMiniPanel> minis;
-	private int curMini = 0;
+	private String curMini = "";
+	private String[] nameMinis = {"enter"};
 	
 //	private int activeIndex;
 	private int stopped;
@@ -38,8 +39,7 @@ public class ServerDirector {
 		this.server = server;
 		players = new ConcurrentHashMap<>();
 		rolledPlayers = new ConcurrentHashMap<>();
-		minis = new ConcurrentHashMap<>();
-		// init minis with reference to minipanel classes here
+
 //		activeIndex = 0;
 		stopped = 0;
 		turnCount = 0;
@@ -263,9 +263,9 @@ public class ServerDirector {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
 		k.put("state", state);
 		if (state == BOARD) {
-			int ranNum = new Random().nextInt(minis.size());
-			curMini = ranNum;
-			k.put("mini", ranNum);
+			int ranNum = new Random().nextInt(nameMinis.length);
+			curMini = nameMinis[ranNum];
+			k.put("mini", nameMinis[ranNum]);
 		}
 		server.echoAll(k);
 	}
