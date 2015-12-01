@@ -18,7 +18,7 @@ import newserver.Keys;
 import util.GameUtils;
 import util.NewJSONObject;
 
-public class MiniPanel extends JPanel {
+public class MiniPanel extends BaseMiniPanel {
 	private ClientApp app;
 	private Controller controller;
 	private boolean isActive;
@@ -28,17 +28,10 @@ public class MiniPanel extends JPanel {
 //	private Keyboard key;
 	
 	public MiniPanel(ClientApp app) {
-		this.app = app;
-		init();
-		players = new ConcurrentHashMap<>();
-		controller = new Controller(this);
-		
-//		key = new Keyboard(this);
-//		
-//		addKeyListener(key);
+		super(app);
 	}
 	
-	private void init() {
+	protected void init() {
 		
 	}
 	
@@ -73,41 +66,6 @@ public class MiniPanel extends JPanel {
 		} finally {
 			g2d.dispose();
 		}
-	}
-	
-	/**
-	 * Draws players.
-	 * @param g - Graphics context to draw to
-	 */
-	private void drawPlayers(Graphics g) {
-		for (NewPlayer p : players.values()) {
-			p.draw(g);
-		}
-	}
-	
-	public Controller getController() {
-		return controller;
-	}
-	
-	public void setActive(boolean b) {
-		isActive = b;
-	}
-	
-	
-	public void setClientPlayer(NewPlayer player) {
-		this.clientPlayer = player;
-	}
-	
-	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
-		return players;
-	}
-	
-	public NewPlayer getClientPlayer() {
-		return clientPlayer;
-	}
-	
-	public boolean isActive() {
-		return isActive;
 	}
 	
 	public class Controller extends IOHandler {

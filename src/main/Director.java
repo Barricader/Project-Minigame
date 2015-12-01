@@ -2,7 +2,6 @@ package main;
 import java.util.ArrayList;
 
 import states.BoardState;
-import states.MinigameState;
 import states.StartState;
 import states.State;
 
@@ -38,7 +37,7 @@ public class Director implements Runnable {
 		this.m = m;
 		this.curState = new StartState(this);
 		this.boardState = new BoardState(this);
-		this.mgState = new MinigameState(this);
+		//this.mgState = new MinigameState(this);
 		this.turn = 1;
 		//this.m = m;
 		

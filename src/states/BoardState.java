@@ -156,7 +156,7 @@ public class BoardState extends State {
 		}
 		
 		private void createDice() {
-			dice = new Dice(midRect.x + (midRect.width / 2 - Dice.WIDTH), midRect.y + (midRect.height / 2 - Dice.HEIGHT));
+			//dice = new Dice(midRect.x + (midRect.width / 2 - Dice.WIDTH), midRect.y + (midRect.height / 2 - Dice.HEIGHT));
 		}
 		
 		private void createMidRect() {
