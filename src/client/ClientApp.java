@@ -4,11 +4,12 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -21,6 +22,7 @@ import org.json.simple.JSONObject;
 import input.Keyboard;
 import newserver.Keys;
 import newserver.Server;
+import panels.BaseMiniPanel;
 import panels.BoardPanel;
 import panels.ChatPanel;
 import panels.ConnectionPanel;
@@ -52,6 +54,8 @@ public class ClientApp extends JFrame {
 	private DicePanel dicePanel;
 	private ConnectionPanel connPanel;
 	private MiniPanel mp;
+	private ConcurrentHashMap<String, BaseMiniPanel> minis;
+	private int curMini = 0;
 	
 	private ErrorHandler errorHandler;
 	
@@ -134,6 +138,8 @@ public class ClientApp extends JFrame {
 		mp = new MiniPanel(this);
 		dicePanel = new DicePanel(this);
 		dicePanel.setVisible(false);
+		minis = new ConcurrentHashMap<>();
+		// init minis with references to 
 	}
 	
 	/**
@@ -248,6 +254,14 @@ public class ClientApp extends JFrame {
 	
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
+	}
+	
+	public void setMini(int curMini) {
+		this.curMini = curMini;
+	}
+	
+	public ConcurrentHashMap<String, BaseMiniPanel> getMinis() {
+		return minis;
 	}
 	
 	public class ErrorHandler extends IOHandler {

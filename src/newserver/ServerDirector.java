@@ -1,7 +1,7 @@
 package newserver;
 
 import java.awt.event.ActionListener;
-import java.security.SecureRandom;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
@@ -9,6 +9,7 @@ import javax.swing.Timer;
 import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
+import panels.BaseMiniPanel;
 import util.NewJSONObject;
 
 @SuppressWarnings({ "static-access", "unchecked" })	// hide stupid warnings!!
@@ -23,6 +24,8 @@ public class ServerDirector {
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;	// players that have rolled;
 	private NewPlayer activePlayer;		// we will probably need this. Haven't used it yet though.
+	private ConcurrentHashMap<String, BaseMiniPanel> minis;
+	private int curMini = 0;
 	
 //	private int activeIndex;
 	private int stopped;
@@ -35,6 +38,8 @@ public class ServerDirector {
 		this.server = server;
 		players = new ConcurrentHashMap<>();
 		rolledPlayers = new ConcurrentHashMap<>();
+		minis = new ConcurrentHashMap<>();
+		// init minis with reference to minipanel classes here
 //		activeIndex = 0;
 		stopped = 0;
 		turnCount = 0;
@@ -257,6 +262,11 @@ public class ServerDirector {
 	public void changeState(int state) {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
 		k.put("state", state);
+		if (state == BOARD) {
+			int ranNum = new Random().nextInt(minis.size());
+			curMini = ranNum;
+			k.put("mini", ranNum);
+		}
 		server.echoAll(k);
 	}
 	
