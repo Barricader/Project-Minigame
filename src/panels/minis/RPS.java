@@ -1,25 +1,21 @@
-package panels;
+package panels.minis;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.JPanel;
-import javax.swing.Timer;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
-import gameobjects.NewPlayer;
+import panels.BaseMiniPanel;
 import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 
-public class MiniPanel extends BaseMiniPanel {
-	public MiniPanel(ClientApp app) {
+public class RPS extends BaseMiniPanel {
+	public RPS(ClientApp app) {
 		super(app);
 	}
 	

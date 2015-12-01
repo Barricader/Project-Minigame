@@ -1,25 +1,22 @@
-package panels;
+package panels.minis;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.JPanel;
-import javax.swing.Timer;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
-import gameobjects.NewPlayer;
+import panels.BaseMiniPanel;
 import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 
-public class MiniPanel extends BaseMiniPanel {
-	public MiniPanel(ClientApp app) {
+public class Paint extends BaseMiniPanel {
+	
+	public Paint(ClientApp app) {
 		super(app);
 	}
 	
@@ -56,8 +53,13 @@ public class MiniPanel extends BaseMiniPanel {
 			g2d.setColor(GameUtils.getRandomColor());
 			g2d.fillOval(40, 40, 20, 60);
 			g2d.setFont(new Font("Courier New", Font.BOLD, 50));
-			g2d.drawString("MINI-GAME, YAY!!!!", getWidth() / 3, getHeight() / 3);
+			g2d.drawString("PAINT, YAY!!!!", getWidth() / 3, getHeight() / 3);
 			g2d.setColor(Color.CYAN);
+			
+			// draw circles
+			for (int i = 0; i < 20; i++) {
+				g2d.drawOval(i * 20, i * 20, 20 + i, 20 + (i * 2));
+			}
 			drawPlayers(g2d);
 		} finally {
 			g2d.dispose();
