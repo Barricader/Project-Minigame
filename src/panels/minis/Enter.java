@@ -33,9 +33,15 @@ public class Enter extends BaseMiniPanel {
 		if (isActive) {
 			System.out.println("Player pressed!");
 			clientPlayer = app.getBoardPanel().getClientPlayer();
-			NewJSONObject k = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_STOPPED);
-			k.put(Keys.NAME, clientPlayer.getName());
-			controller.send(k);
+			
+			NewJSONObject k1 = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_UPDATE);
+			k1.put(Keys.NAME, "enter");
+			k1.put(Keys.PLAYER_NAME, clientPlayer.getName());
+			controller.send(k1);
+			
+			NewJSONObject k2 = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_STOPPED);
+			k2.put(Keys.NAME, clientPlayer.getName());
+			controller.send(k2);
 			isActive = false;
 		}
 	}

@@ -74,6 +74,7 @@ public class ClientApp extends JFrame {
 		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
 		setFocusable(true);
 		requestFocus();
+		initMinis();
 	}
 	
 	/**
@@ -143,10 +144,9 @@ public class ClientApp extends JFrame {
 		dicePanel = new DicePanel(this);
 		dicePanel.setVisible(false);
 		minis = new ConcurrentHashMap<>();
-		// init minis with references to the minigame classes
-		
-		// TODO: change the value of each key to their associated mini-game! 
-		// RIGHT now there are all the same mini panel!!!
+	}
+	
+	private void initMinis() {
 		minis.put(MiniGames.names[0], new Enter(this));
 		minis.put(MiniGames.names[1], new KeyFinder(this));
 		minis.put(MiniGames.names[2], new Paint(this));
