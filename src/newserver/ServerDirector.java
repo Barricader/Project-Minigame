@@ -1,11 +1,15 @@
 package newserver;
 
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
@@ -28,6 +32,7 @@ public class ServerDirector {
 	private NewPlayer activePlayer;		// we will probably need this. Haven't used it yet though.
 	private String curMini = "null";
 	private String[] nameMinis = MiniGames.names;
+	private List<NewPlayer> leaderboard;
 	
 //	private int activeIndex;
 	private int stopped;
@@ -44,6 +49,7 @@ public class ServerDirector {
 //		activeIndex = 0;
 		stopped = 0;
 		turnCount = 0;
+		leaderboard = Collections.synchronizedList(new ArrayList<NewPlayer>());
 //		setActive();
 	}
 	
@@ -263,12 +269,69 @@ public class ServerDirector {
 	public void changeState(int state) {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
 		k.put("state", state);
+		if (state == BOARD) {
+			JSONArray test = (JSONArray) leaderboard;
+			k.put("leaderboard", test);
+			leaderboard.clear();
+		}
 		if (state == MINIGAME) {
 			int ranNum = new Random().nextInt(nameMinis.length);
 			curMini = nameMinis[ranNum];
 			k.put("mini", nameMinis[ranNum]);
 		}
 		server.echoAll(k);
+	}
+	
+	public void updateMinigame(JSONObject in) {
+		String name = (String) in.get("name");
+		if (name.equals(MiniGames.names[0])) {
+			// Run enter update code here
+			handleEnter(in);
+		}
+		else if (name.equals(MiniGames.names[1])) {
+			// Run enter update code here
+			handleKeyFinder(in);
+		}
+		else if (name.equals(MiniGames.names[2])) {
+			// Run enter update code here
+			handlePaint(in);
+		}
+		else if (name.equals(MiniGames.names[3])) {
+			// Run enter update code here
+			handlePong(in);
+		}
+		else if (name.equals(MiniGames.names[4])) {
+			// Run enter update code here
+			handleRPS(in);
+		}
+		else {
+			// Not a known minigame, send error
+			handleError();
+		}
+	}
+	
+	private void handleEnter(JSONObject in) {
+		leaderboard.add(players.get((String) in.get("playerName")));
+	}
+	
+	private void handleKeyFinder(JSONObject in) {
+			
+	}
+	
+	private void handlePaint(JSONObject in) {
+		
+	}
+	
+	private void handlePong(JSONObject in) {
+		
+	}
+	
+	private void handleRPS(JSONObject in) {
+		
+	}
+	
+	private void handleError() {
+		
 	}
 	
 	/**

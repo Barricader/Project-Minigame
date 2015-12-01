@@ -57,6 +57,9 @@ public class ServerIOHandler extends IOHandler {
 		case Keys.Commands.MINI_STOPPED:
 			dir.isMinigameOver();
 			break;
+		case Keys.Commands.MINI_UPDATE:
+			dir.updateMinigame(in);
+			break;
 		case Keys.Commands.MSG:
 			serverClient.getServer().echoAll(in);	// echo to all other clients
 			break;
