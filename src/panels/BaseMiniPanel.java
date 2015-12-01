@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 import org.json.simple.JSONObject;
 
@@ -12,19 +13,20 @@ import client.IOHandler;
 import gameobjects.NewPlayer;
 
 public abstract class BaseMiniPanel extends JPanel {
-	private static final long serialVersionUID = -2710194893729492174L;
-	private ClientApp app;
-	private Controller controller;
-	private boolean isActive;
-	private ConcurrentHashMap<String, NewPlayer> players;
-	private NewPlayer clientPlayer;
-	//private Timer t;
+	protected static final long serialVersionUID = -2710194893729492174L;
+	protected ClientApp app;
+	protected Controller controller;
+	protected boolean isActive;
+	protected ConcurrentHashMap<String, NewPlayer> players;
+	protected NewPlayer clientPlayer;
+	protected Timer t;
 	
 	public BaseMiniPanel(ClientApp app) {
 		this.app = app;
 		init();
 		players = new ConcurrentHashMap<>();
 		controller = new Controller(this);
+		Timer t = new Timer(16, null);
 	}
 	
 	protected abstract void init();

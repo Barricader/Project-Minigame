@@ -19,14 +19,6 @@ import util.GameUtils;
 import util.NewJSONObject;
 
 public class MiniPanel extends BaseMiniPanel {
-	private ClientApp app;
-	private Controller controller;
-	private boolean isActive;
-	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
-	private NewPlayer clientPlayer;	// the player that belong to this client!
-	private Timer t;
-//	private Keyboard key;
-	
 	public MiniPanel(ClientApp app) {
 		super(app);
 	}
