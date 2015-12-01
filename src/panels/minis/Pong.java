@@ -61,11 +61,6 @@ public class Pong extends BaseMiniPanel {
 	}
 	
 	public class Controller extends IOHandler {
-		private MiniPanel mp;
-		
-		public Controller(MiniPanel mp) {
-			this.mp = mp;
-		}
 
 		public void send(JSONObject out) {
 			app.getClient().getIOHandler().send(out);

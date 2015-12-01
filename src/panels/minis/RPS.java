@@ -15,6 +15,7 @@ import util.Keys;
 import util.NewJSONObject;
 
 public class RPS extends BaseMiniPanel {
+	
 	public RPS(ClientApp app) {
 		super(app);
 	}
@@ -61,11 +62,6 @@ public class RPS extends BaseMiniPanel {
 	}
 	
 	public class Controller extends IOHandler {
-		private MiniPanel mp;
-		
-		public Controller(MiniPanel mp) {
-			this.mp = mp;
-		}
 
 		public void send(JSONObject out) {
 			app.getClient().getIOHandler().send(out);
