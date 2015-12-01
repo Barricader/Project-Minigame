@@ -35,6 +35,10 @@ public class MiniPanel extends BaseMiniPanel {
 		
 	}
 	
+	public void update() {
+		
+	}
+	
 	public void playerPressed() {
 		// Send JSON here
 		// must put name key with player name

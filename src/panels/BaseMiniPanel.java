@@ -29,6 +29,8 @@ public abstract class BaseMiniPanel extends JPanel {
 	
 	protected abstract void init();
 	
+	public abstract void update();
+	
 	/**
 	 * Draws players.
 	 * @param g - Graphics context to draw to
