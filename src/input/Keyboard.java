@@ -4,7 +4,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 
-import panels.MiniPanel;
+import panels.minis.Enter;
 
 /**
  * Basic keyboard class that listens to and keeps track of keyboard input.
@@ -20,13 +20,13 @@ public class Keyboard implements KeyEventDispatcher {
 	
 	public boolean[] keys; // encompasses most used keys
 	
-	MiniPanel mp;
+	Enter mp;
 	
 	private int lastKey;	// key code of last key press
 	public boolean spacePressed = false;
 	public boolean enterPressed = false;
 	
-	public Keyboard(MiniPanel mp) {
+	public Keyboard(Enter mp) {
 		shiftFlag = false;
 		altFlag = false;
 		ctrlFlag = false;

@@ -6,8 +6,8 @@ public class MiniGames {
 		"enter",
 		"keyFinder",
 		"paint",
-		"rps",
 		"pong",
+		"rps",
 	};
 	
 	

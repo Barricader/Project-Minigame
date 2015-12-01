@@ -1,25 +1,21 @@
-package panels;
+package panels.minis;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.JPanel;
-import javax.swing.Timer;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
-import gameobjects.NewPlayer;
+import panels.BaseMiniPanel;
 import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 
-public class MiniPanel extends BaseMiniPanel {
-	public MiniPanel(ClientApp app) {
+public class Enter extends BaseMiniPanel {
+	public Enter(ClientApp app) {
 		super(app);
 	}
 	
@@ -53,10 +49,9 @@ public class MiniPanel extends BaseMiniPanel {
 		try {
 			g2d.setColor(GameUtils.colorFromHex("#C0C0C0"));
 			g2d.fillRect(0, 0, getWidth(), getHeight());
-			g2d.setColor(GameUtils.getRandomColor());
-			g2d.fillOval(40, 40, 20, 60);
+			g2d.setColor(Color.BLACK);
 			g2d.setFont(new Font("Courier New", Font.BOLD, 50));
-			g2d.drawString("MINI-GAME, YAY!!!!", getWidth() / 3, getHeight() / 3);
+			g2d.drawString("<Enter-Minigame>", getWidth() / 2 - 20, getHeight() / 2 - 20);
 			g2d.setColor(Color.CYAN);
 			drawPlayers(g2d);
 		} finally {
@@ -65,9 +60,9 @@ public class MiniPanel extends BaseMiniPanel {
 	}
 	
 	public class Controller extends IOHandler {
-		private MiniPanel mp;
+		private Enter mp;
 		
-		public Controller(MiniPanel mp) {
+		public Controller(Enter mp) {
 			this.mp = mp;
 		}
 

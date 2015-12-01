@@ -27,8 +27,9 @@ import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
 import panels.DicePanel;
 import panels.LoginPanel;
-import panels.MiniPanel;
 import panels.StatePanel;
+import panels.minis.Enter;
+import panels.minis.KeyFinder;
 import util.Keys;
 import util.MiniGames;
 
@@ -66,7 +67,7 @@ public class ClientApp extends JFrame {
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
 		instance = this;
-		key = new Keyboard((MiniPanel) minis.get("enter"));
+		key = new Keyboard((Enter) minis.get("enter"));
 		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
 		setFocusable(true);
 		requestFocus();
@@ -143,9 +144,8 @@ public class ClientApp extends JFrame {
 		
 		// TODO: change the value of each key to their associated mini-game! 
 		// RIGHT now there are all the same mini panel!!!
-		for (String name : MiniGames.names) {
-			minis.put(name, new MiniPanel(this));
-		}
+		minis.put(MiniGames.names[0], new Enter(this));
+		minis.put(MiniGames.names[1], new KeyFinder(this));
 	}
 	
 	/**
