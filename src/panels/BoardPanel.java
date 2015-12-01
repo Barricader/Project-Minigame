@@ -21,8 +21,8 @@ import client.IOHandler;
 import gameobjects.NewPlayer;
 import gameobjects.NewTile;
 import main.Animator;
-import newserver.Keys;
 import util.GameUtils;
+import util.Keys;
 import util.NewJSONObject;
 
 public class BoardPanel extends JPanel implements ComponentListener {

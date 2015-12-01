@@ -1,4 +1,4 @@
-package newserver;
+package util;
 
 /**
  * Utility class that contains all available keys. Where keys are needed to write

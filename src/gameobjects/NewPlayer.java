@@ -12,8 +12,8 @@ import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
-import newserver.Keys;
-import newserver.PlayerStyles;
+import util.Keys;
+import util.PlayerStyles;
 import util.Vector;
 
 public class NewPlayer extends GameObject {

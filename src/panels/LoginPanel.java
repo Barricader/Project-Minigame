@@ -25,8 +25,8 @@ import org.json.simple.JSONObject;
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
-import newserver.Keys;
 import util.GameUtils;
+import util.Keys;
 import util.NewJSONObject;
 
 /**

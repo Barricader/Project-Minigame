@@ -10,8 +10,8 @@ import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
-import newserver.Keys;
 import newserver.ServerDirector;
+import util.Keys;
 
 /**
  * This panel will be a container for any state that changes more frequently. This

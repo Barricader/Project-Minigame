@@ -9,9 +9,10 @@ import javax.swing.Timer;
 import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
-import panels.BaseMiniPanel;
-import panels.MiniPanel;
+import util.Keys;
+import util.MiniGames;
 import util.NewJSONObject;
+import util.PlayerStyles;
 
 @SuppressWarnings({ "static-access", "unchecked" })	// hide stupid warnings!!
 public class ServerDirector {
@@ -26,7 +27,7 @@ public class ServerDirector {
 	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;	// players that have rolled;
 	private NewPlayer activePlayer;		// we will probably need this. Haven't used it yet though.
 	private String curMini = "null";
-	private String[] nameMinis = {"enter"};
+	private String[] nameMinis = MiniGames.names;
 	
 //	private int activeIndex;
 	private int stopped;

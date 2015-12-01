@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 
 import client.IOHandler;
+import util.Keys;
 
 /**
  * This class provides implementation for handling JSON objects both sending

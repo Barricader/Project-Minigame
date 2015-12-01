@@ -20,9 +20,9 @@ import org.json.simple.JSONObject;
 import client.Client;
 import client.ClientApp;
 import client.IOHandler;
-import newserver.Keys;
 import newserver.Server;
 import util.GameUtils;
+import util.Keys;
 
 /**
  * Simple connection panel that allows the user to connect / disconnect and provides

@@ -9,7 +9,7 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import gameobjects.NewPlayer;
-import newserver.PlayerStyles;
+import util.PlayerStyles;
 
 /**
  * This class is the cell renderer for the Player list object. This renders each cell 

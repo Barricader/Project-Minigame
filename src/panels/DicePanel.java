@@ -17,10 +17,10 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import main.Dice;
-import newserver.Keys;
-import newserver.PlayerStyles;
 import util.GameUtils;
+import util.Keys;
 import util.NewJSONObject;
+import util.PlayerStyles;
 
 public class DicePanel extends JPanel implements MouseListener {
 	private static final Color BG_COLOR = GameUtils.colorFromHex("#D6D9DF");	// gray

@@ -8,7 +8,6 @@ import java.awt.KeyboardFocusManager;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JFrame;
@@ -20,7 +19,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.json.simple.JSONObject;
 
 import input.Keyboard;
-import newserver.Keys;
 import newserver.Server;
 import panels.BaseMiniPanel;
 import panels.BoardPanel;
@@ -31,6 +29,8 @@ import panels.DicePanel;
 import panels.LoginPanel;
 import panels.MiniPanel;
 import panels.StatePanel;
+import util.Keys;
+import util.MiniGames;
 
 /**
  * This will be the new "MAIN" application that the client will run to use
@@ -140,7 +140,12 @@ public class ClientApp extends JFrame {
 		dicePanel.setVisible(false);
 		minis = new ConcurrentHashMap<>();
 		// init minis with references to the minigame classes
-		minis.put("enter", new MiniPanel(this));
+		
+		// TODO: change the value of each key to their associated mini-game! 
+		// RIGHT now there are all the same mini panel!!!
+		for (String name : MiniGames.names) {
+			minis.put(name, new MiniPanel(this));
+		}
 	}
 	
 	/**
