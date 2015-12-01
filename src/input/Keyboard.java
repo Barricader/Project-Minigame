@@ -4,6 +4,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 
+import panels.BaseMiniPanel;
 import panels.minis.Enter;
 
 /**
@@ -20,13 +21,13 @@ public class Keyboard implements KeyEventDispatcher {
 	
 	public boolean[] keys; // encompasses most used keys
 	
-	Enter mp;
+	private BaseMiniPanel mp;
 	
 	private int lastKey;	// key code of last key press
 	public boolean spacePressed = false;
 	public boolean enterPressed = false;
 	
-	public Keyboard(Enter mp) {
+	public Keyboard(BaseMiniPanel mp) {
 		shiftFlag = false;
 		altFlag = false;
 		ctrlFlag = false;

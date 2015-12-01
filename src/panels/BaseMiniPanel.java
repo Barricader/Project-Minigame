@@ -34,6 +34,11 @@ public abstract class BaseMiniPanel extends JPanel {
 	public abstract void update();
 	
 	/**
+	 * Abstract method for handling key events.
+	 */
+	public abstract void playerPressed();
+	
+	/**
 	 * Draws players.
 	 * @param g - Graphics context to draw to
 	 */

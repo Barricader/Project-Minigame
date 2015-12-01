@@ -30,6 +30,9 @@ import panels.LoginPanel;
 import panels.StatePanel;
 import panels.minis.Enter;
 import panels.minis.KeyFinder;
+import panels.minis.Paint;
+import panels.minis.Pong;
+import panels.minis.RPS;
 import util.Keys;
 import util.MiniGames;
 
@@ -146,6 +149,9 @@ public class ClientApp extends JFrame {
 		// RIGHT now there are all the same mini panel!!!
 		minis.put(MiniGames.names[0], new Enter(this));
 		minis.put(MiniGames.names[1], new KeyFinder(this));
+		minis.put(MiniGames.names[2], new Paint(this));
+		minis.put(MiniGames.names[3], new Pong(this));
+		minis.put(MiniGames.names[4], new RPS(this));
 	}
 	
 	/**
@@ -212,6 +218,15 @@ public class ClientApp extends JFrame {
 			connPanel.getController().updateStatus(Controller.STATUS_ERROR);
 			showTimeOutError();
 		}
+	}
+	
+	/**
+	 * Updates keyboard to the specified state.
+	 * @param state
+	 */
+	public void updateKey(String state) {
+		key = new Keyboard(minis.get(state));
+		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
 	}
 	
 	/**
