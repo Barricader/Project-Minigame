@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
@@ -267,7 +268,16 @@ public class ServerDirector {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
 		k.put("state", state);
 		if (state == BOARD) {
-			k.put("leaderboard", leaderboard);
+			JSONArray players = new JSONArray();
+			for (int i = 0; i < leaderboard.size(); i++) {
+				JSONObject temp = new JSONObject();
+				String name = leaderboard.get(i).getName();
+				temp.put("name", name);
+				temp.put("place", i);		// Place is not neccessary, just for testing
+				players.add(temp);
+				//k.put("p"+i, name);
+			}
+			k.put("leaderboard", players);
 		}
 		if (state == MINIGAME) {
 			int ranNum = lastMini;
@@ -315,23 +325,23 @@ public class ServerDirector {
 	}
 	
 	private void handleKeyFinder(JSONObject in) {
-			
+		leaderboard.add(players.get((String) in.get("playerName")));
 	}
 	
 	private void handlePaint(JSONObject in) {
-		
+		leaderboard.add(players.get((String) in.get("playerName")));
 	}
 	
 	private void handlePong(JSONObject in) {
-		
+		leaderboard.add(players.get((String) in.get("playerName")));
 	}
 	
 	private void handleRPS(JSONObject in) {
-		
+		leaderboard.add(players.get((String) in.get("playerName")));
 	}
 	
 	private void handleError() {
-		
+		System.out.println("ERROR: not a valid minigame");
 	}
 	
 	/**

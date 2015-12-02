@@ -3,13 +3,16 @@ package panels;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
+import gameobjects.NewPlayer;
 import newserver.ServerDirector;
 import util.Keys;
 
@@ -22,6 +25,8 @@ import util.Keys;
  */
 public class StatePanel extends JPanel {
 	private ClientApp app;
+	
+	private ArrayList<NewPlayer> temp;
 	
 	// initial login components
 	private Controller controller;
@@ -36,6 +41,7 @@ public class StatePanel extends JPanel {
 		controller = new Controller();
 		loginPanel = new LoginPanel(app);
 		updateView(loginPanel);
+		temp = new ArrayList<NewPlayer>();
 	}
 	
 	/**
@@ -76,6 +82,17 @@ public class StatePanel extends JPanel {
 			int stateType = (int) in.get(Keys.STATE);
 			switch (stateType) {
 			case (ServerDirector.BOARD):	// board state
+				if (in.containsKey("leaderboard")) {
+					JSONArray test = (JSONArray) in.get("leaderboard");
+					if (test.size() != 0) {
+						for (int i = 0; i < app.getBoardPanel().getPlayers().size(); i++) {
+							String name = (String) ((JSONObject) test.get(i)).get("name");
+							System.out.println("Name " + i + ": " + name);
+							System.out.println("Score " + i + ": " + app.getBoardPanel().getPlayers().get(name).getScore());
+							app.getBoardPanel().getPlayers().get(name).setScore(app.getBoardPanel().getPlayers().get(name).getScore() + app.getBoardPanel().getPlayers().size() - i);
+						}
+					}
+				}
 				updateBoard();
 				break;
 			case (ServerDirector.MINIGAME):		// mini state

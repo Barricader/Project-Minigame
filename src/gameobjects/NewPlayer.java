@@ -270,6 +270,14 @@ public class NewPlayer extends GameObject {
 		return ID + " " + name;
 	}
 	
+	public void setScore(int score) {
+		this.score = score;
+	}
+	
+	public int getScore() {
+		return score;
+	}
+	
 	public JSONObject toJSONObject() {
 		JSONObject player = new JSONObject();
 		player.put(Keys.ID, ID);
