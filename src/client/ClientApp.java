@@ -26,6 +26,7 @@ import panels.ChatPanel;
 import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
 import panels.DicePanel;
+import panels.LeaderBoardPanel;
 import panels.LoginPanel;
 import panels.StatePanel;
 import panels.minis.Enter;
@@ -57,6 +58,7 @@ public class ClientApp extends JFrame {
 	private BoardPanel boardPanel;
 	private DicePanel dicePanel;
 	private ConnectionPanel connPanel;
+	private LeaderBoardPanel leaderPanel;
 	//private MiniPanel mp;
 	private ConcurrentHashMap<String, BaseMiniPanel> minis;
 	private String curMini = "null";
@@ -109,20 +111,27 @@ public class ClientApp extends JFrame {
 		c.weighty = 0.8;
 		panel.add(statePanel, c);
 		
-		// chat panel
-		c.anchor = GridBagConstraints.SOUTH;
+		// leaderboard panel
 		c.fill = GridBagConstraints.BOTH;
-		c.gridx = 0;
-		c.weightx = 0.9;
-		c.gridwidth = 8;
+		c.anchor = GridBagConstraints.SOUTHWEST;
+		c.gridx = 8;
+		c.weightx = 0.1;
+		c.gridwidth = 2;
 		c.gridy = 6;
 		c.gridheight = 4;
 		c.weighty = 0.4;
+		panel.add(leaderPanel, c);
+		
+		// chat panel
+		c.anchor = GridBagConstraints.SOUTH;
+		c.gridx = 0;
+		c.weightx = 0.8;
+		c.gridwidth = 6;
 		panel.add(chatPanel, c);
 		
 		// dice panel
 		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.gridx = 8;
+		c.gridx = 6;
 		c.gridwidth = 2;
 		c.weightx = 0.1;
 		panel.add(dicePanel, c);
@@ -140,9 +149,9 @@ public class ClientApp extends JFrame {
 		connPanel = new ConnectionPanel(this);
 		connPanel.setVisible(false);
 		boardPanel = new BoardPanel(this);
-		//mp = new MiniPanel(this);
 		dicePanel = new DicePanel(this);
-		dicePanel.setVisible(false);
+		dicePanel.setVisible(true);
+		leaderPanel = new LeaderBoardPanel(this);
 		minis = new ConcurrentHashMap<>();
 	}
 	
