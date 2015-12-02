@@ -34,7 +34,6 @@ public class ServerDirector {
 	private String[] nameMinis = MiniGames.names;
 	private List<NewPlayer> leaderboard;
 	
-//	private int activeIndex;
 	private int stopped;
 	private int over;
 	private int turnCount;	// how many turns are we in?
@@ -46,11 +45,9 @@ public class ServerDirector {
 		players = new ConcurrentHashMap<>();
 		rolledPlayers = new ConcurrentHashMap<>();
 
-//		activeIndex = 0;
 		stopped = 0;
 		turnCount = 0;
 		leaderboard = Collections.synchronizedList(new ArrayList<NewPlayer>());
-//		setActive();
 	}
 	
 	/**
@@ -270,9 +267,7 @@ public class ServerDirector {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
 		k.put("state", state);
 		if (state == BOARD) {
-			JSONArray test = (JSONArray) leaderboard;
-			k.put("leaderboard", test);
-			leaderboard.clear();
+			k.put("leaderboard", leaderboard);
 		}
 		if (state == MINIGAME) {
 			int ranNum = new Random().nextInt(nameMinis.length);
@@ -280,6 +275,7 @@ public class ServerDirector {
 			k.put("mini", nameMinis[ranNum]);
 		}
 		server.echoAll(k);
+		leaderboard.clear();
 	}
 	
 	public void updateMinigame(JSONObject in) {

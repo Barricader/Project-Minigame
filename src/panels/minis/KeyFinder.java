@@ -19,7 +19,7 @@ public class KeyFinder extends BaseMiniPanel {
 		super(app);
 	}
 	
-	protected void init() {
+	public void init() {
 		
 	}
 	

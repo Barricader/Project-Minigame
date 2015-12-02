@@ -11,6 +11,7 @@ import org.json.simple.JSONObject;
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
+import input.Keyboard;
 
 public abstract class BaseMiniPanel extends JPanel {
 	protected static final long serialVersionUID = -2710194893729492174L;
@@ -20,16 +21,17 @@ public abstract class BaseMiniPanel extends JPanel {
 	protected ConcurrentHashMap<String, NewPlayer> players;
 	protected NewPlayer clientPlayer;
 	protected Timer t;
+	protected Keyboard key;
 	
 	public BaseMiniPanel(ClientApp app) {
 		this.app = app;
-		init();
+//		init();
 		players = new ConcurrentHashMap<>();
 		controller = new Controller(this);
 		Timer t = new Timer(16, e -> update());
 	}
 	
-	protected abstract void init();
+	public abstract void init();
 	
 	public abstract void update();
 	

@@ -20,7 +20,7 @@ public class Paint extends BaseMiniPanel {
 		super(app);
 	}
 	
-	protected void init() {
+	public void init() {
 		
 	}
 	

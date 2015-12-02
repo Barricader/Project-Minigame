@@ -70,8 +70,8 @@ public class ClientApp extends JFrame {
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
 		instance = this;
-		key = new Keyboard((Enter) minis.get("enter"));
-		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
+//		key = new Keyboard((Enter) minis.get("enter"));
+//		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
 		setFocusable(true);
 		requestFocus();
 		initMinis();

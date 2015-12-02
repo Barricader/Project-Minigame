@@ -19,7 +19,7 @@ public class Pong extends BaseMiniPanel {
 		super(app);
 	}
 	
-	protected void init() {
+	public void init() {
 		
 	}
 	
