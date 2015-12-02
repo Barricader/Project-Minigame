@@ -281,6 +281,10 @@ public class ClientApp extends JFrame {
 		this.curMini = curMini;
 	}
 	
+	public String getMini() {
+		return curMini;
+	}
+	
 	public ConcurrentHashMap<String, BaseMiniPanel> getMinis() {
 		return minis;
 	}

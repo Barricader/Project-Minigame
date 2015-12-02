@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
@@ -34,6 +33,7 @@ public class ServerDirector {
 	private String[] nameMinis = MiniGames.names;
 	private List<NewPlayer> leaderboard;
 	
+	private int lastMini = -1;
 	private int stopped;
 	private int over;
 	private int turnCount;	// how many turns are we in?
@@ -270,9 +270,13 @@ public class ServerDirector {
 			k.put("leaderboard", leaderboard);
 		}
 		if (state == MINIGAME) {
-			int ranNum = new Random().nextInt(nameMinis.length);
-			curMini = nameMinis[ranNum];
+			int ranNum = lastMini;
+			while (ranNum == lastMini) {
+				ranNum = new Random().nextInt(nameMinis.length);
+				curMini = nameMinis[ranNum];
+			}
 			k.put("mini", nameMinis[ranNum]);
+			lastMini = ranNum;
 		}
 		server.echoAll(k);
 		leaderboard.clear();

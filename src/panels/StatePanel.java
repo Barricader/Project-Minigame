@@ -90,6 +90,9 @@ public class StatePanel extends JPanel {
 		 */
 		public void updateBoard() {
 			System.out.println("view should be at board panel");
+			if (!app.getMini().equals("null")) {
+				app.getMinis().get(app.getMini()).exit();
+			}
 			app.getConnPanel().setVisible(true);
 			app.getDicePanel().setVisible(true);
 			updateView(app.getBoardPanel());
@@ -106,6 +109,7 @@ public class StatePanel extends JPanel {
 		public void updateMiniState(String curMini) {
 			//app.getMiniPanel().setActive(true);
 			app.getMinis().get(curMini).setActive(true);
+			app.setMini(curMini);
 			app.updateKey(curMini);
 			updateView(app.getMinis().get(curMini));
 			app.repaint();

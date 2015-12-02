@@ -28,7 +28,8 @@ public abstract class BaseMiniPanel extends JPanel {
 //		init();
 		players = new ConcurrentHashMap<>();
 		controller = new Controller(this);
-		Timer t = new Timer(16, e -> update());
+		t = new Timer(16, e -> update());
+		//t.start();
 	}
 	
 	public abstract void init();
@@ -56,6 +57,11 @@ public abstract class BaseMiniPanel extends JPanel {
 	
 	public void setActive(boolean b) {
 		isActive = b;
+		t.start();
+	}
+	
+	public void exit() {
+		t.stop();
 	}
 	
 	public void setClientPlayer(NewPlayer player) {

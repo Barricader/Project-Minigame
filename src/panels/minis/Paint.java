@@ -25,7 +25,7 @@ public class Paint extends BaseMiniPanel {
 	}
 	
 	public void update() {
-		
+		System.out.println("I has paint minigame");
 	}
 	
 	public void playerPressed() {
