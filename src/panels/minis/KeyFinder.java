@@ -24,7 +24,7 @@ public class KeyFinder extends BaseMiniPanel {
 	}
 	
 	public void update() {
-		
+		System.out.println("I am part of the update method!");
 	}
 	
 	public void playerPressed() {
