@@ -90,6 +90,7 @@ public class StatePanel extends JPanel {
 							System.out.println("Name " + i + ": " + name);
 							System.out.println("Score " + i + ": " + app.getBoardPanel().getPlayers().get(name).getScore());
 							app.getBoardPanel().getPlayers().get(name).setScore(app.getBoardPanel().getPlayers().get(name).getScore() + app.getBoardPanel().getPlayers().size() - i);
+							app.getLeaderPanel().updateList();
 						}
 					}
 				}
@@ -111,7 +112,10 @@ public class StatePanel extends JPanel {
 				app.getMinis().get(app.getMini()).exit();
 			}
 			app.getConnPanel().setVisible(true);
+			app.getDicePanel().setEnabled(true);
 			app.getDicePanel().setVisible(true);
+			app.getLeaderPanel().setVisible(true);
+			app.getLeaderPanel().updateList();
 			updateView(app.getBoardPanel());
 			
 			// board rendering glitch fix
@@ -125,6 +129,7 @@ public class StatePanel extends JPanel {
 		 */
 		public void updateMiniState(String curMini) {
 			//app.getMiniPanel().setActive(true);
+			app.getDicePanel().setEnabled(false);
 			app.getMinis().get(curMini).setActive(true);
 			app.setMini(curMini);
 			app.updateKey(curMini);

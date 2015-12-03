@@ -114,7 +114,7 @@ public class ClientApp extends JFrame {
 		// leaderboard panel
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.SOUTHWEST;
-		c.gridx = 8;
+		c.gridx = 0;
 		c.weightx = 0.1;
 		c.gridwidth = 2;
 		c.gridy = 6;
@@ -124,14 +124,14 @@ public class ClientApp extends JFrame {
 		
 		// chat panel
 		c.anchor = GridBagConstraints.SOUTH;
-		c.gridx = 0;
+		c.gridx = 2;
 		c.weightx = 0.8;
 		c.gridwidth = 6;
 		panel.add(chatPanel, c);
 		
 		// dice panel
 		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.gridx = 6;
+		c.gridx = 8;
 		c.gridwidth = 2;
 		c.weightx = 0.1;
 		panel.add(dicePanel, c);
@@ -150,8 +150,9 @@ public class ClientApp extends JFrame {
 		connPanel.setVisible(false);
 		boardPanel = new BoardPanel(this);
 		dicePanel = new DicePanel(this);
-		dicePanel.setVisible(true);
+		dicePanel.setVisible(false);
 		leaderPanel = new LeaderBoardPanel(this);
+		leaderPanel.setVisible(false);
 		minis = new ConcurrentHashMap<>();
 	}
 	
@@ -273,6 +274,10 @@ public class ClientApp extends JFrame {
 //	public MiniPanel getMiniPanel() {
 //		return mp;
 //	}
+	
+	public LeaderBoardPanel getLeaderPanel() {
+		return leaderPanel;
+	}
 	
 	public DicePanel getDicePanel() {
 		return dicePanel;
