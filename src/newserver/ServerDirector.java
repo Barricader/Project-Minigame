@@ -36,7 +36,6 @@ public class ServerDirector {
 	private List<NewPlayer> leaderboard;
 	
 	private HashMap<Integer, NewPlayer> temp;
-	//private SortedSet<Integer> keys = null;
 	
 	private int lastMini = -1;
 	private int stopped;
