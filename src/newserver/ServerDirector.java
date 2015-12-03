@@ -3,6 +3,7 @@ package newserver;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +35,9 @@ public class ServerDirector {
 	private String[] nameMinis = MiniGames.names;
 	private List<NewPlayer> leaderboard;
 	
+	private HashMap<Integer, NewPlayer> temp;
+	//private SortedSet<Integer> keys = null;
+	
 	private int lastMini = -1;
 	private int stopped;
 	private int over;
@@ -45,6 +49,7 @@ public class ServerDirector {
 		this.server = server;
 		players = new ConcurrentHashMap<>();
 		rolledPlayers = new ConcurrentHashMap<>();
+		temp = new HashMap<>();
 
 		stopped = 0;
 		turnCount = 0;
@@ -207,18 +212,6 @@ public class ServerDirector {
 		return players;
 	}
 	
-//	public void setActive(int id) {
-//		NewJSONObject k = new NewJSONObject(-1, "active");
-//		k.put("playerID", id);
-//		server.echoAll(k);
-//	}
-	
-//	public void setActive() {
-//		NewJSONObject k = new NewJSONObject(-1, "active");
-//		k.put("playerID", activeIndex);
-//		server.echoAll(k);
-//	}
-	
 	/**
 	 * Selects the next active player and sends a request for the player 
 	 * to roll the dice.
@@ -268,18 +261,27 @@ public class ServerDirector {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
 		k.put("state", state);
 		if (state == BOARD) {
+			// Sort the HashMap by values and sort the players into the leaderboard
+			if (!temp.isEmpty()) {
+				List<Integer> sortedKeys = new ArrayList<Integer>(temp.keySet());
+				Collections.sort(sortedKeys);
+				leaderboard.addAll(temp.values());
+			}
+			
+			// Create a JSON array in the JSONObject that we want to send
 			JSONArray players = new JSONArray();
 			for (int i = 0; i < leaderboard.size(); i++) {
 				JSONObject temp = new JSONObject();
 				String name = leaderboard.get(i).getName();
 				temp.put("name", name);
-				temp.put("place", i);		// Place is not neccessary, just for testing
+				temp.put("place", i);		// Place is not necessary, just for testing
 				players.add(temp);
-				//k.put("p"+i, name);
 			}
+			
 			k.put("leaderboard", players);
 		}
-		if (state == MINIGAME) {
+		else if (state == MINIGAME) {
+			// Choose a random minigame that wasn't the last one played
 			int ranNum = lastMini;
 			while (ranNum == lastMini) {
 				ranNum = new Random().nextInt(nameMinis.length);
@@ -290,28 +292,24 @@ public class ServerDirector {
 		}
 		server.echoAll(k);
 		leaderboard.clear();
+		temp.clear();
 	}
 	
 	public void updateMinigame(JSONObject in) {
 		String name = (String) in.get("name");
 		if (name.equals(MiniGames.names[0])) {
-			// Run enter update code here
 			handleEnter(in);
 		}
 		else if (name.equals(MiniGames.names[1])) {
-			// Run enter update code here
 			handleKeyFinder(in);
 		}
 		else if (name.equals(MiniGames.names[2])) {
-			// Run enter update code here
 			handlePaint(in);
 		}
 		else if (name.equals(MiniGames.names[3])) {
-			// Run enter update code here
 			handlePong(in);
 		}
 		else if (name.equals(MiniGames.names[4])) {
-			// Run enter update code here
 			handleRPS(in);
 		}
 		else {
@@ -325,23 +323,23 @@ public class ServerDirector {
 	}
 	
 	private void handleKeyFinder(JSONObject in) {
-		leaderboard.add(players.get((String) in.get("playerName")));
+		leaderboard.add(players.get((String) in.get("playerName")));	// CHANGEME
 	}
 	
 	private void handlePaint(JSONObject in) {
-		leaderboard.add(players.get((String) in.get("playerName")));
+		leaderboard.add(players.get((String) in.get("playerName")));	// CHANGEME
 	}
 	
 	private void handlePong(JSONObject in) {
-		leaderboard.add(players.get((String) in.get("playerName")));
+		leaderboard.add(players.get((String) in.get("playerName")));	// CHANGEME
 	}
 	
 	private void handleRPS(JSONObject in) {
-		leaderboard.add(players.get((String) in.get("playerName")));
+		temp.put((Integer) in.get("wins"), players.get((String) in.get("playerName")));
 	}
 	
 	private void handleError() {
-		System.out.println("ERROR: not a valid minigame");
+		System.out.println("ERROR: Not a valid minigame");
 	}
 	
 	/**
