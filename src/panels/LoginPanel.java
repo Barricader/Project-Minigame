@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -70,7 +69,6 @@ public class LoginPanel extends JPanel {
 	 */
 	private void init() {
 		createComponents();
-		setBorder(new LineBorder(Color.RED));
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(5, 10, 5, 10);

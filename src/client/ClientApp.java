@@ -1,6 +1,5 @@
 package client;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,7 +15,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
@@ -37,7 +35,6 @@ import panels.minis.Paint;
 import panels.minis.Pong;
 import panels.minis.RPS;
 import util.ErrorUtils;
-import util.Keys;
 import util.MiniGames;
 
 /**
@@ -105,7 +102,6 @@ public class ClientApp extends JFrame {
 		c.gridy = 0;
 		c.ipady = 10;
 		c.weighty = 0.0;
-		connPanel.setBorder(new LineBorder(Color.ORANGE));
 		panel.add(connPanel, c);
 		
 		// draw panel

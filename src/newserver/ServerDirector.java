@@ -287,7 +287,8 @@ public class ServerDirector {
 				ranNum = new Random().nextInt(nameMinis.length);
 				curMini = nameMinis[ranNum];
 			}
-			k.put("mini", nameMinis[ranNum]);
+//			k.put("mini", nameMinis[ranNum]);
+			k.put("mini", "rps");
 			lastMini = ranNum;
 		}
 		server.echoAll(k);

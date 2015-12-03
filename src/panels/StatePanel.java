@@ -1,13 +1,11 @@
 package panels;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -44,7 +42,6 @@ public class StatePanel extends JPanel {
 		loginPanel = new LoginPanel(app);
 		updateView(loginPanel);
 		temp = new ArrayList<NewPlayer>();
-		setBorder(new LineBorder(Color.GREEN));
 	}
 	
 	/**
@@ -101,7 +98,6 @@ public class StatePanel extends JPanel {
 				break;
 			case (ServerDirector.MINIGAME):		// mini state
 				updateMiniState((String)in.get("mini"));
-				app.setMini((String)in.get("mini"));
 				break;
 			}
 		}
@@ -136,6 +132,7 @@ public class StatePanel extends JPanel {
 			app.getMinis().get(curMini).setActive(true);
 			app.setMini(curMini);
 			app.updateKey(curMini);
+			app.getMinis().get(curMini).init();
 			updateView(app.getMinis().get(curMini));
 			app.repaint();
 		}
