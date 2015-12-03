@@ -318,23 +318,23 @@ public class ServerDirector {
 	}
 	
 	private void handleEnter(JSONObject in) {
-		leaderboard.add(players.get((String) in.get("playerName")));
+		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));
 	}
 	
 	private void handleKeyFinder(JSONObject in) {
-		leaderboard.add(players.get((String) in.get("playerName")));	// CHANGEME
+		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));	// CHANGEME
 	}
 	
 	private void handlePaint(JSONObject in) {
-		leaderboard.add(players.get((String) in.get("playerName")));	// CHANGEME
+		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));	// CHANGEME
 	}
 	
 	private void handlePong(JSONObject in) {
-		leaderboard.add(players.get((String) in.get("playerName")));	// CHANGEME
+		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));	// CHANGEME
 	}
 	
 	private void handleRPS(JSONObject in) {
-		temp.put((Integer) in.get("wins"), players.get((String) in.get("playerName")));
+		temp.put((Integer) in.get(Keys.WINS), players.get((String) in.get(Keys.PLAYER_NAME)));
 	}
 	
 	private void handleError() {
