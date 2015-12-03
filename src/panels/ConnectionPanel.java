@@ -208,7 +208,7 @@ public class ConnectionPanel extends JPanel {
 		public void reset() {
 			app.resetClient();
 			app.getBoardPanel().getPlayers().clear();
-			app.getStatePanel().getLoginPanel().getLobbyPanel().getPlayerList().removeAll();
+			app.getStatePanel().getLoginPanel().getLobbyPanel().removeAll();
 			app.repaint();
 		}
 		

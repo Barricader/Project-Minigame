@@ -1,11 +1,13 @@
 package panels;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -42,6 +44,7 @@ public class StatePanel extends JPanel {
 		loginPanel = new LoginPanel(app);
 		updateView(loginPanel);
 		temp = new ArrayList<NewPlayer>();
+		setBorder(new LineBorder(Color.GREEN));
 	}
 	
 	/**
@@ -52,12 +55,12 @@ public class StatePanel extends JPanel {
 		removeAll();
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.CENTER;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
 		c.weightx = 1.0;
 		c.gridy = 0;
-		c.weighty = 1.0;
+		c.weighty = 0.1;
 		add(newView, c);
 		app.revalidate();
 	}

@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -15,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
@@ -34,6 +36,7 @@ import panels.minis.KeyFinder;
 import panels.minis.Paint;
 import panels.minis.Pong;
 import panels.minis.RPS;
+import util.ErrorUtils;
 import util.Keys;
 import util.MiniGames;
 
@@ -44,6 +47,10 @@ import util.MiniGames;
  *
  */
 public class ClientApp extends JFrame {
+	// connection settings
+	private String host = Server.HOST;
+	private int port = Server.PORT;
+	
 	private static final String TITLE = "Project Mini-Game by Jo & Kramer";
 	private static final Dimension SIZE = new Dimension(960, 800);	// min size
 	private static ClientApp instance = null;
@@ -90,7 +97,7 @@ public class ClientApp extends JFrame {
 		c.insets = new Insets(5, 5, 5, 5);	// 5 px margin all around
 		
 		// connection panel
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridwidth = 10;
@@ -98,6 +105,7 @@ public class ClientApp extends JFrame {
 		c.gridy = 0;
 		c.ipady = 10;
 		c.weighty = 0.0;
+		connPanel.setBorder(new LineBorder(Color.ORANGE));
 		panel.add(connPanel, c);
 		
 		// draw panel
@@ -108,11 +116,11 @@ public class ClientApp extends JFrame {
 		c.weightx = 1.0;
 		c.gridy = 1;
 		c.gridheight = 5;
-		c.weighty = 0.8;
+		c.weighty = 0.7;
+		c.ipady = 0;
 		panel.add(statePanel, c);
 		
 		// leaderboard panel
-		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.SOUTHWEST;
 		c.gridx = 0;
 		c.weightx = 0.1;
@@ -197,7 +205,7 @@ public class ClientApp extends JFrame {
 			resetClient();
 		}
 		if (!client.isConnected()) {
-			client.connect(new Socket(Server.HOST, Server.PORT));
+			client.connect(new Socket(host, port));
 			client.start();	
 		}
 	}
@@ -245,6 +253,14 @@ public class ClientApp extends JFrame {
 	public void showTimeOutError() {
 		JOptionPane.showMessageDialog(this, "Client has timed out. Please try reconnecting to server!", 
 				"Timeout", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	public void setHost(String host) {
+		this.host = host;
+	}
+	
+	public void setPort(int port) {
+		this.port = port;
 	}
 	
 	public Client getClient() {
@@ -308,20 +324,21 @@ public class ClientApp extends JFrame {
 		public void send(JSONObject out) {}
 
 		public void receive(JSONObject in) {
-			System.out.println("error handler received: " + in.toJSONString());
-			JSONObject error = (JSONObject) in.get(Keys.Commands.ERROR);
-			int id = (int)in.get(Keys.ID);
-			
-			if (id != getLoginPanel().getClientPlayer().getID()) {	// only show to this client!
-				String errorMsg = (String) error.get(Keys.ERROR_MSG);
-				String errorTitle = (String) error.get(Keys.ERROR_TITLE);
-				showErrorDialog(errorMsg, errorTitle);	
-			}
+			ErrorUtils.processServerError(ClientApp.this, in);
+//			System.out.println("error handler received: " + in.toJSONString());
+//			JSONObject error = (JSONObject) in.get(Keys.Commands.ERROR);
+//			int id = (int)in.get(Keys.ID);
+//			
+//			if (id != getLoginPanel().getClientPlayer().getID()) {	// only show to this client!
+//				String errorMsg = (String) error.get(Keys.ERROR_MSG);
+//				String errorTitle = (String) error.get(Keys.ERROR_TITLE);
+//				showErrorDialog(errorMsg, errorTitle);	
+//			}
 		}
-		
-		public void showErrorDialog(String msg, String title) {
-			JOptionPane.showMessageDialog(ClientApp.this, msg, title, JOptionPane.ERROR_MESSAGE);
-		}
+//		
+//		public void showErrorDialog(String msg, String title) {
+//			JOptionPane.showMessageDialog(ClientApp.this, msg, title, JOptionPane.ERROR_MESSAGE);
+//		}
 			
 	}
 	

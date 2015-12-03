@@ -1,15 +1,14 @@
 package panels;
 
 import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.util.Collections;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 
 import org.json.simple.JSONObject;
 
@@ -17,14 +16,15 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import screen.PlayerListCellRenderer;
+import util.GameUtils;
 
-public class LobbyPanel extends JPanel {
+public class LobbyPanel extends JList<NewPlayer> {
 	private ClientApp app;
 	private Controller controller;
 	private DefaultListModel<NewPlayer> listModel;
 	private PlayerListCellRenderer listRenderer;
 	private ConcurrentHashMap<String, NewPlayer> playerMap;
-	private JList<NewPlayer> playerList;
+//	private JList<NewPlayer> playerList;
 	
 	public LobbyPanel(ClientApp app) {
 		this.app = app;
@@ -35,17 +35,9 @@ public class LobbyPanel extends JPanel {
 	private void init() {
 		createComponents();
 		setBackground(Color.BLACK);
-		playerList.setBackground(Color.BLACK);
-		
-		setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.BOTH;
-		c.gridx = 0;
-		c.weightx = 1.0;
-		c.gridy = 0;
-		c.weighty = 1.0;
-		add(playerList, c);
+//		setBorder(new TitledBorder(new LineBorder(Color.CYAN), " Waiting Players: ", TitledBorder.LEFT, 
+//				TitledBorder.CENTER, new Font("Courier New", Font.BOLD, 16), Color.CYAN));
+		setPreferredSize(new Dimension(200, 55));
 	}
 	
 	/**
@@ -54,9 +46,10 @@ public class LobbyPanel extends JPanel {
 	private void createComponents() {
 		listRenderer = new PlayerListCellRenderer();
 		listModel = new DefaultListModel<>();
-		playerList = new JList<>(listModel);
-		playerList.setCellRenderer(listRenderer);
+		setCellRenderer(listRenderer);
 		setBorder(new LineBorder(Color.LIGHT_GRAY));
+		setModel(listModel);
+		repaint();
 	}
 	
 	/**
@@ -83,9 +76,9 @@ public class LobbyPanel extends JPanel {
 		return controller;
 	}
 	
-	public JList<NewPlayer> getPlayerList() {
-		return playerList;
-	}
+//	public JList<NewPlayer> getPlayerList() {
+//		return playerList;
+//	}
 	
 	public class Controller extends IOHandler {
 
