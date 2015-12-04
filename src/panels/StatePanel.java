@@ -78,26 +78,42 @@ public class StatePanel extends JPanel {
 			
 		}
 
+//		public void receive(JSONObject in) {
+//			int stateType = (int) in.get(Keys.STATE);
+//			switch (stateType) {
+//			case (ServerDirector.BOARD):	// board state
+//				if (in.containsKey("leaderboard")) {
+//					JSONArray test = (JSONArray) in.get("leaderboard");
+//					if (test.size() > 0) {
+//						for (int i = 0; i < app.getBoardPanel().getPlayers().size(); i++) {
+//							String name = (String) ((JSONObject) test.get(i)).get("name");
+//							System.out.println("Name " + i + ": " + name);
+//							System.out.println("Score " + i + ": " + app.getBoardPanel().getPlayers().get(name).getScore());
+//							app.getBoardPanel().getPlayers().get(name).setScore(app.getBoardPanel().getPlayers().get(name).getScore() + app.getBoardPanel().getPlayers().size() - i);
+//							app.getLeaderPanel().updateList();
+//						}
+//					}
+//				}
+//				updateBoard();
+//				break;
+//			case (ServerDirector.MINIGAME):		// mini state
+//				updateMiniState((String)in.get("mini"));
+//				break;
+//			}
+//		}
+		
 		public void receive(JSONObject in) {
 			int stateType = (int) in.get(Keys.STATE);
 			switch (stateType) {
-			case (ServerDirector.BOARD):	// board state
+			case ServerDirector.BOARD:
 				if (in.containsKey("leaderboard")) {
-					JSONArray test = (JSONArray) in.get("leaderboard");
-					if (test.size() != 0) {
-						for (int i = 0; i < app.getBoardPanel().getPlayers().size(); i++) {
-							String name = (String) ((JSONObject) test.get(i)).get("name");
-							System.out.println("Name " + i + ": " + name);
-							System.out.println("Score " + i + ": " + app.getBoardPanel().getPlayers().get(name).getScore());
-							app.getBoardPanel().getPlayers().get(name).setScore(app.getBoardPanel().getPlayers().get(name).getScore() + app.getBoardPanel().getPlayers().size() - i);
-							app.getLeaderPanel().updateList();
-						}
-					}
+					app.getLeaderPanel().updateList(in);
 				}
 				updateBoard();
 				break;
-			case (ServerDirector.MINIGAME):		// mini state
-				updateMiniState((String)in.get("mini"));
+			case ServerDirector.MINIGAME:
+				String miniState = (String)in.get("mini");
+				updateMiniState(miniState);
 				break;
 			}
 		}

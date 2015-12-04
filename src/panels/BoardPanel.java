@@ -336,24 +336,10 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		}
 		
 		public void update() {
-			if (activePlayer.getName().equals(clientPlayer.getName())) {
-				System.out.println("SHOULD BE SENDING UPDATE!");
-				activePlayer.setActive(false);
-				NewJSONObject update = new NewJSONObject(activePlayer.getID(), Keys.Commands.UPDATE);
-				update.put(Keys.PLAYER, activePlayer.toJSONObject());
-				send(update);
-			}
-		}
-		
-		/**
-		 * First update to server that syncs tile info. *NOTE: This should
-		 * only ever be called once. Use the other update method for handling
-		 * player updates between the server and client.
-		 */
-		public void firstUpdate() {
-//			NewJSONObject update = new NewJSONObject(clientPlayer.getID(), Keys.Commands.UPDATE);
-//			update.put(Keys.PLAYER, clientPlayer.toJSONObject());
-//			send(update);
+			activePlayer.setActive(false);
+			NewJSONObject update = new NewJSONObject(activePlayer.getID(), Keys.Commands.UPDATE);
+			update.put(Keys.PLAYER, activePlayer.toJSONObject());
+			send(update);
 		}
 		
 	}

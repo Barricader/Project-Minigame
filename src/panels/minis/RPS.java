@@ -1,5 +1,6 @@
 package panels.minis;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
+import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
@@ -16,6 +18,7 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import panels.BaseMiniPanel;
+import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 import util.PlayerStyles;
@@ -33,10 +36,11 @@ public class RPS extends BaseMiniPanel {
 	private JButton rockBtn;
 	private JButton paperBtn;
 	private JButton scissorBtn;
-	private JLabel timerLabel;
+	private JLabel timerLabel;	// displays countdown
 	private JLabel playerChoiceLabel;
 	private JLabel compChoiceLabel;	// choice that the computer chose
-	private Timer countdownTimer;	
+	private JLabel turnLabel;	// displays what turn we're on
+	private Timer timer;	
 	
 	private int turnCount;	// what turn are we currently on?
 	private int wins;
@@ -51,75 +55,80 @@ public class RPS extends BaseMiniPanel {
 	public void init() {
 		wins = 0;
 		turnCount = 0;
-		resetTimer();
-		
+		timer = new Timer(1000, null);
 		createComponents();
-		
+		updateView();
+		timer.start();
+	}
+	
+	/**
+	 * Updates the view of this RPS game.
+	 */
+	private void updateView() {
+		removeAll();
 		// player choice
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
+		
+		// player choice
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.gridx = 0;
+		c.ipadx = 10;
+		c.weightx = 1.0;
 		c.gridy = 0;
+		c.ipady = 20;
 		add(playerChoiceLabel, c);
 		
 		// timer label
 		c.anchor = GridBagConstraints.NORTH;
 		c.gridx = 1;
+		c.ipadx = 0;
 		c.gridy = 0;
+		c.ipady = 0;
 		add(timerLabel, c);
 		
 		// comp choice
 		c.anchor = GridBagConstraints.NORTHEAST;
 		c.gridx = 2;
+		c.ipadx = 10;
+		c.gridy = 0;
+		c.ipady = 20;
 		add(compChoiceLabel, c);
 		
 		// rock
 		c.anchor = GridBagConstraints.CENTER;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
-		c.weightx = 1.0;
 		c.gridy = 1;
 		c.ipady = 50;
 		c.weighty = 1.0;
 		add(rockBtn, c);
 		
 		// paper
-		c.gridx = 1;
-		c.gridy = 1;
+		c.gridx = 0;
+		c.gridy = 2;
 		c.weighty = 1.0;
 		add(paperBtn, c);
 		
 		// scissor
-		c.gridx = 2;
-		c.gridy = 1;
+		c.gridx = 0;
+		c.gridy = 3;
 		c.weighty = 1.0;
 		add(scissorBtn, c);
 		
-		countdownTimer.start();
-	}
-	
-	/**
-	 * Resets the timer and time left!
-	 * @return - this countdown timer.
-	 */
-	private void resetTimer() {
-		timeLeft = WAIT_TIME;
+		// turn label
+		c.anchor = GridBagConstraints.SOUTH;
+		c.gridx = 0;
+		c.gridwidth = 3;
+		c.gridy = 5;
+		add(turnLabel, c);
 		
-		countdownTimer = new Timer(1000, e -> {
-			timeLeft--;
-			
-			if (timeLeft == 0) {
-				compChoose(true);	// choose for player!
-				countdownTimer.stop();
-			} else {
-				timerLabel.setText("" + timeLeft);
-			}
-		});
+		revalidate();
+		repaint();
 	}
 	
 	/**
-	 * Creates GUI components.
+	 * Creates GUI components and timer.
 	 */
 	private void createComponents() {
 		rockBtn = new JButton("Rock");
@@ -144,6 +153,7 @@ public class RPS extends BaseMiniPanel {
 		});
 		
 		reset();
+		timer.start();
 	}
 	
 	/**
@@ -151,7 +161,7 @@ public class RPS extends BaseMiniPanel {
 	 * @param choosePlayer - flag to set if we should also choose player
 	 */
 	private void compChoose(boolean choosePlayer) {
-		countdownTimer.stop();
+		timer.stop();
 		turnCount++;
 		
 		// choose for player
@@ -162,68 +172,103 @@ public class RPS extends BaseMiniPanel {
 		
 		String compChoice = choices[rng.nextInt(choices.length)];
 		compChoiceLabel.setText(compChoiceLabel.getText() + compChoice);
+		boolean tied = false;
 		boolean compWon = false;
 		boolean playerWon = false;
 		
 		// determine who won
 		if (compChoice.equals(playerChoice)) {
+			tied = true;
 			JOptionPane.showMessageDialog(app, "Tied!");
-			reset();
-			return;
 		}
 		
-		if (compChoice.equals("Rock")) {
-			if (playerChoice.equals("Paper")) {
-				playerWon = true;
-			} else if (playerChoice.equals("Scissor")) {
-				compWon = true;
-			}
-		} else if (compChoice.equals("paper")) {
-			if (playerChoice.equals("Rock")) {
-				compWon = true;
-			} else if (playerChoice.equals("Scissor")) {
-				playerWon = true;
-			}
-		} else if (compChoice.equals("Scissor")) {
-			if (playerChoice.equals("Rock")) {
-				playerWon = true;
-			} else if (playerChoice.equals("Paper")) {
-				compWon = true;
-			}
-		}	
-		
-		if (playerWon) {
-			JOptionPane.showMessageDialog(app, "Player won!");
-			wins++;
-		} else if (compWon) {
-			JOptionPane.showMessageDialog(app, "Comp won!");
+		if (!tied) {
+			if (compChoice.equals("Rock")) {
+				if (playerChoice.equals("Paper")) {
+					playerWon = true;
+				} else if (playerChoice.equals("Scissor")) {
+					compWon = true;
+				}
+			} else if (compChoice.equals("Paper")) {
+				if (playerChoice.equals("Rock")) {
+					compWon = true;
+				} else if (playerChoice.equals("Scissor")) {
+					playerWon = true;
+				}
+			} else if (compChoice.equals("Scissor")) {
+				if (playerChoice.equals("Rock")) {
+					playerWon = true;
+				} else if (playerChoice.equals("Paper")) {
+					compWon = true;
+				}
+			}	
+			
+			if (playerWon) {
+				JOptionPane.showMessageDialog(app, "Player won!");
+				wins++;
+			} else if (compWon) {
+				JOptionPane.showMessageDialog(app, "Comp won!");
+			}	
 		}
 		
-		if (turnCount == MAX_TURNS) {
+		if (turnCount >= MAX_TURNS) {
 			sendUpdate();
 			return;
 		}
 		reset();	
 	}
 	
+	/**
+	 * Resets the view / labels, and the timer.
+	 */
 	private void reset() {
 		resetTimer();
 		playerChoice = "";
 		timerLabel = new JLabel("" + timeLeft);
-		timerLabel.setFont(new Font("Courier New", Font.BOLD, 50));
+		timerLabel.setFont(new Font("Courier New", Font.BOLD, 40));
 		
 		compChoiceLabel = new JLabel("Computer Choice: ");
-		compChoiceLabel.setFont(new Font("Courier New", Font.BOLD, 30));
+		compChoiceLabel.setFont(new Font("Courier New", Font.BOLD, 20));
+		compChoiceLabel.setOpaque(true);
+		compChoiceLabel.setBackground(Color.BLACK);
+		compChoiceLabel.setForeground(Color.CYAN);
+		compChoiceLabel.setBorder(new LineBorder(Color.CYAN, 2));
 		
 		player = app.getBoardPanel().getClientPlayer();
-		playerChoiceLabel = new JLabel();
-		playerChoiceLabel.setText(player.getName() + " Choice: ");
+		playerChoiceLabel = new JLabel(player.getName() + " Choice: ");
+		playerChoiceLabel.setFont(new Font("Courier New", Font.BOLD, 20));
+		playerChoiceLabel.setOpaque(true);
+		playerChoiceLabel.setBackground(Color.BLACK);
 		playerChoiceLabel.setForeground(PlayerStyles.getColor(player.getStyleID()));
-		playerChoiceLabel.setFont(new Font("Courier New", Font.BOLD, 30));
+		playerChoiceLabel.setBorder(new LineBorder(playerChoiceLabel.getForeground(), 2));
 		
-		repaint();
-		System.out.println("reset!");
-		countdownTimer.start();
+		turnLabel = new JLabel("Turn : " + turnCount + " of " + MAX_TURNS);
+		turnLabel.setForeground(GameUtils.colorFromHex("58D168"));
+		turnLabel.setFont(new Font("Courier New", Font.BOLD, 20));
+		
+		updateView();
+		
+		if (turnCount < MAX_TURNS) {
+			timer.start();	
+		}
+	}
+	
+	/**
+	 * Resets the timer and time left!
+	 */
+	private void resetTimer() {
+		timeLeft = WAIT_TIME;
+		GameUtils.resetTimer(timer);
+		timer = new Timer(1000, e -> {
+			System.out.println("timer: " + timer + ", action performed!");
+			timeLeft--;
+			if (timeLeft == 0) {
+				compChoose(true);
+			} else {
+				timerLabel.setText("" + timeLeft);
+			}
+			repaint();
+		});
 	}
 	
 	public void update() {

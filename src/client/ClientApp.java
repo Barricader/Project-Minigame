@@ -63,7 +63,6 @@ public class ClientApp extends JFrame {
 	private DicePanel dicePanel;
 	private ConnectionPanel connPanel;
 	private LeaderBoardPanel leaderPanel;
-	//private MiniPanel mp;
 	private ConcurrentHashMap<String, BaseMiniPanel> minis;
 	private String curMini = "null";
 	
@@ -76,8 +75,6 @@ public class ClientApp extends JFrame {
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
 		instance = this;
-//		key = new Keyboard((Enter) minis.get("enter"));
-//		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
 		setFocusable(true);
 		requestFocus();
 		initMinis();
@@ -207,14 +204,33 @@ public class ClientApp extends JFrame {
 	}
 	
 	/**
-	 * Resets the client of this application, typically after a disconnection.
+	 * Resets the client connection. This should be used when we disconnect from
+	 * the server.
 	 */
 	public void resetClient() {
 		client = null;
 		client = new Client(this);
 		client.setIOHandler(new ClientIOHandler(this));
-		
 		chatPanel.getController().toggleUI(client.isConnected());
+	}
+	
+	/**
+	 * Resets everything in the client app, typically when the client disconnects
+	 * from the server. All players are cleared out, and the active client connection
+	 * is terminated.
+	 */
+	public void reset() {
+		try {
+			client.terminate();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		statePanel.getLoginPanel().getLobbyPanel().removeAll();
+		boardPanel.getPlayers().clear();
+		resetClient();
+		repaint();
 	}
 	
 	/**
@@ -230,7 +246,7 @@ public class ClientApp extends JFrame {
 			e.printStackTrace();
 		} finally {
 			connPanel.getController().updateStatus(Controller.STATUS_ERROR);
-			showTimeOutError();
+			ErrorUtils.showTimeOutError(this);
 		}
 	}
 	
@@ -243,13 +259,7 @@ public class ClientApp extends JFrame {
 		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
 	}
 	
-	/**
-	 * Shows a time out error message to the screen.
-	 */
-	public void showTimeOutError() {
-		JOptionPane.showMessageDialog(this, "Client has timed out. Please try reconnecting to server!", 
-				"Timeout", JOptionPane.ERROR_MESSAGE);
-	}
+	// mutator methods
 	
 	public void setHost(String host) {
 		this.host = host;
@@ -258,6 +268,16 @@ public class ClientApp extends JFrame {
 	public void setPort(int port) {
 		this.port = port;
 	}
+	
+	public void setClient(Client client) {
+		this.client = client;
+	}
+	
+	public void setMini(String curMini) {
+		this.curMini = curMini;
+	}
+	
+	// accessor methods
 	
 	public Client getClient() {
 		return client;
@@ -283,10 +303,6 @@ public class ClientApp extends JFrame {
 		return statePanel.getLoginPanel();
 	}
 	
-//	public MiniPanel getMiniPanel() {
-//		return mp;
-//	}
-	
 	public LeaderBoardPanel getLeaderPanel() {
 		return leaderPanel;
 	}
@@ -295,16 +311,8 @@ public class ClientApp extends JFrame {
 		return dicePanel;
 	}
 	
-	public void setClient(Client client) {
-		this.client = client;
-	}
-	
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
-	}
-	
-	public void setMini(String curMini) {
-		this.curMini = curMini;
 	}
 	
 	public String getMini() {
@@ -315,27 +323,19 @@ public class ClientApp extends JFrame {
 		return minis;
 	}
 	
+	/**
+	 * This class is responsible for handling errors when received from
+	 * the server.
+	 * @author David Kramer
+	 *
+	 */
 	public class ErrorHandler extends IOHandler {
 		
 		public void send(JSONObject out) {}
 
 		public void receive(JSONObject in) {
 			ErrorUtils.processServerError(ClientApp.this, in);
-//			System.out.println("error handler received: " + in.toJSONString());
-//			JSONObject error = (JSONObject) in.get(Keys.Commands.ERROR);
-//			int id = (int)in.get(Keys.ID);
-//			
-//			if (id != getLoginPanel().getClientPlayer().getID()) {	// only show to this client!
-//				String errorMsg = (String) error.get(Keys.ERROR_MSG);
-//				String errorTitle = (String) error.get(Keys.ERROR_TITLE);
-//				showErrorDialog(errorMsg, errorTitle);	
-//			}
 		}
-//		
-//		public void showErrorDialog(String msg, String title) {
-//			JOptionPane.showMessageDialog(ClientApp.this, msg, title, JOptionPane.ERROR_MESSAGE);
-//		}
-			
 	}
 	
 	/**

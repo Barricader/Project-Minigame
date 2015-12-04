@@ -63,6 +63,11 @@ public final class Keys {
 	 */
 	public static final String LOG = "log";
 	
+	/**
+	 * Key indicating the wins the player has.
+	 */
+	public static final String WINS = "wins";
+	
 	
 	//********************************************************
 	//* 			    PLAYER SPECIFIC KEYS				 *

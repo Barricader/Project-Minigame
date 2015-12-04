@@ -5,9 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
@@ -18,6 +17,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
@@ -169,7 +169,7 @@ public class LeaderBoardPanel extends JPanel {
 			players[i] = iterator.next();
 			i++;
 		}
-		rankPlayers();	// sort by score
+		GameUtils.sortPlayersByScore(players);
 		
 		for (NewPlayer p : players) {
 			nameListModel.addElement(p.getName());
@@ -179,24 +179,16 @@ public class LeaderBoardPanel extends JPanel {
 		app.repaint();
 	}
 	
-	/**
-	 * Sorts players by their score ranking in descending order.
-	 */
-	private void rankPlayers() {
-		Arrays.sort(players, new Comparator<NewPlayer>() {
-			public int compare(NewPlayer p1, NewPlayer p2) {
-				int score1 = p1.getScore();
-				int score2 = p2.getScore();
-				
-				if (score1 == score2) {
-					return 0;
-				} else if (score1 < score2) {
-					return 1;
-				} else {
-					return -1;
-				}
-			}
-		});
+	public void updateList(JSONObject in) {
+		JSONArray leaderBoard = (JSONArray) in.get("leaderboard");
+		Map<String, NewPlayer> players = app.getBoardPanel().getPlayers();
+		
+		for (int i = 0; i < leaderBoard.size(); i++) {
+			NewPlayer p = (NewPlayer) leaderBoard.get(i);
+			players.get(p.getName()).setScore(players.get(p.getName()).getScore() + players.size() - i);
+			
+		}
+		updateList();
 	}
 	
 	/**

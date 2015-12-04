@@ -436,13 +436,7 @@ public class LoginPanel extends JPanel {
 				NewJSONObject obj = new NewJSONObject(app.getClient().getID(), Keys.Commands.REM_PLAYER);
 				obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
 				send(obj);
-				
-				// clear out old players
-				clientPlayer = null;
-				app.resetClient();
-				app.getStatePanel().getLoginPanel().getLobbyPanel().removeAll();
-				app.getBoardPanel().getPlayers().clear();
-				app.repaint();
+				app.reset();
 				// setup to join again
 				GameUtils.clearActions(joinBtn);
 				nameField.setEnabled(true);

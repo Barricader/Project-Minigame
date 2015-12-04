@@ -2,6 +2,7 @@ package newserver;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -108,26 +109,17 @@ public class Server extends Thread {
 			try {
 				sc.terminate();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 	
 	/**
-	 * Echoes string to all clients.
-	 * @param out - String to send to all clients.
-	 * @Decrepated
+	 * Echoes JSONObject to all clients.
+	 * @param out - JSONObject to send to all clients.
 	 */
-	public void echoAll(String out) {
-		for (ServerClient sc : clients.values()) {
-			//sc.getIOHandler().send(out);
-		}
-	}
-	
 	public void echoAll(JSONObject out) {
 		for (ServerClient sc : clients.values()) {
 			sc.getIOHandler().send(out);
@@ -135,7 +127,7 @@ public class Server extends Thread {
 	}
 	
 	/**
-	 * Terminates this thread process.
+	 * Terminates this server thread process.
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
@@ -154,6 +146,10 @@ public class Server extends Thread {
 		Server server = new Server();
 		try {
 			server.open();
+		} catch (BindException e) {
+			System.out.println("Launch aborted! Another Server Instance Is Already Running On: "
+					+ HOST + ":" + PORT);
+			System.exit(1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

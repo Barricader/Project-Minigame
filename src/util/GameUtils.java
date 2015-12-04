@@ -4,10 +4,18 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.Timer;
+
+import gameobjects.NewPlayer;
 
 /**
  * Collection of useful utilities that can be used throughout the game.
@@ -79,7 +87,6 @@ public class GameUtils {
 		return new Color(red, green, blue);
 	}
 	
-	
 	/**
 	 * Customize labels to reduce some redundancy when applying styles. The font set is
 	 * Courier New BOLD.
@@ -112,12 +119,74 @@ public class GameUtils {
 	}
 	
 	/**
+	 * Utility method that converts a map to an array.
+	 * @param map - Map to convert
+	 * @param c - The class type that the map values contain
+	 * @return - An array, based off values stored in map
+	 */
+	public static <K, V> V[] mapToArray(Map<K, V> map, Class<V> c) {
+		V[] temp = (V[]) Array.newInstance(c, map.size());
+		Iterator<V> iterator = map.values().iterator();
+		int i = 0;
+		while (iterator.hasNext()) {
+			temp[i] = iterator.next();
+			i++;
+		}
+		return temp;
+	}
+	
+	/**
+	 * Utility method to sort players by score in descending order
+	 */
+	public static void sortPlayersByScore(NewPlayer[] pArray) {
+		Arrays.sort(pArray, new Comparator<NewPlayer>() {
+			public int compare(NewPlayer p1, NewPlayer p2) {
+				int score1 = p1.getScore();
+				int score2 = p2.getScore();
+				
+				if (score1 == score2) {
+					return 0;
+				} else if (score1 < score2) {
+					return 1;
+				} else {
+					return -1;
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Utility method to sort players by their name.
+	 * @param pArray
+	 */
+	public static void sortPlayersByName(NewPlayer[] pArray) {
+		Arrays.sort(pArray, new Comparator<NewPlayer>() {
+			public int compare(NewPlayer p1, NewPlayer p2) {
+				return p1.getName().compareTo(p2.getName());
+			}
+		});
+	}
+	
+	/**
 	 * Clears any actions on a JButton.
 	 * @param btnToReset - The JButton to remove actions from.
 	 */
 	public static void clearActions(JButton btnToReset) {
 		for (ActionListener a : btnToReset.getActionListeners()) {
 			btnToReset.removeActionListener(a);
+		}
+	}
+	
+	/**
+	 * Resets a timer by ensuring it's stopped and removes any actions.
+	 * @param timer - Timer to reset
+	 */
+	public static void resetTimer(Timer timer) {
+		if (timer != null) {
+			timer.stop();
+			for (ActionListener a : timer.getActionListeners()) {
+				timer.removeActionListener(a);
+			}
 		}
 	}
 	

@@ -1,6 +1,5 @@
 package newserver;
 
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +13,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
+import util.GameUtils;
 import util.Keys;
 import util.MiniGames;
 import util.NewJSONObject;
@@ -97,7 +97,7 @@ public class ServerDirector {
 		JSONObject timerObj = new JSONObject();
 		if (players.size() >= 2) {
 			timeLeft = WAIT_TIME;
-			resetTimer();
+			GameUtils.resetTimer(timer);
 			
 			if (players.size() == 4) {
 				timeLeft = 5;	// shorten time, we have reached player limit
@@ -119,7 +119,7 @@ public class ServerDirector {
 			});
 			timer.start();	
 		} else {
-			resetTimer();
+			GameUtils.resetTimer(timer);
 			timerObj.put(Keys.TIME, "reset");
 			obj.put(Keys.Commands.TIMER, timerObj);
 			server.echoAll(obj);
@@ -140,22 +140,11 @@ public class ServerDirector {
 	}
 	
 	/**
-	 * Resets the timer.
-	 */
-	private void resetTimer() {
-		if (timer != null) {
-			timer.stop();
-			for (ActionListener a : timer.getActionListeners()) {
-				timer.removeActionListener(a);
-			}
-		}
-	}
-	
-	/**
 	 * Removes a player, and resets the countdown timer.
 	 * @param obj - JSONObject containing the player to remove.
 	 */
 	public void removePlayer(JSONObject obj) {
+		System.out.println("should be removing player from server!");
 		NewPlayer p = NewPlayer.fromJSON(obj);
 		NewJSONObject out = null;
 		
@@ -252,47 +241,78 @@ public class ServerDirector {
 		server.echoAll(obj);
 	}
 	
-	/**
-	 * Changes the state and lets the clients know
-	 * @param state - State to change to
-	 */
+//	/**
+//	 * Changes the state and lets the clients know
+//	 * @param state - State to change to
+//	 */
+//	public void changeState(int state) {
+//		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
+//		k.put("state", state);
+//		if (state == BOARD) {
+//			// Sort the HashMap by values and sort the players into the leaderboard
+//			if (!temp.isEmpty()) {
+//				System.out.println("temp shouldn't be empty!");
+//				List<Integer> sortedKeys = new ArrayList<Integer>(temp.keySet());
+//				Collections.sort(sortedKeys);
+//				leaderboard.addAll(temp.values());
+//			}
+//			
+//			// Create a JSON array in the JSONObject that we want to send
+//			JSONArray players = new JSONArray();
+//			for (int i = 0; i < leaderboard.size(); i++) {
+//				JSONObject temp = new JSONObject();
+//				String name = leaderboard.get(i).getName();
+//				temp.put("name", name);
+//				temp.put("place", i);		// Place is not necessary, just for testing
+//				players.add(temp);
+//			}
+//			
+//			k.put("leaderboard", players);
+//		}
+//		else if (state == MINIGAME) {
+//			// Choose a random minigame that wasn't the last one played
+//			int ranNum = lastMini;
+//			while (ranNum == lastMini) {
+//				ranNum = new Random().nextInt(nameMinis.length);
+//				curMini = nameMinis[ranNum];
+//			}
+////			k.put("mini", nameMinis[ranNum]);
+//			k.put("mini", "rps");
+//			lastMini = ranNum;
+//		}
+//		server.echoAll(k);
+//		leaderboard.clear();
+//		temp.clear();
+//	}
+	
 	public void changeState(int state) {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
-		k.put("state", state);
+		k.put(Keys.STATE, state);
+		
 		if (state == BOARD) {
-			// Sort the HashMap by values and sort the players into the leaderboard
-			if (!temp.isEmpty()) {
-				List<Integer> sortedKeys = new ArrayList<Integer>(temp.keySet());
-				Collections.sort(sortedKeys);
-				leaderboard.addAll(temp.values());
-			}
-			
-			// Create a JSON array in the JSONObject that we want to send
-			JSONArray players = new JSONArray();
-			for (int i = 0; i < leaderboard.size(); i++) {
-				JSONObject temp = new JSONObject();
-				String name = leaderboard.get(i).getName();
-				temp.put("name", name);
-				temp.put("place", i);		// Place is not necessary, just for testing
-				players.add(temp);
-			}
-			
-			k.put("leaderboard", players);
-		}
-		else if (state == MINIGAME) {
-			// Choose a random minigame that wasn't the last one played
+			JSONArray pArray = createLeaderBoard();
+			k.put("leaderboard", pArray);
+		} else if (state == MINIGAME) {
 			int ranNum = lastMini;
 			while (ranNum == lastMini) {
 				ranNum = new Random().nextInt(nameMinis.length);
 				curMini = nameMinis[ranNum];
 			}
 //			k.put("mini", nameMinis[ranNum]);
-			k.put("mini", "rps");
+			k.put("mini", "rps");	//TODO change back to above. This locks on RPS game!
 			lastMini = ranNum;
 		}
 		server.echoAll(k);
-		leaderboard.clear();
-		temp.clear();
+	}
+	
+	private JSONArray createLeaderBoard() {
+		JSONArray pArray = new JSONArray();
+		NewPlayer[] temp = GameUtils.mapToArray(players, NewPlayer.class);
+		GameUtils.sortPlayersByName(temp);
+		for (NewPlayer p : temp) {
+			pArray.add(p);
+		}
+		return pArray;
 	}
 	
 	public void updateMinigame(JSONObject in) {
