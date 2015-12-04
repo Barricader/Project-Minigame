@@ -1,15 +1,20 @@
 package panels;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
@@ -17,12 +22,12 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import main.Dice;
-import newserver.Keys;
-import newserver.PlayerStyles;
 import util.GameUtils;
+import util.Keys;
 import util.NewJSONObject;
+import util.PlayerStyles;
 
-public class DicePanel extends JPanel implements MouseListener {
+public class DicePanel extends JPanel implements MouseListener, MouseMotionListener {
 	private static final Color BG_COLOR = GameUtils.colorFromHex("#D6D9DF");	// gray
 	private Controller controller;
 	private ClientApp app;
@@ -33,15 +38,39 @@ public class DicePanel extends JPanel implements MouseListener {
 	public DicePanel(ClientApp app) {
 		this.app = app;
 		controller = new Controller();
+		init();
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		setPreferredSize(new Dimension(100, 100));
+		setBorder(new LineBorder(Color.LIGHT_GRAY));
+	}
+	
+	private void init() {
+		createComponents();
+		setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.NORTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.weightx = 1.0;
+		c.gridy = 0;
+		c.ipady = 20;
+		c.weighty = 1.0;
+		add(statusLabel, c);
+	}
+	
+	private void createComponents() {
 		dice = new Dice(0, 0, this);
 		dice.setEnabled(false);
-		addMouseListener(this);
+		
 		statusLabel = new JLabel();
 		statusLabel.setOpaque(true);
-		statusLabel.setBorder(new EmptyBorder(10, 10, 10, 10)); // add some padding
+		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		statusLabel.setBackground(Color.BLACK);
-		statusLabel.setFont(new Font("Courier New", Font.BOLD, 20));
-		add(statusLabel);
+		statusLabel.setFont(new Font("Courier New", Font.BOLD, 16));
+		statusLabel.setMaximumSize(new Dimension(100, 50));
+		statusLabel.setText(" ");
+		statusLabel.setBorder(new LineBorder(Color.BLACK, 2));
 	}
 	
 	/**
@@ -62,6 +91,8 @@ public class DicePanel extends JPanel implements MouseListener {
 	public void mouseClicked(MouseEvent e) {
 		if (canRoll) {
 			if (dice.contains(e.getPoint())) {
+				Cursor cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+				setCursor(cursor);
 				int rollAmt = dice.roll(Dice.SIZE);
 				System.out.println("Rolled: " + rollAmt);
 				NewPlayer activePlayer = app.getBoardPanel().getActivePlayer();
@@ -82,12 +113,27 @@ public class DicePanel extends JPanel implements MouseListener {
 			}
 		}
 	}
-
+	
+	/**
+	 * Updates mouse cursor to pointing hand, if user hovers over mouse
+	 * and they can roll.
+	 */
+	public void mouseMoved(MouseEvent e) {
+		Cursor cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+		if (canRoll) {
+			if (dice.contains(e.getPoint())) {
+				cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+			}
+		}
+		setCursor(cursor);
+	}
+	
 	// unused
-	public void mousePressed(MouseEvent e) {}
-	public void mouseReleased(MouseEvent e) {}
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
+	public void mouseDragged(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
 	
 	public Controller getController() {
 		return controller;
@@ -116,17 +162,22 @@ public class DicePanel extends JPanel implements MouseListener {
 				statusLabel.setVisible(true);
 				statusLabel.setText("Your turn!");
 				dice.setEnabled(true);
-//				JOptionPane.showMessageDialog(app, "Your turn to roll!");
 			} else {
 				statusLabel.setText(p.getName() + "'s turn");
 				statusLabel.setVisible(true);
 				dice.setEnabled(false);
 			}
-			statusLabel.setForeground(PlayerStyles.getColor(p.getStyleID()));
-			statusLabel.setBackground(Color.BLACK);
-			statusLabel.setOpaque(true);
-			repaint();
+			Color c = PlayerStyles.getColor(p.getStyleID());
 			
+			if (c.getRGB() == Color.YELLOW.getRGB()) {	// make yellow easier to see!
+				setForeground(Color.BLACK);
+			} else {
+				setForeground(Color.WHITE);
+			}
+			statusLabel.setBackground(PlayerStyles.getColor(p.getStyleID()));
+			statusLabel.setOpaque(true);
+			statusLabel.setBorder(new LineBorder(statusLabel.getForeground(), 2));
+			repaint();
 		}
 		
 	}

@@ -4,9 +4,11 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -16,16 +18,24 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.json.simple.JSONObject;
 
-import newserver.Keys;
+import input.Keyboard;
 import newserver.Server;
+import panels.BaseMiniPanel;
 import panels.BoardPanel;
 import panels.ChatPanel;
 import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
 import panels.DicePanel;
+import panels.LeaderBoardPanel;
 import panels.LoginPanel;
-import panels.MiniPanel;
 import panels.StatePanel;
+import panels.minis.Enter;
+import panels.minis.KeyFinder;
+import panels.minis.Paint;
+import panels.minis.Pong;
+import panels.minis.RPS;
+import util.Keys;
+import util.MiniGames;
 
 /**
  * This will be the new "MAIN" application that the client will run to use
@@ -39,6 +49,8 @@ public class ClientApp extends JFrame {
 	private static ClientApp instance = null;
 	private Client client;
 	
+	private Keyboard key;
+	
 	// GUI stuff
 	private JPanel panel;	// main container panel for all other panels
 	private StatePanel statePanel;	// render state view
@@ -46,7 +58,10 @@ public class ClientApp extends JFrame {
 	private BoardPanel boardPanel;
 	private DicePanel dicePanel;
 	private ConnectionPanel connPanel;
-	private MiniPanel mp;
+	private LeaderBoardPanel leaderPanel;
+	//private MiniPanel mp;
+	private ConcurrentHashMap<String, BaseMiniPanel> minis;
+	private String curMini = "null";
 	
 	private ErrorHandler errorHandler;
 	
@@ -57,6 +72,11 @@ public class ClientApp extends JFrame {
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
 		instance = this;
+//		key = new Keyboard((Enter) minis.get("enter"));
+//		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
+		setFocusable(true);
+		requestFocus();
+		initMinis();
 	}
 	
 	/**
@@ -91,15 +111,22 @@ public class ClientApp extends JFrame {
 		c.weighty = 0.8;
 		panel.add(statePanel, c);
 		
-		// chat panel
-		c.anchor = GridBagConstraints.SOUTH;
+		// leaderboard panel
 		c.fill = GridBagConstraints.BOTH;
+		c.anchor = GridBagConstraints.SOUTHWEST;
 		c.gridx = 0;
-		c.weightx = 0.9;
-		c.gridwidth = 8;
+		c.weightx = 0.1;
+		c.gridwidth = 2;
 		c.gridy = 6;
 		c.gridheight = 4;
 		c.weighty = 0.4;
+		panel.add(leaderPanel, c);
+		
+		// chat panel
+		c.anchor = GridBagConstraints.SOUTH;
+		c.gridx = 2;
+		c.weightx = 0.8;
+		c.gridwidth = 6;
 		panel.add(chatPanel, c);
 		
 		// dice panel
@@ -124,6 +151,17 @@ public class ClientApp extends JFrame {
 		boardPanel = new BoardPanel(this);
 		dicePanel = new DicePanel(this);
 		dicePanel.setVisible(false);
+		leaderPanel = new LeaderBoardPanel(this);
+		leaderPanel.setVisible(false);
+		minis = new ConcurrentHashMap<>();
+	}
+	
+	private void initMinis() {
+		minis.put(MiniGames.names[0], new Enter(this));
+		minis.put(MiniGames.names[1], new KeyFinder(this));
+		minis.put(MiniGames.names[2], new Paint(this));
+		minis.put(MiniGames.names[3], new Pong(this));
+		minis.put(MiniGames.names[4], new RPS(this));
 	}
 	
 	/**
@@ -193,6 +231,15 @@ public class ClientApp extends JFrame {
 	}
 	
 	/**
+	 * Updates keyboard to the specified state.
+	 * @param state
+	 */
+	public void updateKey(String state) {
+		key = new Keyboard(minis.get(state));
+		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
+	}
+	
+	/**
 	 * Shows a time out error message to the screen.
 	 */
 	public void showTimeOutError() {
@@ -224,8 +271,12 @@ public class ClientApp extends JFrame {
 		return statePanel.getLoginPanel();
 	}
 	
-	public MiniPanel getMiniPanel() {
-		return mp;
+//	public MiniPanel getMiniPanel() {
+//		return mp;
+//	}
+	
+	public LeaderBoardPanel getLeaderPanel() {
+		return leaderPanel;
 	}
 	
 	public DicePanel getDicePanel() {
@@ -238,6 +289,18 @@ public class ClientApp extends JFrame {
 	
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
+	}
+	
+	public void setMini(String curMini) {
+		this.curMini = curMini;
+	}
+	
+	public String getMini() {
+		return curMini;
+	}
+	
+	public ConcurrentHashMap<String, BaseMiniPanel> getMinis() {
+		return minis;
 	}
 	
 	public class ErrorHandler extends IOHandler {

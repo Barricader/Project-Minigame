@@ -2,8 +2,6 @@ package util;
 
 import org.json.simple.JSONObject;
 
-import newserver.Keys;
-
 public class NewJSONObject extends JSONObject {
 	private static final long serialVersionUID = -3684644029817668627L;
 

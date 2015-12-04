@@ -57,7 +57,7 @@ public class Main extends JFrame {
 	 */
 	private void init() {
 		dir = new Director(this);
-		key = new Keyboard();
+		//key = new Keyboard();
 		createComponents();
 		setTitle(TITLE);
 		setSize(SIZE);
@@ -65,7 +65,7 @@ public class Main extends JFrame {
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);	// handle disconnection first!
 		setVisible(true);
-		addKeyListener(key);
+		//addKeyListener(key);
 		
 		// disconnect from server when client is closed!
 		addWindowListener(new WindowAdapter() {

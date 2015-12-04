@@ -12,8 +12,8 @@ import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
-import newserver.Keys;
-import newserver.PlayerStyles;
+import util.Keys;
+import util.PlayerStyles;
 import util.Vector;
 
 public class NewPlayer extends GameObject {
@@ -268,6 +268,14 @@ public class NewPlayer extends GameObject {
 	
 	public String toString() {
 		return ID + " " + name;
+	}
+	
+	public void setScore(int score) {
+		this.score = score;
+	}
+	
+	public int getScore() {
+		return score;
 	}
 	
 	public JSONObject toJSONObject() {

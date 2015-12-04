@@ -1,25 +1,33 @@
 package input;
 
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+
+import panels.BaseMiniPanel;
+import panels.minis.Enter;
 
 /**
  * Basic keyboard class that listens to and keeps track of keyboard input.
  * @author David Kramer
  * @author Joseph Jones
  */
-public class Keyboard implements KeyListener {
+public class Keyboard implements KeyEventDispatcher {
 	// Modifier key flags
 	private boolean shiftFlag;
 	private boolean altFlag;
 	private boolean ctrlFlag;
+	private KeyboardFocusManager kfm;
 	
 	public boolean[] keys; // encompasses most used keys
 	
+	private BaseMiniPanel mp;
+	
 	private int lastKey;	// key code of last key press
 	public boolean spacePressed = false;
+	public boolean enterPressed = false;
 	
-	public Keyboard() {
+	public Keyboard(BaseMiniPanel mp) {
 		shiftFlag = false;
 		altFlag = false;
 		ctrlFlag = false;
@@ -27,6 +35,7 @@ public class Keyboard implements KeyListener {
 
 		keys = new boolean[120];
 		//System.out.println("UUUUUUUUUUUUUUUH");
+		this.mp = mp;
 	}
 
 	/**
@@ -34,7 +43,7 @@ public class Keyboard implements KeyListener {
 	 */
 	public void keyPressed(KeyEvent e) {
 		lastKey = e.getKeyCode();
-		//System.out.println(e.getKeyCode());
+		System.out.println(e.getKeyCode());
 
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_ALT:
@@ -50,6 +59,10 @@ public class Keyboard implements KeyListener {
 		
 		if (!spacePressed && e.getKeyCode() == KeyEvent.VK_SPACE) {
 			spacePressed = true;
+		}
+		if (!enterPressed && e.getKeyCode() == KeyEvent.VK_ENTER) {
+			enterPressed = true;
+			mp.playerPressed();
 		}
 	}
 
@@ -70,6 +83,9 @@ public class Keyboard implements KeyListener {
 		
 		if (spacePressed && e.getKeyCode() == KeyEvent.VK_SPACE) {
 			spacePressed = false;
+		}
+		if (enterPressed && e.getKeyCode() == KeyEvent.VK_ENTER) {
+			enterPressed = false;
 		}
 		
 		keys[e.getKeyCode()] = false;
@@ -119,5 +135,22 @@ public class Keyboard implements KeyListener {
 	 */
 	public boolean isCtrl() {
 		return ctrlFlag;
+	}
+	
+	public void setKFM(KeyboardFocusManager kfm) {
+		this.kfm = kfm;
+		kfm.addKeyEventDispatcher(this);
+	}
+
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent e) {
+		if (e.getID() == KeyEvent.KEY_PRESSED) {
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+				if (mp.isActive()) {
+					mp.playerPressed();	
+				}
+			}
+		}
+		return false;
 	}
 }

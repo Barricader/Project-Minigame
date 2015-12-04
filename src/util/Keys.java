@@ -1,4 +1,4 @@
-package newserver;
+package util;
 
 /**
  * Utility class that contains all available keys. Where keys are needed to write
@@ -43,6 +43,12 @@ public final class Keys {
 	public static final String STATE = "state";
 	
 	/**
+	 * Key indicating the name of the state.
+	 * ** NOTE -> USE PLAYER_NAME for player
+	 */
+	public static final String NAME = "name";
+	
+	/**
 	 * Key indicating the string value that coincides with CommandKey.ERROR.
 	 */
 	public static final String ERROR_MSG = "errorMsg";
@@ -70,7 +76,7 @@ public final class Keys {
 	/**
 	 * Key indicating the player name.
 	 */
-	public static final String NAME = "name";
+	public static final String PLAYER_NAME = "playerName";
 	
 	/**
 	 * Key indicating the player score.
@@ -151,6 +157,10 @@ public final class Keys {
 		 * mini-game.
 		 */
 		public static final String STATE_UPDATE = "stateUpdate";
+		
+		public static final String MINI_UPDATE = "miniUpdate";
+		
+		public static final String MINI_STOPPED = "miniStopped";
 		
 		/**
 		 * Key indicating an active player.

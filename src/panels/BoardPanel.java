@@ -21,8 +21,8 @@ import client.IOHandler;
 import gameobjects.NewPlayer;
 import gameobjects.NewTile;
 import main.Animator;
-import newserver.Keys;
 import util.GameUtils;
+import util.Keys;
 import util.NewJSONObject;
 
 public class BoardPanel extends JPanel implements ComponentListener {
@@ -58,8 +58,8 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	public void addPlayer(NewPlayer p) {
 		System.out.println("board addplayer!");
 		p.style(p.getStyleID());	// make sure player is styled!
-		p.setTile(tiles.get(0));	// default starting location!
-		p.setLocation(tiles.get(0).getCellLocation(p.getID()));
+		p.setTile(tiles.get(tiles.size()-1));	// default starting location!
+		p.setLocation(tiles.get(tiles.size()-1).getCellLocation(p.getID()));
 		players.put(p.getName(), p);
 	}
 	
@@ -95,7 +95,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 */
 	public ArrayList<NewTile> createPathFromRoll(NewPlayer player, int roll) {
 		int curTileID = player.getTileID();
-		int newTileID = curTileID + roll + 1;	// adding 1 fixes glitch, and is intentional!
+		int newTileID = curTileID + roll;	// adding 1 fixes glitch, and is intentional!
 		
 		ArrayList<NewTile> movePath = new ArrayList<>();
 		for (int i = curTileID; i < newTileID; i++) {
@@ -312,18 +312,25 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			players.put(p.getName(), p);
 			setActive(p.getName());
 			System.out.println("ACTIVE PLAYER TILE NUM: " + p.getTileID());
+			int temp = (int) in.get(Keys.ROLL_AMT);
 			if (p.getTileID() > 0) {
 				p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));	
 			} else {
 				p.setLocation(tiles.get(p.getTileID()).getCellLocation(p.getID()));
+				temp++;
 			}
-			activePlayer.initMove(createPathFromRoll(p, (int)in.get(Keys.ROLL_AMT)));
+			activePlayer.initMove(createPathFromRoll(p, temp));
 			animator.animatePlayer(BoardPanel.this, p);
 		}
 		
 		public void updatePlayer(NewPlayer p) {
 			System.out.println("updating player: " + p.toJSONObject().toJSONString() + ", on board panel!");
-			p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));
+			if (p.getTileID() > 0) {
+				p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));
+			}
+			else {
+				p.setLocation(tiles.get(p.getTileID()).getCellLocation(p.getID()));
+			}
 			players.put(p.getName(), p);
 			repaint();
 		}

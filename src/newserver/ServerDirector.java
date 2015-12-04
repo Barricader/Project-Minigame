@@ -1,21 +1,29 @@
 package newserver;
 
 import java.awt.event.ActionListener;
-import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
+import util.Keys;
+import util.MiniGames;
 import util.NewJSONObject;
+import util.PlayerStyles;
 
 @SuppressWarnings({ "static-access", "unchecked" })	// hide stupid warnings!!
 public class ServerDirector {
 	public static final int BOARD = 0;
 	public static final int MINIGAME = 1;
-	//private static SecureRandom rng = new SecureRandom();	// might not need this?
+	
 	private static final int MAX_PLAYERS = 4;
 	private static final int WAIT_TIME = 3;	// TODO change back to 20 secs
 	private int timeLeft = WAIT_TIME;	// time remaining
@@ -23,9 +31,15 @@ public class ServerDirector {
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;	// players that have rolled;
 	private NewPlayer activePlayer;		// we will probably need this. Haven't used it yet though.
+	private String curMini = "null";
+	private String[] nameMinis = MiniGames.names;
+	private List<NewPlayer> leaderboard;
 	
-//	private int activeIndex;
+	private HashMap<Integer, NewPlayer> temp;
+	
+	private int lastMini = -1;
 	private int stopped;
+	private int over;
 	private int turnCount;	// how many turns are we in?
 	
 	private Timer timer;	// timer for controlling events
@@ -34,10 +48,11 @@ public class ServerDirector {
 		this.server = server;
 		players = new ConcurrentHashMap<>();
 		rolledPlayers = new ConcurrentHashMap<>();
-//		activeIndex = 0;
+		temp = new HashMap<>();
+
 		stopped = 0;
 		turnCount = 0;
-//		setActive();
+		leaderboard = Collections.synchronizedList(new ArrayList<NewPlayer>());
 	}
 	
 	/**
@@ -92,7 +107,7 @@ public class ServerDirector {
 				if (timeLeft == 0) {
 					timer.stop();
 					System.out.println("OK. CHANGE ALL CLIENTS STATE TO BOARD!!!!");
-					changeClientState("board");
+					changeClientState(BOARD);
 				} else {
 					timeLeft--;
 					// create timer packet and send to all clients.
@@ -115,10 +130,11 @@ public class ServerDirector {
 	 * Sends a command to client to change to a new state.
 	 * @param state - Name of state to change to.
 	 */
-	private void changeClientState(String state) {
+	private void changeClientState(int state) {
 		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
-		JSONObject stateObj = new JSONObject();
-		stateObj.put(Keys.STATE, state);
+		obj.put(Keys.STATE, state);
+//		JSONObject stateObj = new JSONObject();
+//		stateObj.put(Keys.STATE, state);
 		server.echoAll(obj);
 		nextPlayer();	// assign next player
 	}
@@ -195,18 +211,6 @@ public class ServerDirector {
 		return players;
 	}
 	
-//	public void setActive(int id) {
-//		NewJSONObject k = new NewJSONObject(-1, "active");
-//		k.put("playerID", id);
-//		server.echoAll(k);
-//	}
-	
-//	public void setActive() {
-//		NewJSONObject k = new NewJSONObject(-1, "active");
-//		k.put("playerID", activeIndex);
-//		server.echoAll(k);
-//	}
-	
 	/**
 	 * Selects the next active player and sends a request for the player 
 	 * to roll the dice.
@@ -255,7 +259,86 @@ public class ServerDirector {
 	public void changeState(int state) {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
 		k.put("state", state);
+		if (state == BOARD) {
+			// Sort the HashMap by values and sort the players into the leaderboard
+			if (!temp.isEmpty()) {
+				List<Integer> sortedKeys = new ArrayList<Integer>(temp.keySet());
+				Collections.sort(sortedKeys);
+				leaderboard.addAll(temp.values());
+			}
+			
+			// Create a JSON array in the JSONObject that we want to send
+			JSONArray players = new JSONArray();
+			for (int i = 0; i < leaderboard.size(); i++) {
+				JSONObject temp = new JSONObject();
+				String name = leaderboard.get(i).getName();
+				temp.put("name", name);
+				temp.put("place", i);		// Place is not necessary, just for testing
+				players.add(temp);
+			}
+			
+			k.put("leaderboard", players);
+		}
+		else if (state == MINIGAME) {
+			// Choose a random minigame that wasn't the last one played
+			int ranNum = lastMini;
+			while (ranNum == lastMini) {
+				ranNum = new Random().nextInt(nameMinis.length);
+				curMini = nameMinis[ranNum];
+			}
+			k.put("mini", nameMinis[ranNum]);
+			lastMini = ranNum;
+		}
 		server.echoAll(k);
+		leaderboard.clear();
+		temp.clear();
+	}
+	
+	public void updateMinigame(JSONObject in) {
+		String name = (String) in.get("name");
+		if (name.equals(MiniGames.names[0])) {
+			handleEnter(in);
+		}
+		else if (name.equals(MiniGames.names[1])) {
+			handleKeyFinder(in);
+		}
+		else if (name.equals(MiniGames.names[2])) {
+			handlePaint(in);
+		}
+		else if (name.equals(MiniGames.names[3])) {
+			handlePong(in);
+		}
+		else if (name.equals(MiniGames.names[4])) {
+			handleRPS(in);
+		}
+		else {
+			// Not a known minigame, send error
+			handleError();
+		}
+	}
+	
+	private void handleEnter(JSONObject in) {
+		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));
+	}
+	
+	private void handleKeyFinder(JSONObject in) {
+		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));	// CHANGEME
+	}
+	
+	private void handlePaint(JSONObject in) {
+		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));	// CHANGEME
+	}
+	
+	private void handlePong(JSONObject in) {
+		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));	// CHANGEME
+	}
+	
+	private void handleRPS(JSONObject in) {
+		temp.put((Integer) in.get(Keys.WINS), players.get((String) in.get(Keys.PLAYER_NAME)));
+	}
+	
+	private void handleError() {
+		System.out.println("ERROR: Not a valid minigame");
 	}
 	
 	/**
@@ -273,6 +356,18 @@ public class ServerDirector {
 				changeState(MINIGAME);
 			}
 			nextPlayer();
+		}
+	}
+	
+	/**
+	 * Called when a client is finished with a minigame. If all players have finished
+	 * the minigame, we need to move onto the board state
+	 */
+	public void isMinigameOver() {
+		over++;
+		if (over == players.size()) {
+			over = 0;
+			changeState(BOARD);
 		}
 	}
 }

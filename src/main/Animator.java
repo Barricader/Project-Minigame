@@ -5,8 +5,8 @@ import javax.swing.Timer;
 import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
-import newserver.Keys;
 import panels.BoardPanel;
+import util.Keys;
 import util.NewJSONObject;
 
 /**

@@ -6,9 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -22,9 +20,9 @@ import org.json.simple.JSONObject;
 import client.Client;
 import client.ClientApp;
 import client.IOHandler;
-import newserver.Keys;
 import newserver.Server;
 import util.GameUtils;
+import util.Keys;
 
 /**
  * Simple connection panel that allows the user to connect / disconnect and provides
