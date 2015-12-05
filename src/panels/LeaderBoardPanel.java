@@ -23,6 +23,7 @@ import org.json.simple.JSONObject;
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
+import util.DisabledItemSelectionModel;
 import util.GameUtils;
 import util.Keys;
 
@@ -192,17 +193,5 @@ public class LeaderBoardPanel extends JPanel {
 			players.get(name).setScore(players.get(name).getScore() + players.size() - i);
 		}
 		updateList();
-	}
-	
-	/**
-	 * This class just makes it so that you can't click and highlight a 
-	 * value in the leader board list.
-	 * @author David Kramer
-	 *
-	 */
-	class DisabledItemSelectionModel extends DefaultListSelectionModel {
-		public void setSelectionInterval(int index0, int index1) {
-			super.setSelectionInterval(-1, -1);
-		}
 	}
 }

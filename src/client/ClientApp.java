@@ -11,7 +11,6 @@ import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -27,8 +26,8 @@ import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
 import panels.DicePanel;
 import panels.LeaderBoardPanel;
-import panels.LoginPanel;
 import panels.StatePanel;
+import panels.LoginPanel;
 import panels.minis.Enter;
 import panels.minis.KeyFinder;
 import panels.minis.Paint;
@@ -41,6 +40,7 @@ import util.MiniGames;
  * This will be the new "MAIN" application that the client will run to use
  * to connect to the server and play the game. 
  * @author David Kramer
+ * @author JoJones
  *
  */
 public class ClientApp extends JFrame {
@@ -53,7 +53,7 @@ public class ClientApp extends JFrame {
 	private static ClientApp instance = null;
 	private Client client;
 	
-	private Keyboard key;
+	private Keyboard key;	// keyboard to give mini games access to, when we switch to them.
 	
 	// GUI stuff
 	private JPanel panel;	// main container panel for all other panels
@@ -157,6 +157,9 @@ public class ClientApp extends JFrame {
 		minis = new ConcurrentHashMap<>();
 	}
 	
+	/**
+	 * Initializes the mini games for this app.
+	 */
 	private void initMinis() {
 		minis.put(MiniGames.names[0], new Enter(this));
 		minis.put(MiniGames.names[1], new KeyFinder(this));
@@ -227,10 +230,12 @@ public class ClientApp extends JFrame {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		statePanel.getLoginPanel().getLobbyPanel().removeAll();
-		boardPanel.getPlayers().clear();
-		resetClient();
-		repaint();
+		finally {
+			statePanel.getLoginPanel().getLobby().removeAll();
+			boardPanel.getPlayers().clear();
+			resetClient();
+			repaint();	
+		}
 	}
 	
 	/**
@@ -281,6 +286,14 @@ public class ClientApp extends JFrame {
 	
 	public Client getClient() {
 		return client;
+	}
+	
+	public String getHost() {
+		return host;
+	}
+	
+	public int getPort() {
+		return port;
 	}
 	
 	public StatePanel getStatePanel() {

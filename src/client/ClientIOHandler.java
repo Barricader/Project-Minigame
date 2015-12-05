@@ -19,6 +19,10 @@ public class ClientIOHandler extends IOHandler {
 	private ClientApp app;
 	private HashMap<String, IOHandler> handlerMap;
 	
+	/**
+	 * Constructs a new ClientIOHandler with a link to the main ClientApp.
+	 * @param app - Target ClientApp
+	 */
 	public ClientIOHandler(ClientApp app) {
 		super();
 		this.app = app;

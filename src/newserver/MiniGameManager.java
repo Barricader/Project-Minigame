@@ -14,8 +14,16 @@ import util.GameUtils;
 import util.Keys;
 import util.MiniGames;
 
+/**
+ * This class is responsible for handling the various mini games, when the
+ * ServerDirector changes states from Board to Mini. This will keep track of
+ * player's progress and win counts for various mini games and has the ability
+ * to send out JSON leaderboard packets, to update clients of their score.
+ * @author David Kramer
+ *
+ */
 public class MiniGameManager {
-	private NewServerDirector serverDir;
+	private ServerDirector serverDir;
 	private Map<String, Action> actionMap;
 	private int over;	// count of clients finished with active mini game state
 	private JSONObject miniObj;	// input received for mini game
@@ -24,13 +32,18 @@ public class MiniGameManager {
 	private List<NewPlayer> leaderboard;
 	private Map<Integer, NewPlayer> temp;	// holds win values from mini-games
 	
-	public MiniGameManager(NewServerDirector serverDir) {
+	public MiniGameManager(ServerDirector serverDir) {
 		this.serverDir = serverDir;
 		initActionMap();
 		leaderboard = Collections.synchronizedList(new ArrayList<NewPlayer>());
 		temp = new HashMap<>();
 	}
 	
+	/**
+	 * Initializes the action map which routes the various mini game action updates
+	 * to their respective method. Depending on the type of mini-game update we
+	 * receive based on the name, the correct handle method will be called.
+	 */
 	private void initActionMap() {
 		actionMap = new HashMap<>();
 		actionMap.put(MiniGames.names[0], () -> handleEnter(miniObj));
@@ -66,10 +79,15 @@ public class MiniGameManager {
 		over++;
 		if (over == serverDir.getPlayers().size()) {
 			over = 0;
-			serverDir.changeState(NewServerDirector.BOARD);
+			serverDir.changeState(ServerDirector.BOARD);
 		}
 	}
 	
+	/**
+	 * Generates a random mini game, that is not equal to the last mini game that
+	 * we have just played.
+	 * @return - A string containing the name of one of the available mini games.
+	 */
 	public String randMini() {
 		int ranNum = lastMini;
 		while (ranNum == lastMini) {
@@ -79,6 +97,11 @@ public class MiniGameManager {
 		return MiniGames.names[lastMini];
 	}
 	
+	/**
+	 * Creates an array of all players and their win count for the leaderboard
+	 * packet update.
+	 * @return - JSONArray containing leaderboard wins by player name.
+	 */
 	public JSONArray getJSONLeaderboard() {
 		if (!temp.isEmpty()) {
 			List<Integer> sortedKeys = new ArrayList<>(temp.keySet());
@@ -90,7 +113,6 @@ public class MiniGameManager {
 		for (int i = 0; i < leaderboard.size(); i++) {
 			JSONObject k = new JSONObject();
 			String name = leaderboard.get(i).getName();
-			System.out.println("leader json array: " + name + ", wins-> " + temp.get(name));
 			k.put("name", name);
 			players.add(k);
 		}

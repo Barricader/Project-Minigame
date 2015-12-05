@@ -38,7 +38,7 @@ public class ServerIOHandler extends IOHandler {
 	 */
 	private void initActionMap() {
 		actionMap = new HashMap<>();
-		NewServerDirector dir = serverClient.getServer().getServerDirector();
+		ServerDirector dir = serverClient.getServer().getServerDirector();
 		actionMap.put(Keys.Commands.ADD_PLAYER, 	() -> dir.addPlayer(input));
 		actionMap.put(Keys.Commands.REM_PLAYER, 	() -> dir.removePlayer(input));
 		actionMap.put(Keys.Commands.UPDATE, 		() -> dir.updatePlayer(input));

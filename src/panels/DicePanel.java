@@ -27,6 +27,14 @@ import util.Keys;
 import util.NewJSONObject;
 import util.PlayerStyles;
 
+/**
+ * Dice panel contains the dice, needed for player movement. The player
+ * can click on the dice if it is their turn, and then whatever roll amt
+ * they get, will be sent to the server to update other players about
+ * this player's roll.
+ * @author David Kramer
+ *
+ */
 public class DicePanel extends JPanel implements MouseListener, MouseMotionListener {
 	private static final Color BG_COLOR = GameUtils.colorFromHex("#D6D9DF");	// gray
 	private Controller controller;
@@ -45,6 +53,9 @@ public class DicePanel extends JPanel implements MouseListener, MouseMotionListe
 		setBorder(new LineBorder(Color.LIGHT_GRAY));
 	}
 	
+	/**
+	 * Initializes and lays out components using GridBagLayout.
+	 */
 	private void init() {
 		createComponents();
 		setLayout(new GridBagLayout());
@@ -59,6 +70,9 @@ public class DicePanel extends JPanel implements MouseListener, MouseMotionListe
 		add(statusLabel, c);
 	}
 	
+	/**
+	 * Creates GUI components.
+	 */
 	private void createComponents() {
 		dice = new Dice(0, 0, this);
 		dice.setEnabled(false);

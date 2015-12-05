@@ -18,6 +18,15 @@ import client.ClientApp;
  */
 public class ErrorUtils {
 	
+	public static NewJSONObject createJSONError(int id, String title, String msg) {
+		NewJSONObject obj = new NewJSONObject(id, Keys.Commands.ERROR);
+		JSONObject error = new JSONObject();
+		error.put(Keys.ERROR_TITLE, title);
+		error.put(Keys.ERROR_MSG, msg);
+		obj.put(Keys.Commands.ERROR, error);
+		return obj;
+	}
+	
 	/**
 	 * Displays custom errror dialog with specified message.
 	 * @param c - component to plce error dialog relative to
@@ -82,6 +91,15 @@ public class ErrorUtils {
 	public static void showInvalidPortError(Component c) {
 		JOptionPane.showMessageDialog(c, "Port must be a number between 1024 - 65536!", 
 				"Invalid Port", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	/**
+	 * Displays an error message that we were unable to connect to server.
+	 * @param c - component to place warning dialog relative to 
+	 */
+	public static void showConnectionError(Component c) {
+		JOptionPane.showMessageDialog(c, "Unable to connect... Server may not have been started!"
+				, "Connection Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	//********************************************************

@@ -14,8 +14,17 @@ import org.json.simple.JSONObject;
 import util.Keys;
 import util.NewJSONObject;
 
+/**
+ * The Server class is responsible for accepting new client connections through
+ * this server socket. If the client count is less than the max allowed clients,
+ * new connections will be accepted, otherwise they are refused. Each connection
+ * spawns a ServerClient which is an independent thread with a link to this 
+ * server that relays information between the client and this server.
+ * @author David Kramer
+ * @author JoJones
+ *
+ */
 public class Server extends Thread {
-	private static SecureRandom rng = new SecureRandom();	// ID generator
 	public static final String HOST = "localhost";
 	public static final int PORT = 7742;
 	private static final int MAX_CLIENTS = 4;
@@ -23,14 +32,14 @@ public class Server extends Thread {
 	private boolean running = false;
 	private ServerSocket serverSocket = null;
 	private HashMap<Integer, ServerClient> clients;
+	private ServerDirector serverDir;
 	
-//	private ServerDirector serverDir;
-	private NewServerDirector serverDir;
-	
+	/**
+	 * Constructs a new Server.
+	 */
 	public Server() {
 		clients = new HashMap<>();
-//		serverDir = new ServerDirector(this);
-		serverDir = new NewServerDirector(this);
+		serverDir = new ServerDirector(this);
 	}
 	
 	/**
@@ -140,14 +149,18 @@ public class Server extends Thread {
 		join();
 	}
 	
-//	public ServerDirector getServerDirector() {
-//		return serverDir;
-//	}
+	// accessor methods
 	
-	public NewServerDirector getServerDirector() {
+	public ServerDirector getServerDirector() {
 		return serverDir;
 	}
 	
+	/**
+	 * Main method of the application, that starts the server. If another instance of 
+	 * a server in running on the same Host and port, the server launch attempt will
+	 * quietly terminate.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Server server = new Server();
 		try {

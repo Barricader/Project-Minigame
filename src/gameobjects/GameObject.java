@@ -12,6 +12,9 @@ import org.json.simple.JSONObject;
 public abstract class GameObject extends Rectangle {
 	protected JSONObject jsonObj;
 	
+	/**
+	 * Default constructor.
+	 */
 	public GameObject() {
 		
 	}

@@ -23,6 +23,13 @@ import gameobjects.NewPlayer;
 import util.Keys;
 import util.NewJSONObject;
 
+/**
+ * Chat panel contains a text area where all messages that have been sent
+ * will be kept track of. This allows for communication between other 
+ * clients through instant messaging.
+ * @author David Kramer
+ *
+ */
 public class ChatPanel extends JPanel {
 	public ClientApp app;
 	
@@ -32,6 +39,10 @@ public class ChatPanel extends JPanel {
 	private JButton sendBtn;
 	private Controller controller;
 	
+	/**
+	 * Constructs a new ClientApp with a link to the main ClientApp.
+	 * @param app - Target ClientApp.
+	 */
 	public ChatPanel(ClientApp app) {
 		this.app = app;
 		controller = new Controller(this);
@@ -143,6 +154,9 @@ public class ChatPanel extends JPanel {
 			this.cp = cp;
 		}
 		
+		/**
+		 * Sends a message and echoes it to all other currently connected clients.
+		 */
 		public void sendMessage() {
 			String text = msgField.getText();
 			if (!text.isEmpty() && app.getClient().isConnected()) {
@@ -170,11 +184,17 @@ public class ChatPanel extends JPanel {
 			msgField.setEnabled(enabled);
 			sendBtn.setEnabled(enabled);
 		}
-
+		
+		/**
+		 * Sends JSONObject to clients.
+		 */
 		public void send(JSONObject out) {
 			cp.app.getClient().getIOHandler().send(out);
 		}
 
+		/**
+		 * Processes message from incoming JSONObject.
+		 */
 		public void receive(JSONObject in) {
 			String text = (String)in.get(Keys.TEXT);
 			String name = (String)in.get(Keys.NAME);
