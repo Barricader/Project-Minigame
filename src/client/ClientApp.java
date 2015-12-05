@@ -68,6 +68,10 @@ public class ClientApp extends JFrame {
 	
 	private ErrorHandler errorHandler;
 	
+	/**
+	 * Constructs a new ClientApp that has a client ready to be connected
+	 * to the server.
+	 */
 	public ClientApp() {
 		client = new Client(this);
 		errorHandler = new ErrorHandler();
@@ -231,7 +235,10 @@ public class ClientApp extends JFrame {
 			e.printStackTrace();
 		}
 		finally {
-			statePanel.getLoginPanel().getLobby().removeAll();
+			statePanel.reset();
+			chatPanel.getController().toggleUI(false);
+			dicePanel.setVisible(false);
+			leaderPanel.setVisible(false);
 			boardPanel.getPlayers().clear();
 			resetClient();
 			repaint();	

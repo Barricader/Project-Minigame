@@ -60,6 +60,14 @@ public class StatePanel extends JPanel {
 		app.revalidate();
 	}
 	
+	/**
+	 * Resets state panel back to a fresh login view.
+	 */
+	public void reset() {
+		loginPanel = new LoginPanel(app);
+		updateView(loginPanel);
+	}
+	
 	// accessor methods
 	
 	public LoginPanel getLoginPanel() {

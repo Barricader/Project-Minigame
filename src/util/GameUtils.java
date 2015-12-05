@@ -4,6 +4,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -12,6 +16,7 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 
@@ -186,6 +191,40 @@ public class GameUtils {
 			timer.stop();
 			for (ActionListener a : timer.getActionListeners()) {
 				timer.removeActionListener(a);
+			}
+		}
+	}
+	
+	/**
+	 * Utility method that writes a string of text to a log file and
+	 * provides a GUI save dialog.
+	 * @param text - The text to write to file.
+	 */
+	public static void writeLogFile(String text) {
+		JFileChooser chooser = new JFileChooser();
+		chooser.showSaveDialog(null);
+		File f = chooser.getSelectedFile();
+		String filePath = f.getAbsolutePath();
+	
+		// add.log extension if not exists!
+		if (!filePath.endsWith(".log")) {
+			f = new File(filePath + ".log");
+		}
+		
+		BufferedWriter bw = null;
+		
+		try {
+			bw = new BufferedWriter(new FileWriter(f));
+			bw.write(text);
+			System.out.println("Log file written successfully!");
+		} catch (IOException e) {
+			System.out.println("An error occurred when trying to write log file!");
+			e.printStackTrace();
+		} finally {
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}

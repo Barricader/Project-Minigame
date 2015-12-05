@@ -2,11 +2,9 @@ package newserver;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.security.SecureRandom;
 import java.util.HashMap;
 
 import org.json.simple.JSONObject;
@@ -26,13 +24,16 @@ import util.NewJSONObject;
  */
 public class Server extends Thread {
 	public static final String HOST = "localhost";
+//	public static final String HOST = "192.168.10.104";
 	public static final int PORT = 7742;
 	private static final int MAX_CLIENTS = 4;
+	private ServerApp app;
 	
 	private boolean running = false;
 	private ServerSocket serverSocket = null;
 	private HashMap<Integer, ServerClient> clients;
 	private ServerDirector serverDir;
+	private int portNo = PORT;
 	
 	/**
 	 * Constructs a new Server.
@@ -43,12 +44,22 @@ public class Server extends Thread {
 	}
 	
 	/**
+	 * Constructs a new Server with a link to the ServerApp.
+	 * @param app - Target ServerApp
+	 */
+	public Server(ServerApp app) {
+		this.app = app;
+		clients = new HashMap<>();
+		serverDir = new ServerDirector(this);
+	}
+	
+	/**
 	 * Starts this thread.
 	 */
 	public void start() {
 		running = true;
 		super.start();
-		System.out.println("Server started....");
+		app.log("Server started....");
 	}
 	
 	/**
@@ -58,14 +69,17 @@ public class Server extends Thread {
 		while (running) {
 			try {
 				// wait and accept new clients
+				app.log("Waiting for client...");
 				System.out.println("Waiting for client...");
 				addClient(serverSocket.accept());
 			} catch (SocketException e) {	// terminate if socket is closed!
 				running = false;
 			} catch (EOFException e) {
 				running = false;
+				app.log(e.getMessage());
 				e.printStackTrace();
 			} catch (IOException e) {
+				app.log(e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -76,7 +90,7 @@ public class Server extends Thread {
 	 * @throws IOException
 	 */
 	public void open() throws IOException {
-		serverSocket = new ServerSocket(PORT);
+		serverSocket = new ServerSocket(portNo);
 	}
 	
 	/**
@@ -103,9 +117,9 @@ public class Server extends Thread {
 			k.put(Keys.CONNECT_STATUS, 1);	// connection is good!
 			sc.getIOHandler().send(k);
 			clients.put(ID, sc);
-			System.out.println("client: " + ID + ", added!");
+			app.log("client: " + ID + ", added!");
 		} else {
-			System.out.println("Client limit reached. Client connection refused!");
+			app.log("Client limit reached. Client connection refused!");
 		}
 	}
 	
@@ -135,6 +149,12 @@ public class Server extends Thread {
 		for (ServerClient sc : clients.values()) {
 			sc.getIOHandler().send(out);
 		}
+		// log, if applicable
+		if (out.containsKey(Keys.LOG)) {
+			if ((boolean)out.get(Keys.LOG)) {
+				app.log(out.toJSONString());
+			}
+		}
 	}
 	
 	/**
@@ -143,6 +163,9 @@ public class Server extends Thread {
 	 * @throws InterruptedException
 	 */
 	public void terminate() throws IOException, InterruptedException {
+		for (ServerClient sc : clients.values()) {
+			removeClient(sc.getID());
+		}
 		running = false;
 		interrupt();
 		close();
@@ -151,27 +174,45 @@ public class Server extends Thread {
 	
 	// accessor methods
 	
+	public ServerApp getServerApp() {
+		return app;
+	}
+	
 	public ServerDirector getServerDirector() {
 		return serverDir;
 	}
 	
-	/**
-	 * Main method of the application, that starts the server. If another instance of 
-	 * a server in running on the same Host and port, the server launch attempt will
-	 * quietly terminate.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Server server = new Server();
-		try {
-			server.open();
-		} catch (BindException e) {
-			System.out.println("Launch aborted! Another Server Instance Is Already Running On: "
-					+ HOST + ":" + PORT);
-			System.exit(1);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		server.start();
+	public boolean isRunning() {
+		return running;
 	}
+	
+	public void setPort(int portNo) {
+		this.portNo = portNo;
+	}
+	
+	/* Main method isn't used because we now have a ServerGUI app that starts the
+	 * server, that way.
+	 */
+	
+//	/**
+//	 * Main method of the application, that starts the server. If another instance of 
+//	 * a server in running on the same Host and port, the server launch attempt will
+//	 * quietly terminate.
+//	 * @param args
+//	 */
+//	public static void main(String[] args) {
+//		Server server = new Server();
+////		int port = Integer.parseInt(args[0]);
+////		server.setPort(port);
+//		try {
+//			server.open();
+//		} catch (BindException e) {
+//			System.out.println("Launch aborted! Another Server Instance Is Already Running On: "
+//					+ HOST + ":" + PORT);
+////			System.exit(1);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		server.start();
+//	}
 }

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -101,17 +102,14 @@ public class ChatPanel extends JPanel {
 		chatArea.setBorder(new LineBorder(Color.LIGHT_GRAY));
 		
 		msgField = new JTextField();
-		msgField.addKeyListener(new KeyListener() {
+		msgField.addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent e) {
 				if (e.getKeyChar() == '\n') {
 					controller.sendMessage();
 				}
 			}
-
-			// unused
-			public void keyPressed(KeyEvent e) {}
-			public void keyReleased(KeyEvent e) {}
 		});
+		
 		msgField.setFocusable(true);
 		msgField.requestFocus();
 		

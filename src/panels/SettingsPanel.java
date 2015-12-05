@@ -6,8 +6,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -133,11 +133,11 @@ public class SettingsPanel extends JPanel {
 	
 	/**
 	 * Checks textfields on key events.
-	 * @return - A Keylistener that listens to key typed, and key
+	 * @return - A KeyAdapter that listens to key typed, and key
 	 * released events.
 	 */
-	private KeyListener handleKey() {
-		KeyListener key = new KeyListener() {
+	private KeyAdapter handleKey() {
+		KeyAdapter key = new KeyAdapter() {
 			
 			public void keyTyped(KeyEvent e) {
 				checkFields();
@@ -146,8 +146,6 @@ public class SettingsPanel extends JPanel {
 			public void keyReleased(KeyEvent e) {
 				checkFields();
 			}
-		
-			public void keyPressed(KeyEvent e) {}
 		};
 		return key;
 	}

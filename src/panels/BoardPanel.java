@@ -3,6 +3,7 @@ package panels;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
@@ -25,7 +26,7 @@ import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 
-public class BoardPanel extends JPanel implements ComponentListener {
+public class BoardPanel extends JPanel {
 	public static final int HORIZONTAL_TILE_COUNT = 10;
 	public static final byte VERTICAL_TILE_COUNT = HORIZONTAL_TILE_COUNT / 2;
 	
@@ -46,8 +47,6 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		init();
 		players = new ConcurrentHashMap<>();
 		controller = new Controller();
-		
-		addComponentListener(this);
 	}
 	
 	/**
@@ -55,6 +54,15 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 */
 	private void init() {
 		createTiles();
+		
+		// handles resizing window event
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				resizeTiles();
+				resizePlayers();
+				repaint();
+			}
+		});
 	}
 	
 	/**
@@ -233,20 +241,6 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			}
 		}
 	}
-
-	/**
-	 * Resize any GUI elements in response to a window resize.
-	 */
-	public void componentResized(ComponentEvent e) {
-		resizeTiles();
-		resizePlayers();
-		repaint();
-	}
-
-	// unused component listener methods
-	public void componentMoved(ComponentEvent e) {}
-	public void componentShown(ComponentEvent e) {}
-	public void componentHidden(ComponentEvent e) {}
 	
 	// mutator methods
 	

@@ -5,8 +5,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -146,7 +146,7 @@ public class LoginPanel extends JPanel {
 		
 		nameField = new JTextField(10);
 		nameField.setFont(new Font("Courier New", Font.BOLD, 20));
-		nameField.addKeyListener(new KeyListener() {
+		nameField.addKeyListener(new KeyAdapter() {
 			
 			public void keyReleased(KeyEvent e) {
 				if (!nameField.getText().isEmpty()) {
@@ -158,9 +158,6 @@ public class LoginPanel extends JPanel {
 					joinBtn.setEnabled(false);
 				}
 			}
-			// unused
-			public void keyTyped(KeyEvent e) {}
-			public void keyPressed(KeyEvent e) {}
 		});
 		
 		joinBtn = new JButton("Join Game");
@@ -275,6 +272,9 @@ public class LoginPanel extends JPanel {
 		 */
 		public void removePlayer(NewPlayer player) {
 			if (player.getName().equals(app.getBoardPanel().getClientPlayer().getName())) {
+				Runnable r = () -> { app.reset(); };
+				new Thread(r).start();	// disconnect everything in background
+				ErrorUtils.showDisconnectMessage(app);
 				app.reset();
 			}
 			app.getBoardPanel().getPlayers().remove(player.getName());

@@ -118,4 +118,13 @@ public class ErrorUtils {
 		return choice == 0;	// they hit ok
 	}
 	
+	/**
+	 * Shows a predefined message letting the user know they have been
+	 * disconnected from the server.
+	 * @param c - component to to place warning dialog relative to.
+	 */
+	public static void showDisconnectMessage(Component c) {
+		JOptionPane.showMessageDialog(c, "You have been disconnected from the server!");
+	}
+	
 }

@@ -66,6 +66,7 @@ public class ServerDirector {
 				p.style(PlayerStyles.getInstance().getStyle());
 				players.put(p.getName(), p);
 				echoAllPlayers();	// update to all players
+				server.getServerApp().getListPanel().getListModel().addElement(p.getName());
 			} else {
 				// TODO duplicate error!
 			}
@@ -81,6 +82,14 @@ public class ServerDirector {
 	 */
 	public void removePlayer(JSONObject obj) {
 		NewPlayer p = NewPlayer.fromJSON(obj);
+		removePlayer(p);
+	}
+	
+	/**
+	 * Removes a player from the map, from a Player object itself.
+	 * @param p - Player to remove (if it exists in map by the name)
+	 */
+	public void removePlayer(NewPlayer p) {
 		NewJSONObject out = null;
 		
 		if (players.containsKey(p.getName())) {
@@ -89,23 +98,16 @@ public class ServerDirector {
 			out = new NewJSONObject(p.getID(), Keys.Commands.REM_PLAYER);
 			out.put(Keys.PLAYER, p.toJSONObject());
 			server.echoAll(out);
+			
+			// if the active player was what we just removed, go to the next player!
+			if (activePlayer != null) {
+				if (activePlayer.getName().equals(p.getName())) {
+					nextPlayer();
+				}
+			}
+			server.getServerApp().getListPanel().updateList();	// update list with players still here!
 		}
-	}
-	
-	/**
-	 * @deprecated - This method seems to break the streams and so far
-	 * the game works fine without using this, so this will probably
-	 * be removed.
-	 * @param obj
-	 */
-	public void updatePlayer(JSONObject obj) {
-//		NewPlayer p = NewPlayer.fromJSON(obj);
-//		players.put(p.getName(), p);
-//		System.out.println("SERVER UPDATE PLAYER RECEIVED: " + p.toJSONObject().toJSONString());
-//		// echo back
-//		NewJSONObject update = new NewJSONObject(p.getID(), Keys.Commands.UPDATE);
-//		update.put(Keys.PLAYER, p.toJSONObject());
-//		server.echoAll(update);
+		checkCountdown();
 	}
 	
 	/**
@@ -220,34 +222,39 @@ public class ServerDirector {
 	private void checkCountdown() {
 		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.TIMER);
 		JSONObject timerObj = new JSONObject();
-		if (players.size() >= 2) {
-			timeLeft = WAIT_TIME;
-			GameUtils.resetTimer(timer);
-			
-			if (players.size() == 4 && timeLeft > 5) {
-				timeLeft = 5;	// shorten time, we have reached player limit
-			}
-			timer = new Timer(1000, e -> {
-				
-				if (timeLeft == 0) {
-					timer.stop();
-					System.out.println("OK. CHANGE ALL CLIENTS STATE TO BOARD!!!!");
-					changeClientState(BOARD);
-				} else {
-					timeLeft--;
-					// create timer packet and send to all clients.
-					timerObj.put(Keys.TIME, timeLeft);
-					obj.put(Keys.Commands.TIMER, timerObj);
-					server.echoAll(obj);
-				}
 		
-			});
-			timer.start();	
-		} else {
-			GameUtils.resetTimer(timer);
-			timerObj.put(Keys.TIME, "reset");
-			obj.put(Keys.Commands.TIMER, timerObj);
-			server.echoAll(obj);
+		if (!hasStarted) {
+			if (players.size() >= 2) {
+				timeLeft = WAIT_TIME;
+				GameUtils.resetTimer(timer);
+				
+				if (players.size() == 4 && timeLeft > 5) {
+					timeLeft = 5;	// shorten time, we have reached player limit
+				}
+				timer = new Timer(1000, e -> {
+					
+					if (timeLeft == 0) {
+						timer.stop();
+						hasStarted = true;	// we've started the game now!
+						System.out.println("OK. CHANGE ALL CLIENTS STATE TO BOARD!!!!");
+						changeClientState(BOARD);
+					} else {
+						timeLeft--;
+						// create timer packet and send to all clients.
+						timerObj.put(Keys.TIME, timeLeft);
+						obj.put(Keys.Commands.TIMER, timerObj);
+						server.echoAll(obj);
+					}
+			
+				});
+				timer.start();	
+			} else {
+				GameUtils.resetTimer(timer);
+				timerObj.put(Keys.TIME, "reset");
+				hasStarted = false;
+				obj.put(Keys.Commands.TIMER, timerObj);
+				server.echoAll(obj);
+			}	
 		}
 	}
 	
