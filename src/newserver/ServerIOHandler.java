@@ -1,6 +1,8 @@
 package newserver;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 
@@ -16,15 +18,42 @@ import util.Keys;
  */
 public class ServerIOHandler extends IOHandler {
 	private ServerClient serverClient;
+	private Map<String, Action> actionMap;	// routes commands to method calls
+	private JSONObject input;	// last input received
 	
+	/**
+	 * Constructs a new ServerIOHandler with a connection to a ServerClient.
+	 * @param serverClient - ServerClient to connect with
+	 */
 	public ServerIOHandler(ServerClient serverClient) {
 		super();
 		this.serverClient = serverClient;
+		initActionMap();
+	}
+	
+	/**
+	 * Initializes the action map, which routes command keys to their
+	 * associated event methods, that are contained within this ServerClient's
+	 * ServerDirector.
+	 */
+	private void initActionMap() {
+		actionMap = new HashMap<>();
+		ServerDirector dir = serverClient.getServer().getServerDirector();
+		actionMap.put(Keys.Commands.ADD_PLAYER, 	() -> dir.addPlayer(input));
+		actionMap.put(Keys.Commands.REM_PLAYER, 	() -> dir.removePlayer(input));
+		actionMap.put(Keys.Commands.UPDATE, 		() -> dir.movePlayer(input));
+		actionMap.put(Keys.Commands.ROLLED, 		() -> dir.updatePlayer(input));
+		actionMap.put(Keys.Commands.STOPPED, 		() -> dir.isStopped());
+		actionMap.put(Keys.Commands.MINI_STOPPED, 	() -> dir.isMinigameOver());
+		actionMap.put(Keys.Commands.MINI_UPDATE, 	() -> dir.updateMinigame(input));
+		actionMap.put(Keys.Commands.MSG, 			() -> serverClient.getServer().echoAll(input));
 	}
 
+	/**
+	 * Writes a JSONObject through this ServerClient's output stream.
+	 * @param out JSONObject to write out
+	 */
 	public void send(JSONObject out) {
-//		System.out.println("ServerClient should be sending: " + out);
-		// send JSON object through objectOutputStream
 		try {
 			serverClient.getOutputStream().writeObject(out);
 			serverClient.getOutputStream().flush();
@@ -34,35 +63,19 @@ public class ServerIOHandler extends IOHandler {
 		}
 	}
 
+	/**
+	 * Receives incoming JSONObjects and checks to see if the actionMap 
+	 * contains the command key, which it should, unless an undefined
+	 * command has been passed. The actionMap then calls the appropriate
+	 * method to carry out the execution of the command.
+	 * @param in - JSONObject received 
+	 */
 	public void receive(JSONObject in) {
-		String cmd = (String) in.get(Keys.CMD);
+		String cmdKey = (String) in.get(Keys.CMD);
+		input = in;
 		
-		ServerDirector dir = serverClient.getServer().getServerDirector();
-		switch (cmd) {
-		case Keys.Commands.ADD_PLAYER:
-			dir.addPlayer(in);
-			break;
-		case Keys.Commands.REM_PLAYER:
-			dir.removePlayer(in);
-			break;
-		case Keys.Commands.UPDATE:
-			dir.updatePlayer(in);
-			break;
-		case Keys.Commands.ROLLED:
-			dir.movePlayer(in);
-			break;
-		case Keys.Commands.STOPPED:
-			dir.isStopped();
-			break;
-		case Keys.Commands.MINI_STOPPED:
-			dir.isMinigameOver();
-			break;
-		case Keys.Commands.MINI_UPDATE:
-			dir.updateMinigame(in);
-			break;
-		case Keys.Commands.MSG:
-			serverClient.getServer().echoAll(in);	// echo to all other clients
-			break;
+		if (actionMap.containsKey(cmdKey)) {
+			actionMap.get(cmdKey).execute();
 		}
 	}
 }
