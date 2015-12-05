@@ -77,7 +77,6 @@ public class ServerDirector {
 				error.put(Keys.ERROR_MSG, "Another player already exists with name: " 
 						+ p.getName() + ". Try another name!");
 				out.put(Keys.Commands.ERROR, error);
-				server.echoAll(out);
 			}
 		} else {
 			out = new NewJSONObject(p.getID(), Keys.Commands.ERROR);	// max player limit error

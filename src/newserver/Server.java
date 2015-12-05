@@ -24,11 +24,13 @@ public class Server extends Thread {
 	private ServerSocket serverSocket = null;
 	private HashMap<Integer, ServerClient> clients;
 	
-	private ServerDirector serverDir;
+//	private ServerDirector serverDir;
+	private NewServerDirector serverDir;
 	
 	public Server() {
 		clients = new HashMap<>();
-		serverDir = new ServerDirector(this);
+//		serverDir = new ServerDirector(this);
+		serverDir = new NewServerDirector(this);
 	}
 	
 	/**
@@ -138,7 +140,11 @@ public class Server extends Thread {
 		join();
 	}
 	
-	public ServerDirector getServerDirector() {
+//	public ServerDirector getServerDirector() {
+//		return serverDir;
+//	}
+	
+	public NewServerDirector getServerDirector() {
 		return serverDir;
 	}
 	

@@ -82,7 +82,6 @@ public class Client extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -132,12 +131,21 @@ public class Client extends Thread {
 	 * @throws InterruptedException
 	 */
 	public void terminate() throws IOException, InterruptedException {
-		//TODO send terminate command using JSON
 		running = false;
 		connected = false;
 		interrupt();
 		close();
 		join();
+	}
+	
+	// Mutator methods
+	
+	public void setIOHandler(IOHandler handler) {
+		this.ioHandler = handler;
+	}
+	
+	public void setID(int ID) {
+		this.ID = ID;
 	}
 	
 	// Accessor methods
@@ -164,17 +172,6 @@ public class Client extends Thread {
 	
 	public int getID() {
 		return ID;
-	}
-	
-	
-	// Mutator methods
-	
-	public void setIOHandler(IOHandler handler) {
-		this.ioHandler = handler;
-	}
-	
-	public void setID(int ID) {
-		this.ID = ID;
 	}
 	
 }

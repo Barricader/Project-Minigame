@@ -38,14 +38,14 @@ public class ServerIOHandler extends IOHandler {
 	 */
 	private void initActionMap() {
 		actionMap = new HashMap<>();
-		ServerDirector dir = serverClient.getServer().getServerDirector();
+		NewServerDirector dir = serverClient.getServer().getServerDirector();
 		actionMap.put(Keys.Commands.ADD_PLAYER, 	() -> dir.addPlayer(input));
 		actionMap.put(Keys.Commands.REM_PLAYER, 	() -> dir.removePlayer(input));
-		actionMap.put(Keys.Commands.UPDATE, 		() -> dir.movePlayer(input));
-		actionMap.put(Keys.Commands.ROLLED, 		() -> dir.updatePlayer(input));
+		actionMap.put(Keys.Commands.UPDATE, 		() -> dir.updatePlayer(input));
+		actionMap.put(Keys.Commands.ROLLED, 		() -> dir.movePlayer(input));
 		actionMap.put(Keys.Commands.STOPPED, 		() -> dir.isStopped());
-		actionMap.put(Keys.Commands.MINI_STOPPED, 	() -> dir.isMinigameOver());
-		actionMap.put(Keys.Commands.MINI_UPDATE, 	() -> dir.updateMinigame(input));
+		actionMap.put(Keys.Commands.MINI_STOPPED, 	() -> dir.getMiniMngr().isMinigameOver());
+		actionMap.put(Keys.Commands.MINI_UPDATE, 	() -> dir.getMiniMngr().handle(input));
 		actionMap.put(Keys.Commands.MSG, 			() -> serverClient.getServer().echoAll(input));
 	}
 
@@ -73,7 +73,7 @@ public class ServerIOHandler extends IOHandler {
 	public void receive(JSONObject in) {
 		String cmdKey = (String) in.get(Keys.CMD);
 		input = in;
-		
+		System.out.println("ServerIOReceived: " + in.toJSONString());
 		if (actionMap.containsKey(cmdKey)) {
 			actionMap.get(cmdKey).execute();
 		}

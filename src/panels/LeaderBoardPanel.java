@@ -24,6 +24,7 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import util.GameUtils;
+import util.Keys;
 
 /**
  * This class will display all the current player's scores.
@@ -32,7 +33,6 @@ import util.GameUtils;
  */
 public class LeaderBoardPanel extends JPanel {
 	private ClientApp app;
-	private Controller controller;
 	private NewPlayer[] players;	// holds players, in sorted order by their score
 	private DefaultListModel<String> nameListModel;
 	private DefaultListModel<Integer> scoreListModel;
@@ -49,7 +49,6 @@ public class LeaderBoardPanel extends JPanel {
 	 */
 	public LeaderBoardPanel(ClientApp app) {
 		this.app = app;
-		controller = new Controller();
 		init();
 		setPreferredSize(new Dimension(100, 100));
 	}
@@ -179,14 +178,18 @@ public class LeaderBoardPanel extends JPanel {
 		app.repaint();
 	}
 	
+	/**
+	 * Updates the list using a JSONObject that contains leaderboard scores.
+	 * @param in - JSONObject player win scores
+	 */
 	public void updateList(JSONObject in) {
-		JSONArray leaderBoard = (JSONArray) in.get("leaderboard");
+		JSONArray leaderboard = (JSONArray) in.get("leaderboard");
 		Map<String, NewPlayer> players = app.getBoardPanel().getPlayers();
 		
-		for (int i = 0; i < leaderBoard.size(); i++) {
-			NewPlayer p = (NewPlayer) leaderBoard.get(i);
-			players.get(p.getName()).setScore(players.get(p.getName()).getScore() + players.size() - i);
-			
+		for (int i = 0; i < leaderboard.size(); i++) {
+			JSONObject obj = (JSONObject) leaderboard.get(i);
+			String name = (String) obj.get(Keys.NAME);
+			players.get(name).setScore(players.get(name).getScore() + players.size() - i);
 		}
 		updateList();
 	}
@@ -201,18 +204,5 @@ public class LeaderBoardPanel extends JPanel {
 		public void setSelectionInterval(int index0, int index1) {
 			super.setSelectionInterval(-1, -1);
 		}
-	}
-	
-	public class Controller extends IOHandler {
-
-		@Override
-		public void send(JSONObject out) {
-		}
-
-		@Override
-		public void receive(JSONObject in) {
-
-		}
-		
 	}
 }

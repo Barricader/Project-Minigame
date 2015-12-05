@@ -401,6 +401,9 @@ public class LoginPanel extends JPanel {
 		 * @param player - Player to remove
 		 */
 		public void removePlayer(NewPlayer player) {
+			if (player.getName().equals(app.getBoardPanel().getClientPlayer().getName())) {
+				app.reset();
+			}
 			app.getBoardPanel().getPlayers().remove(player.getName());
 			lobbyPanel.updateList();
 		}
@@ -436,7 +439,6 @@ public class LoginPanel extends JPanel {
 				NewJSONObject obj = new NewJSONObject(app.getClient().getID(), Keys.Commands.REM_PLAYER);
 				obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
 				send(obj);
-				app.reset();
 				// setup to join again
 				GameUtils.clearActions(joinBtn);
 				nameField.setEnabled(true);
