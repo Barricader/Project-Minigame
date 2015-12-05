@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
@@ -26,11 +25,11 @@ import util.Keys;
 public class StatePanel extends JPanel {
 	private ClientApp app;
 	
-	private ArrayList<NewPlayer> temp;
-	
 	// initial login components
 	private Controller controller;
 	private LoginPanel loginPanel;
+	
+	private boolean fixedBoardGlitch = false;	// yes, this is crude, it works!
 	
 	/**
 	 * Constructs a new StatePanel with the default view set to login.
@@ -41,7 +40,6 @@ public class StatePanel extends JPanel {
 		controller = new Controller();
 		loginPanel = new LoginPanel(app);
 		updateView(loginPanel);
-		temp = new ArrayList<NewPlayer>();
 	}
 	
 	/**
@@ -62,6 +60,8 @@ public class StatePanel extends JPanel {
 		app.revalidate();
 	}
 	
+	// accessor methods
+	
 	public LoginPanel getLoginPanel() {
 		return loginPanel;
 	}
@@ -70,38 +70,20 @@ public class StatePanel extends JPanel {
 		return controller;
 	}
 	
+	/**
+	 * Controller for handling changing between various states of the game.
+	 * @author David Kramer
+	 *
+	 */
 	public class Controller extends IOHandler {
 
-		@Override
-		public void send(JSONObject out) {
-			// TODO Auto-generated method stub
-			
+		public void send(JSONObject out) {	
+			// currently unused
 		}
-
-//		public void receive(JSONObject in) {
-//			int stateType = (int) in.get(Keys.STATE);
-//			switch (stateType) {
-//			case (ServerDirector.BOARD):	// board state
-//				if (in.containsKey("leaderboard")) {
-//					JSONArray test = (JSONArray) in.get("leaderboard");
-//					if (test.size() > 0) {
-//						for (int i = 0; i < app.getBoardPanel().getPlayers().size(); i++) {
-//							String name = (String) ((JSONObject) test.get(i)).get("name");
-//							System.out.println("Name " + i + ": " + name);
-//							System.out.println("Score " + i + ": " + app.getBoardPanel().getPlayers().get(name).getScore());
-//							app.getBoardPanel().getPlayers().get(name).setScore(app.getBoardPanel().getPlayers().get(name).getScore() + app.getBoardPanel().getPlayers().size() - i);
-//							app.getLeaderPanel().updateList();
-//						}
-//					}
-//				}
-//				updateBoard();
-//				break;
-//			case (ServerDirector.MINIGAME):		// mini state
-//				updateMiniState((String)in.get("mini"));
-//				break;
-//			}
-//		}
 		
+		/**
+		 * Handles receiving state change requests.
+		 */
 		public void receive(JSONObject in) {
 			int stateType = (int) in.get(Keys.STATE);
 			switch (stateType) {
@@ -133,10 +115,14 @@ public class StatePanel extends JPanel {
 			app.getLeaderPanel().updateList();
 			updateView(app.getBoardPanel());
 			
-			// board rendering glitch fix
-			Dimension size = app.getSize();
-			app.setSize(size);
-			app.repaint();
+			// board rendering glitch fix for when players are cut off!
+			if (!fixedBoardGlitch) {
+				Dimension size = app.getSize();
+				size.width += 2;
+				size.height += 2;
+				app.setSize(size);
+				app.repaint();	
+			}
 		}
 		
 		/**

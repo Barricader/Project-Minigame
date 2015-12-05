@@ -34,19 +34,25 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	
 	private ArrayList<NewTile> tiles;
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
-	private NewPlayer clientPlayer;	// the player that belong to this client!
-	private NewPlayer activePlayer;
+	private NewPlayer clientPlayer;	// the player that belongs to this client!
+	private NewPlayer activePlayer;	// the player that is allowed to move / isMoving
 	
+	/**
+	 * Constructs a new BoardPanel with a connection to the main client app
+	 * @param app - Target client app
+	 */
 	public BoardPanel(ClientApp app) {
 		this.app = app;
 		init();
 		players = new ConcurrentHashMap<>();
 		controller = new Controller();
 		
-		controller.setBP(this);
 		addComponentListener(this);
 	}
 	
+	/**
+	 * Initializes all necessary items for this boardpanel.
+	 */
 	private void init() {
 		createTiles();
 	}
@@ -151,7 +157,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	}
 	
 	/**
-	 * Creates all the board tiles
+	 * Creates all the board tiles as specified in the tiles.map file.
 	 */
 	private void createTiles() {
 		tiles = new ArrayList<>();
@@ -229,12 +235,11 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	}
 
 	/**
-	 * Resize any GUI elements.
+	 * Resize any GUI elements in response to a window resize.
 	 */
 	public void componentResized(ComponentEvent e) {
 		resizeTiles();
 		resizePlayers();
-		System.out.println(ClientApp.getInstance().getSize());
 		repaint();
 	}
 
@@ -243,20 +248,19 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	public void componentShown(ComponentEvent e) {}
 	public void componentHidden(ComponentEvent e) {}
 	
-	public Controller getController() {
-		return controller;
-	}
+	// mutator methods
 	
 	public void setActive(String name) {
 		activePlayer = players.get(name);
-		activePlayer.setActive(true);	// draw the active indicator!
+		activePlayer.setActive(true);	// draws the active indicator!
 		repaint();
 	}
 	
 	public void setClientPlayer(NewPlayer player) {
 		this.clientPlayer = player;
-//		controller.firstUpdate();
 	}
+	
+	// accessor methods
 	
 	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
 		return players;
@@ -274,12 +278,16 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		return clientPlayer;
 	}
 	
+	public Controller getController() {
+		return controller;
+	}
+	
+	/**
+	 * Controller for handling player movements and updates on this board panel.
+	 * @author David Kramer
+	 *
+	 */
 	public class Controller extends IOHandler {
-		private BoardPanel bp;
-		
-		public void setBP(BoardPanel bp) {
-			this.bp = bp;
-		}
 
 		public void send(JSONObject out) {
 			app.getClient().getIOHandler().send(out);
@@ -288,7 +296,6 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		public void receive(JSONObject in) {
 			String cmdKey = (String)in.get(Keys.CMD);
 			NewPlayer p = NewPlayer.fromJSON(in);
-//			players.put(p.getName(), p);
 			p.style(p.getStyleID());	// make sure player is always styled!
 			System.out.println("board panel received: " + p.toJSONObject().toJSONString());
 			
@@ -306,9 +313,14 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			}
 		}
 		
+		/**
+		 * Moves the player, using an Animator object, based on a specified 
+		 * roll amount for specified player
+		 * @param in - JSONObject containing roll amt
+		 * @param p - Target player we need to animate
+		 */
 		public void movePlayer(JSONObject in, NewPlayer p) {
 			Animator animator = new Animator();
-//			p.setLocation(tiles.get(p.getTileID()).getCellLocation(p.getID()));
 			players.put(p.getName(), p);
 			setActive(p.getName());
 			System.out.println("ACTIVE PLAYER TILE NUM: " + p.getTileID());
@@ -323,6 +335,11 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			animator.animatePlayer(BoardPanel.this, p);
 		}
 		
+		/**
+		 * Updates specified player by setting their tile location
+		 * on their tile ID.
+		 * @param p - Player to update
+		 */
 		public void updatePlayer(NewPlayer p) {
 			System.out.println("updating player: " + p.toJSONObject().toJSONString() + ", on board panel!");
 			if (p.getTileID() > 0) {
@@ -335,6 +352,10 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			repaint();
 		}
 		
+		/**
+		 * @deprecated
+		 * I don't think we will actually need this anymore!!
+		 */
 		public void update() {
 			activePlayer.setActive(false);
 			NewJSONObject update = new NewJSONObject(activePlayer.getID(), Keys.Commands.UPDATE);
