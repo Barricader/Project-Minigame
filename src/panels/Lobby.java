@@ -65,11 +65,9 @@ public class Lobby extends JList<NewPlayer> {
 		listModel.removeAllElements();
 		for (NewPlayer p : playerMap.values()) {
 			listModel.addElement(p);
-			System.out.println("element: " + p + ", was added to list");
 			repaint();
+			app.repaint();
 		}
-		repaint();
-		app.repaint();
 	}
 	
 }

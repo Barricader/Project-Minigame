@@ -176,6 +176,7 @@ public class ConnectionPanel extends JPanel {
 			connectBtn.setText("Disconnect");
 			connectBtn.addActionListener( e -> {
 				try {
+					app.getStatePanel().getLoginPanel().getController().disconnectPlayer();
 					Client c = app.getClient();
 					c.terminate();
 				} catch (Exception e1) {
