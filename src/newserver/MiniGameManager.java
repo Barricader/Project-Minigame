@@ -2,9 +2,11 @@ package newserver;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -104,9 +106,12 @@ public class MiniGameManager {
 	 */
 	public JSONArray getJSONLeaderboard() {
 		if (!temp.isEmpty()) {
-			List<Integer> sortedKeys = new ArrayList<>(temp.keySet());
-			Collections.sort(sortedKeys);
-			leaderboard.addAll(temp.values());
+			System.out.println("\n\n"+temp);
+			TempComparator tc = new TempComparator(temp);
+			TreeMap sorted = new TreeMap(tc);
+			sorted.putAll(temp);
+			System.out.println(sorted);
+			leaderboard.addAll(sorted.keySet());
 		}
 		
 		JSONArray players = new JSONArray();
@@ -148,5 +153,23 @@ public class MiniGameManager {
 		int wins = (int) obj.get(Keys.WINS);
 		System.out.println("wins for : " + pName + ", is " + wins);
 		temp.put(wins, serverDir.getPlayers().get(pName));
+	}
+	
+	class TempComparator implements Comparator<String> {
+		Map base;
+		
+		public TempComparator(Map base) {
+			this.base = base;
+		}
+
+		public int compare(String o1, String o2) {
+			if ((Integer)base.get(o1) <= (Integer)base.get(o2)) {
+				return 1;
+			}
+			else {
+				return -1;
+			}
+		}
+		
 	}
 }
