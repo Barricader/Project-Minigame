@@ -10,14 +10,11 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.Timer;
-
 import org.json.simple.JSONObject;
 
 import com.sun.glass.events.KeyEvent;
 
 import client.ClientApp;
-import gameobjects.NewPlayer;
 import panels.BaseMiniPanel;
 import util.BaseController;
 import util.GameUtils;
@@ -30,7 +27,7 @@ public class Pong extends BaseMiniPanel {
 	private PongRect playerRect;	// the pong rectangle that belongs to the player
 	private boolean xAxis;	// movement restricted to x-axis
 	private boolean yAxis;	// movement restricted to y-axis
-	private NewPlayer player;	// this player
+	private boolean didPressEnter;	// have we pressed enter already to exit?
 	
 	private ConcurrentHashMap<String, PongRect> playerRects;
 	
@@ -50,8 +47,9 @@ public class Pong extends BaseMiniPanel {
 	public void init() {
 		playerRects = new ConcurrentHashMap<>();
 		isActive = true;
-		player = app.getBoardPanel().getClientPlayer();
-		int id = player.getID();
+		didPressEnter = false;
+		clientPlayer = app.getBoardPanel().getClientPlayer();
+		int id = clientPlayer.getID();
 		
 		// size info from current state panel
 		int h = app.getStatePanel().getHeight();
@@ -133,15 +131,15 @@ public class Pong extends BaseMiniPanel {
 	 * colored easily.
 	 */
 	public void sendUpdate() {
-		NewJSONObject obj = new NewJSONObject(player.getID(), Keys.Commands.MINI_UPDATE);
+		NewJSONObject obj = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_UPDATE);
 		obj.put(Keys.NAME, "pong");
-		obj.put(Keys.PLAYER_NAME, player.getName());
-		obj.put(Keys.STYLE_ID, player.getStyleID());
+		obj.put(Keys.PLAYER_NAME, clientPlayer.getName());
+		obj.put(Keys.STYLE_ID, clientPlayer.getStyleID());
 		obj.put("x", playerRect.x);
 		obj.put("y", playerRect.y);
 		obj.put("width", playerRect.width);
 		obj.put("height", playerRect.height);
-		playerRects.put(player.getName(), playerRect);
+		playerRects.put(clientPlayer.getName(), playerRect);
 		controller.send(obj);
 	}
 	
@@ -157,6 +155,15 @@ public class Pong extends BaseMiniPanel {
 			}
 		}
 		sendUpdate();
+		
+		// send request to leave pong
+		if (key.keys[KeyEvent.VK_ENTER] && !didPressEnter) {
+			NewJSONObject k = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_STOPPED);
+			k.put(Keys.NAME, clientPlayer.getName());
+			controller.send(k);
+			isActive = false;	
+			didPressEnter = true;
+		}
 	}
 	
 	/**
@@ -201,7 +208,7 @@ public class Pong extends BaseMiniPanel {
 				PongRect r = playerRects.get(name);
 				g2d.setColor(r.getColor());
 				g2d.fillRect(r.x, r.y, r.width, r.height);
-				if (name.equals(player.getName())) {
+				if (name.equals(clientPlayer.getName())) {
 					g2d.setColor(Color.BLACK);
 					g2d.setStroke(new BasicStroke(2.0f));
 					g2d.drawRect(r.x, r.y, r.width, r.height);
@@ -254,7 +261,6 @@ public class Pong extends BaseMiniPanel {
 		}
 
 		public void receive(JSONObject in) {
-			System.out.println("Pong client received: " + in.toJSONString());
 			String pName = (String) in.get(Keys.PLAYER_NAME);
 			Color c = PlayerStyles.colors[(int) in.get(Keys.STYLE_ID)];	// color the rectangle
 
