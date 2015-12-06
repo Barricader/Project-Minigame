@@ -96,31 +96,43 @@ public class Pong extends BaseMiniPanel {
 				} else if (yAxis) {
 					playerRect.y += e.getWheelRotation() * 15;
 				}
-				checkMovement();
-				sendUpdate();
+				if (checkMovement()) {
+					sendUpdate();
+				}
 			}
 		});
 	
 	}
 	
 	/**
-	 * Checks to make sure that paddles stay within bounds.
+	 * Checks to make sure that pongRect stay within bounds. If the 
+	 * pongRect is at an extreme boundary, (i.e. edge of screen), this 
+	 * will return false. This is useful when sending updates, as it will
+	 * limit redundant packet updates, since nothing will have changed and 
+	 * reduces the load on the server.
+	 * @return true if within bounds, false otherwise.
+	 * 
 	 */
-	private void checkMovement() {
+	private boolean checkMovement() {
 		if (xAxis) {
 			if (playerRect.x <= 5) {
 				playerRect.x = 5;
+				return false;
 			} else if (playerRect.x >= app.getStatePanel().getWidth() - playerRect.width) {
 				playerRect.x = app.getStatePanel().getWidth() - playerRect.width;
+				return false;
 			}
 			
 		} else if (yAxis) {
 			if (playerRect.y <= 0) {
 				playerRect.y = 0;
+				return false;
 			} else if (playerRect.y >= app.getStatePanel().getHeight() - playerRect.height) {
 				playerRect.y = app.getStatePanel().getHeight() - playerRect.height;
+				return false;
 			}	
 		}
+		return true;	// within boundaries
 	}
 	
 	public void update() {}	// this method unused. we use sendUpdate instead
@@ -154,7 +166,6 @@ public class Pong extends BaseMiniPanel {
 				moveY();
 			}
 		}
-		sendUpdate();
 		
 		// send request to leave pong
 		if (key.keys[KeyEvent.VK_ENTER] && !didPressEnter) {
@@ -176,7 +187,9 @@ public class Pong extends BaseMiniPanel {
 		} else if (key.keys[KeyEvent.VK_RIGHT]) {
 			playerRect.x+= 10;
 		}
-		checkMovement();
+		if (checkMovement()) {
+			sendUpdate();
+		}
 	}
 	
 	/**
@@ -189,7 +202,9 @@ public class Pong extends BaseMiniPanel {
 		} else if (key.keys[KeyEvent.VK_DOWN]) {
 			playerRect.y+= 10;
 		}
-		checkMovement();
+		if (checkMovement()) {
+			sendUpdate();
+		}
 	}
 	
 	/**

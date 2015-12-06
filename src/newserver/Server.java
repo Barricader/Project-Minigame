@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.simple.JSONObject;
 
@@ -30,7 +31,7 @@ public class Server extends Thread {
 	
 	private boolean running = false;
 	private ServerSocket serverSocket = null;
-	private HashMap<Integer, ServerClient> clients;
+	private ConcurrentHashMap<Integer, ServerClient> clients;
 	private ServerDirector serverDir;
 	private int portNo = PORT;
 	
@@ -38,7 +39,7 @@ public class Server extends Thread {
 	 * Constructs a new Server.
 	 */
 	public Server() {
-		clients = new HashMap<>();
+		clients = new ConcurrentHashMap<>();
 		serverDir = new ServerDirector(this);
 	}
 	
@@ -48,7 +49,7 @@ public class Server extends Thread {
 	 */
 	public Server(ServerApp app) {
 		this.app = app;
-		clients = new HashMap<>();
+		clients = new ConcurrentHashMap<>();
 		serverDir = new ServerDirector(this);
 	}
 	
@@ -162,9 +163,7 @@ public class Server extends Thread {
 	 * @throws InterruptedException
 	 */
 	public void terminate() throws IOException, InterruptedException {
-		for (ServerClient sc : clients.values()) {
-			removeClient(sc.getID());
-		}
+		clients.clear();
 		running = false;
 		interrupt();
 		close();
