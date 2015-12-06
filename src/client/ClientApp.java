@@ -5,6 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -180,8 +182,28 @@ public class ClientApp extends JFrame {
 		setMinimumSize(SIZE);
 		setTitle(TITLE);
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+//		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setVisible(true);
+		
+		// window close - make sure to disconnect nicely!
+		addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    	if (client.isConnected()) {
+		    		if(statePanel.getLoginPanel().getController().disconnectPlayer()) {
+		    			dispose();
+		    			System.exit(0);
+		    		} else {
+		    			// they canceled their decision to disconnect. don't close window!
+		    			return;
+		    		}
+		    	} else {
+		    		// not connected, just close out window!
+			    	dispose();
+			    	System.exit(0);	
+		    	}
+		    }
+		});
 	}
 	
 	/**

@@ -307,7 +307,7 @@ public class LoginPanel extends JPanel {
 		/**
 		 * Disconnects a player and clears them out from server.
 		 */
-		public void disconnectPlayer() {
+		public boolean disconnectPlayer() {
 			if (ErrorUtils.showDisconnectWarning(app)) {
 				NewJSONObject obj = new NewJSONObject(app.getClient().getID(), Keys.Commands.REM_PLAYER);
 				obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
@@ -320,7 +320,9 @@ public class LoginPanel extends JPanel {
 				joinBtn.addActionListener(e -> {
 					joinPlayer();
 				});
+				return true;
 			}
+			return false;
 		}
 		
 		/**

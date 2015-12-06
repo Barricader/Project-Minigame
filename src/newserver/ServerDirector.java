@@ -27,7 +27,7 @@ public class ServerDirector {
 	public static final int MINIGAME = 1;
 	
 	private static final int MAX_PLAYERS = 4;
-	private static final int WAIT_TIME = 20;	// countdown time, until we start game!
+	private static final int WAIT_TIME = 3;	// countdown time, until we start game!
 	private Server server;
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;

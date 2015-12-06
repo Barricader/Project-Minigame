@@ -31,13 +31,13 @@ public class MiniGameManager {
 	private JSONObject miniObj;	// input received for mini game
 	
 	private int lastMini = -1;
-	private List<NewPlayer> leaderboard;
-	private Map<Integer, NewPlayer> temp;	// holds win values from mini-games
+	private List<String> leaderboard;
+	private Map<String, Integer> temp;	// holds win values from mini-games
 	
 	public MiniGameManager(ServerDirector serverDir) {
 		this.serverDir = serverDir;
 		initActionMap();
-		leaderboard = Collections.synchronizedList(new ArrayList<NewPlayer>());
+		leaderboard = Collections.synchronizedList(new ArrayList<String>());
 		temp = new HashMap<>();
 	}
 	
@@ -69,7 +69,7 @@ public class MiniGameManager {
 			
 			// update leaderboard
 			String pName = (String) in.get(Keys.PLAYER_NAME);
-			leaderboard.add(serverDir.getPlayers().get(pName));
+			leaderboard.add(pName);
 		}
 	}
 	
@@ -96,7 +96,8 @@ public class MiniGameManager {
 			ranNum = GameUtils.random.nextInt(MiniGames.names.length);
 		}
 		lastMini = ranNum;
-		return MiniGames.names[lastMini];
+		return "enter";
+//		return MiniGames.names[lastMini];
 	}
 	
 	/**
@@ -117,7 +118,7 @@ public class MiniGameManager {
 		JSONArray players = new JSONArray();
 		for (int i = 0; i < leaderboard.size(); i++) {
 			JSONObject k = new JSONObject();
-			String name = leaderboard.get(i).getName();
+			String name = leaderboard.get(i);
 			k.put("name", name);
 			players.add(k);
 		}
@@ -149,10 +150,10 @@ public class MiniGameManager {
 	}
 	
 	private void handleRPS(JSONObject obj) {
-		String pName = (String) obj.get(Keys.PLAYER_NAME);
-		int wins = (int) obj.get(Keys.WINS);
-		System.out.println("wins for : " + pName + ", is " + wins);
-		temp.put(wins, serverDir.getPlayers().get(pName));
+//		String pName = (String) obj.get(Keys.PLAYER_NAME);
+//		int wins = (int) obj.get(Keys.WINS);
+//		System.out.println("wins for : " + pName + ", is " + wins);
+//		temp.put(wins, serverDir.getPlayers().get(pName));
 	}
 	
 	class TempComparator implements Comparator<String> {
