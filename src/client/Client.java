@@ -45,7 +45,7 @@ public class Client extends Thread {
 	
 	/**
 	 * Constructs a client with link to main app, and specified ID and socket.
-	 * @param app - ClientAPp
+	 * @param app - ClientApp
 	 * @param ID - ID to assign
 	 * @param socket - Socket to connect to
 	 */

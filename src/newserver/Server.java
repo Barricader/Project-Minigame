@@ -24,8 +24,7 @@ import util.NewJSONObject;
  */
 public class Server extends Thread {
 	public static final String HOST = "localhost";
-//	public static final String HOST = "192.168.10.104";
-	public static final int PORT = 7742;
+	public static final int PORT = 6354;
 	private static final int MAX_CLIENTS = 4;
 	private ServerApp app;
 	
@@ -70,7 +69,6 @@ public class Server extends Thread {
 			try {
 				// wait and accept new clients
 				app.log("Waiting for client...");
-				System.out.println("Waiting for client...");
 				addClient(serverSocket.accept());
 			} catch (SocketException e) {	// terminate if socket is closed!
 				running = false;
@@ -109,6 +107,7 @@ public class Server extends Thread {
 	public void addClient(Socket socket) throws IOException {
 		if (clients.size() < MAX_CLIENTS) {
 			int ID = serverDir.getPlayers().size();
+			System.out.println("Socket: " + socket);
 			ServerClient sc = new ServerClient(ID, socket, this);
 			sc.open();
 			sc.start();

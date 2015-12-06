@@ -157,6 +157,7 @@ public class ServerApp extends JFrame {
 		String consoleText = consolePanel.getConsole().getText();
 		consoleText += "\n " + msg;
 		consolePanel.getConsole().setText(consoleText);
+		consolePanel.getConsole().setCaretPosition(consolePanel.console.getDocument().getLength());	// scroll down
 		System.out.println(msg);
 	}
 	
