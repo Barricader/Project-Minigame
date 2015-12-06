@@ -48,7 +48,7 @@ public class MiniGameManager {
 	 */
 	private void initActionMap() {
 		actionMap = new HashMap<>();
-//		actionMap.put(MiniGames.names[0], () -> handleEnter(miniObj));
+		actionMap.put(MiniGames.names[0], () -> handleEnter(miniObj));
 		actionMap.put(MiniGames.names[1], () -> handleKeyFinder(miniObj));
 		actionMap.put(MiniGames.names[2], () -> handlePaint(miniObj));
 		actionMap.put(MiniGames.names[3], () -> handlePong(miniObj));
@@ -96,8 +96,8 @@ public class MiniGameManager {
 			ranNum = GameUtils.random.nextInt(MiniGames.names.length);
 		}
 		lastMini = ranNum;
-		return "pong";
-//		return MiniGames.names[lastMini];
+		return "enter";
+		//return MiniGames.names[lastMini];
 	}
 	
 	/**

@@ -93,6 +93,7 @@ public class Enter extends BaseMiniPanel {
 	public void reset() {
 		pressed = 0;
 		counter = 0;
+		diff = 80;
 	}
 	
 	public void playerPressed() {
