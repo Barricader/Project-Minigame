@@ -24,7 +24,7 @@ import util.NewJSONObject;
  */
 public class Server extends Thread {
 	public static final String HOST = "localhost";
-	public static final int PORT = 6354;
+	public static final int PORT = 7742;
 	private static final int MAX_CLIENTS = 4;
 	private ServerApp app;
 	

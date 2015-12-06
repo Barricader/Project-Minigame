@@ -96,8 +96,7 @@ public class MiniGameManager {
 			ranNum = GameUtils.random.nextInt(MiniGames.names.length);
 		}
 		lastMini = ranNum;
-		return "enter";
-//		return MiniGames.names[lastMini];
+		return MiniGames.names[lastMini];
 	}
 	
 	/**
@@ -150,10 +149,10 @@ public class MiniGameManager {
 	}
 	
 	private void handleRPS(JSONObject obj) {
-//		String pName = (String) obj.get(Keys.PLAYER_NAME);
-//		int wins = (int) obj.get(Keys.WINS);
-//		System.out.println("wins for : " + pName + ", is " + wins);
-//		temp.put(wins, serverDir.getPlayers().get(pName));
+		String pName = (String) obj.get(Keys.PLAYER_NAME);
+		int wins = (int) obj.get(Keys.WINS);
+		System.out.println("wins for : " + pName + ", is " + wins);
+		temp.put(pName, wins);
 	}
 	
 	class TempComparator implements Comparator<String> {
