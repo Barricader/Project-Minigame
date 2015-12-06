@@ -13,8 +13,8 @@ import javax.swing.JLabel;
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
-import client.IOHandler;
 import panels.BaseMiniPanel;
+import util.BaseController;
 import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
@@ -42,6 +42,7 @@ public class Enter extends BaseMiniPanel {
 				moveButton();
 			}
 		});
+		controller = new Controller(app);
 		theLabel = new JLabel("Waiting for other players...");
 		theTime = new JLabel("Time left: 20");
 		add(theButton);
@@ -84,8 +85,8 @@ public class Enter extends BaseMiniPanel {
 	}
 	
 	public void moveButton() {
-		rX = r.nextInt(app.getStatePanel().getSize().width - theButton.getSize().width);
-		rY = r.nextInt(app.getStatePanel().getSize().height - theButton.getSize().height);
+		rX = r.nextInt(app.getStatePanel().getSize().width - theButton.getSize().width + 1);
+		rY = r.nextInt(app.getStatePanel().getSize().height - theButton.getSize().height + 1);
 		theButton.setLocation(new Point(rX, rY));
 	}
 	
@@ -154,19 +155,15 @@ public class Enter extends BaseMiniPanel {
 		}
 	}
 	
-	public class Controller extends IOHandler {
-		private Enter mp;
-		
-		public Controller(Enter mp) {
-			this.mp = mp;
-		}
+	class Controller extends BaseController {
 
-		public void send(JSONObject out) {
-			app.getClient().getIOHandler().send(out);
+		public Controller(ClientApp app) {
+			super(app);
 		}
 
 		public void receive(JSONObject in) {
 			
 		}
-	}	
+		
+	}
 }

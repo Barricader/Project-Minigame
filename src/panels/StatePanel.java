@@ -140,8 +140,8 @@ public class StatePanel extends JPanel {
 			//app.getMiniPanel().setActive(true);
 			app.getDicePanel().setEnabled(false);
 			app.getDicePanel().setVisible(false);
-			app.getMinis().get(curMini).setActive(true);
 			app.setMini(curMini);
+			app.getMinis().get(curMini).setActive(true);
 			app.updateKey(curMini);
 			app.getMinis().get(curMini).init();
 			updateView(app.getMinis().get(curMini));

@@ -69,9 +69,13 @@ public class ClientIOHandler extends IOHandler {
 	 */
 	public void receive(JSONObject in) {
 		System.out.println("Client Handler received: " + in);
-		
 		String cmdKey = (String)in.get(Keys.CMD);
-		System.out.println("command key: " + cmdKey);
+		
+		// have to handle mini updates here, otherwise it points to wrong thing.
+		if (cmdKey.equals(Keys.Commands.MINI_UPDATE)) {
+			handlerMap.put(Keys.Commands.MINI_UPDATE, app.getMinis().get(app.getMini()).getController());
+		}
+		
 		if (handlerMap.containsKey(cmdKey)) {
 			handlerMap.get(cmdKey).receive(in);
 		}

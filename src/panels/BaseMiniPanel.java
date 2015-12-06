@@ -12,11 +12,12 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import input.Keyboard;
+import util.BaseController;
 
 public abstract class BaseMiniPanel extends JPanel {
 	protected static final long serialVersionUID = -2710194893729492174L;
 	protected ClientApp app;
-	protected Controller controller;
+	protected BaseController controller;
 	protected boolean isActive;
 	protected ConcurrentHashMap<String, NewPlayer> players;
 	protected NewPlayer clientPlayer;
@@ -27,7 +28,7 @@ public abstract class BaseMiniPanel extends JPanel {
 		this.app = app;
 //		init();
 		players = new ConcurrentHashMap<>();
-		controller = new Controller(this);
+//		controller = new Controller(this);
 		t = new Timer(16, e -> update());
 		//t.start();
 	}
@@ -51,7 +52,7 @@ public abstract class BaseMiniPanel extends JPanel {
 		}
 	}
 	
-	public Controller getController() {
+	public BaseController getController() {
 		return controller;
 	}
 	
@@ -68,6 +69,10 @@ public abstract class BaseMiniPanel extends JPanel {
 		this.clientPlayer = player;
 	}
 	
+	public void setKey(Keyboard key) {
+		this.key = key;
+	}
+	
 	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
 		return players;
 	}
@@ -80,19 +85,4 @@ public abstract class BaseMiniPanel extends JPanel {
 		return isActive;
 	}
 	
-	protected class Controller extends IOHandler {
-		private BaseMiniPanel bmp;
-		
-		public Controller(BaseMiniPanel bmp) {
-			this.bmp = bmp;
-		}
-
-		public void send(JSONObject out) {
-			app.getClient().getIOHandler().send(out);
-		}
-
-		public void receive(JSONObject in) {
-			// check updates from server here
-		}
-	}	
 }

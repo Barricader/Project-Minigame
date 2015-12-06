@@ -272,6 +272,10 @@ public class ServerDirector {
 	
 	// accessor methods
 	
+	public Server getServer() {
+		return server;
+	}
+	
 	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
 		return players;
 	}

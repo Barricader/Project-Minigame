@@ -28,8 +28,8 @@ import panels.ConnectionPanel;
 import panels.ConnectionPanel.Controller;
 import panels.DicePanel;
 import panels.LeaderBoardPanel;
-import panels.StatePanel;
 import panels.LoginPanel;
+import panels.StatePanel;
 import panels.minis.Enter;
 import panels.minis.KeyFinder;
 import panels.minis.Paint;
@@ -66,7 +66,11 @@ public class ClientApp extends JFrame {
 	private ConnectionPanel connPanel;
 	private LeaderBoardPanel leaderPanel;
 	private ConcurrentHashMap<String, BaseMiniPanel> minis;
-	private String curMini = "null";
+	
+	/* default start value, so that ClientIOHandler map doesn't throw a 
+	 * NullPointException when accessing a non-existent minigame 
+	 */
+	private String curMini = MiniGames.names[0];
 	
 	private ErrorHandler errorHandler;
 	
@@ -78,12 +82,12 @@ public class ClientApp extends JFrame {
 		client = new Client(this);
 		errorHandler = new ErrorHandler();
 		init();
+		initMinis();
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
 		instance = this;
 		setFocusable(true);
 		requestFocus();
-		initMinis();
 	}
 	
 	/**
@@ -160,13 +164,13 @@ public class ClientApp extends JFrame {
 		dicePanel.setVisible(false);
 		leaderPanel = new LeaderBoardPanel(this);
 		leaderPanel.setVisible(false);
-		minis = new ConcurrentHashMap<>();
 	}
 	
 	/**
 	 * Initializes the mini games for this app.
 	 */
 	private void initMinis() {
+		minis = new ConcurrentHashMap<>(MiniGames.names.length);
 		minis.put(MiniGames.names[0], new Enter(this));
 		minis.put(MiniGames.names[1], new KeyFinder(this));
 		minis.put(MiniGames.names[2], new Paint(this));
@@ -291,6 +295,7 @@ public class ClientApp extends JFrame {
 	public void updateKey(String state) {
 		key = new Keyboard(minis.get(state));
 		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
+		minis.get(state).setKey(key);
 	}
 	
 	// mutator methods
