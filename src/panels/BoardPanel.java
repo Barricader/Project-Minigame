@@ -348,17 +348,5 @@ public class BoardPanel extends JPanel {
 			players.put(p.getName(), p);
 			repaint();
 		}
-		
-		/**
-		 * @deprecated
-		 * I don't think we will actually need this anymore!!
-		 */
-		public void update() {
-			activePlayer.setActive(false);
-			NewJSONObject update = new NewJSONObject(activePlayer.getID(), Keys.Commands.UPDATE);
-			update.put(Keys.PLAYER, activePlayer.toJSONObject());
-			send(update);
-		}
-		
 	}
 }

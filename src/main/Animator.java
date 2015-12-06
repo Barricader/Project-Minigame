@@ -87,7 +87,8 @@ public class Animator {
 					e.printStackTrace();
 				}
 			}
-			// finished, send update
+			// remove the active indicator after done moving and send update
+			player.setActive(false);	
 			NewJSONObject obj = new NewJSONObject(player.getID(), Keys.Commands.STOPPED);
 			board.getController().send(obj);
 		};
