@@ -160,8 +160,11 @@ public class BoardPanel extends JPanel {
 	 */
 	private void drawPlayers(Graphics g) {
 		for (NewPlayer p : players.values()) {
-			p.draw(g);
+			if (!p.getName().equals(activePlayer.getName())) {
+				p.draw(g);
+			}
 		}
+		activePlayer.draw(g);	// draw active player last, so that it's on top!
 	}
 	
 	/**

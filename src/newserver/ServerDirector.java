@@ -170,15 +170,36 @@ public class ServerDirector {
 	 */
 	public void isStopped() {
 		stopCount++;
+
 		if (stopCount == players.size()) {
 			stopCount = 0;
-			activePlayer.setHasRolled(true);			
+			activePlayer.setHasRolled(true);		
+			
 			if (rolledPlayers.size() == players.size()) {
 				reset();
-				changeState(MINIGAME);
+				// slight delay when transitioning
+				GameUtils.resetTimer(timer);
+				timer = new Timer(1500, e -> {
+					changeState(MINIGAME);
+					nextPlayer();
+				});
+				timer.setRepeats(false);
+				timer.start();
+				return;
 			}
 			nextPlayer();
 		}
+	}
+	
+	/**
+	 * Clears out all players, and resets hasStarted flag to false.
+	 * This should be called if we need to restart the server game.
+	 */
+	public void clearAll() {
+		players.clear();
+		rolledPlayers.clear();
+		activePlayer = null;
+		hasStarted = false;
 	}
 	
 	/**

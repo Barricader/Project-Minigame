@@ -7,11 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.swing.Timer;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import gameobjects.NewPlayer;
 import util.GameUtils;
 import util.Keys;
 import util.MiniGames;
@@ -33,6 +36,8 @@ public class MiniGameManager {
 	private int lastMini = -1;
 	private List<String> leaderboard;
 	private Map<String, Integer> temp;	// holds win values from mini-games
+	private Timer timer;
+	private int count = 0;	// TODO this is for counting packets. Remove me later!
 	
 	public MiniGameManager(ServerDirector serverDir) {
 		this.serverDir = serverDir;
@@ -66,10 +71,6 @@ public class MiniGameManager {
 		if (actionMap.containsKey(name)) {
 			miniObj = in;
 			actionMap.get(name).execute();
-			
-			// update leaderboard
-			String pName = (String) in.get(Keys.PLAYER_NAME);
-			leaderboard.add(pName);
 		}
 	}
 	
@@ -81,6 +82,7 @@ public class MiniGameManager {
 		over++;
 		if (over == serverDir.getPlayers().size()) {
 			over = 0;
+			count = 0;	// TODO remove this later. this is just counting pkts for pong.
 			serverDir.changeState(ServerDirector.BOARD);
 		}
 	}
@@ -134,7 +136,9 @@ public class MiniGameManager {
 	}
 	
 	private void handleEnter(JSONObject obj) {
-		
+		// update leaderboard
+		String pName = (String) obj.get(Keys.PLAYER_NAME);
+		leaderboard.add(pName);
 	}
 	
 	private void handleKeyFinder(JSONObject obj) {
@@ -147,8 +151,10 @@ public class MiniGameManager {
 
 	private void handlePong(JSONObject obj) {
 		System.out.println("Pong stuff...");
-		System.out.println(obj.toJSONString());
+		System.out.println(obj.toJSONString()); 		
 		serverDir.getServer().echoAll(obj);
+		count++;
+		System.out.println("pong pkt count: " + count);
 	}
 	
 	private void handleRPS(JSONObject obj) {

@@ -203,30 +203,33 @@ public class GameUtils {
 	 */
 	public static void writeLogFile(JTextArea textArea) {
 		JFileChooser chooser = new JFileChooser();
-		chooser.showSaveDialog(null);
-		File f = chooser.getSelectedFile();
-		String filePath = f.getAbsolutePath();
-	
-		// add.log extension if not exists!
-		if (!filePath.endsWith(".log")) {
-			f = new File(filePath + ".log");
-		}
+		int choice = chooser.showSaveDialog(null);
+		// they didn't cancel out dialog
+		if (choice == JFileChooser.APPROVE_OPTION) {
+			File f = chooser.getSelectedFile();
+			String filePath = f.getAbsolutePath();
 		
-		BufferedWriter bw = null;
-		
-		try {
-			bw = new BufferedWriter(new FileWriter(f));
-			textArea.write(bw);
-			System.out.println("Log file written successfully!");
-		} catch (IOException e) {
-			System.out.println("An error occurred when trying to write log file!");
-			e.printStackTrace();
-		} finally {
-			try {
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+			// add.log extension if not exists!
+			if (!filePath.endsWith(".log")) {
+				f = new File(filePath + ".log");
 			}
+			
+			BufferedWriter bw = null;
+			
+			try {
+				bw = new BufferedWriter(new FileWriter(f));
+				textArea.write(bw);
+				System.out.println("Log file written successfully!");
+			} catch (IOException e) {
+				System.out.println("An error occurred when trying to write log file!");
+				e.printStackTrace();
+			} finally {
+				try {
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}	
 		}
 	}
 	

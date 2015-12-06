@@ -416,6 +416,7 @@ public class ServerApp extends JFrame {
 				try {	
 					if (server.isRunning()) {
 						terminateServer();
+						server.getServerDirector().clearAll();
 					}
 				} catch (InterruptedException ex) {
 					statusLabel.setText("Status: Server Error.");
