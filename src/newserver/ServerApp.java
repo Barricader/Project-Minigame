@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.BindException;
 
@@ -59,14 +61,8 @@ public class ServerApp extends JFrame {
 	 */
 	public ServerApp() {
 		server = new Server(this);
-		
 		init();
-		setSize(SIZE);
-		setMinimumSize(SIZE);
-		setLocationRelativeTo(null);
-		setTitle("Project MiniGame Server");
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setVisible(true);
+		createAndShowGUI();
 	}
 	
 	/**
@@ -124,6 +120,35 @@ public class ServerApp extends JFrame {
 	}
 	
 	/**
+	 * Sizes out the application window and makes it visible to the screen
+	 * and makes sure that we close out the application nicely.
+	 */
+	private void createAndShowGUI() {
+		setSize(SIZE);
+		setMinimumSize(SIZE);
+		setLocationRelativeTo(null);
+		setTitle("Project MiniGame Server");
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setVisible(true);
+		
+		// window close and ensures server is terminated nicely.
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				try {
+					if (server.isRunning()) {
+						terminateServer();
+					}
+				} catch (IOException | InterruptedException ex) {
+					ex.printStackTrace();
+				} finally {
+					dispose();
+					System.exit(0);
+				}
+			}
+		});
+	}
+	
+	/**
 	 * Records a string to the console, such as when a client connects.
 	 * Also prints everything out to the text-console as well.
 	 * @param msg - String to log.
@@ -133,6 +158,19 @@ public class ServerApp extends JFrame {
 		consoleText += "\n " + msg;
 		consolePanel.getConsole().setText(consoleText);
 		System.out.println(msg);
+	}
+	
+	/**
+	 * Terminates the server by disconnecting all connected players
+	 * and then ends the process.
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	private void terminateServer() throws IOException, InterruptedException {
+		for (NewPlayer p : server.getServerDirector().getPlayers().values()) {
+			server.getServerDirector().removePlayer(p);
+		}
+		server.terminate();
 	}
 	
 	public ListPanel getListPanel() {
@@ -196,7 +234,7 @@ public class ServerApp extends JFrame {
 				menuItem = new JMenuItem("Save to log file");
 				add(menuItem);
 				menuItem.addActionListener( e -> {
-					GameUtils.writeLogFile(console.getText());
+					GameUtils.writeLogFile(console);
 				});
 			}
 		}
@@ -375,19 +413,17 @@ public class ServerApp extends JFrame {
 			// stops the server
 			stopBtn = new JButton("Stop");
 			stopBtn.addActionListener(e -> {
-				System.out.println("should be stopping!");
-				for (NewPlayer p : server.getServerDirector().getPlayers().values()) {
-					server.getServerDirector().removePlayer(p);
+				try {	
+					if (server.isRunning()) {
+						terminateServer();
+					}
+				} catch (InterruptedException ex) {
+					statusLabel.setText("Status: Server Error.");
+				} catch (IOException ex) {
+					statusLabel.setText("Status: Server Error.");
+				} finally {
+					statusLabel.setText("Status: Not running");
 				}
-				try {
-					server.terminate();
-					server = null;
-				} catch (Exception e1) {
-					log(e1.getMessage());
-					e1.printStackTrace();
-					statusLabel = new JLabel("Status: Server Error: " + e1.getMessage());
-				}
-				statusLabel = new JLabel("Status: Not running");
 			});
 			
 			statusLabel = new JLabel("Status: Not running");

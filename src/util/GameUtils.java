@@ -18,6 +18,7 @@ import java.util.Random;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.Timer;
 
 import gameobjects.NewPlayer;
@@ -198,9 +199,9 @@ public class GameUtils {
 	/**
 	 * Utility method that writes a string of text to a log file and
 	 * provides a GUI save dialog.
-	 * @param text - The text to write to file.
+	 * @param text - Textarea containing text to write.
 	 */
-	public static void writeLogFile(String text) {
+	public static void writeLogFile(JTextArea textArea) {
 		JFileChooser chooser = new JFileChooser();
 		chooser.showSaveDialog(null);
 		File f = chooser.getSelectedFile();
@@ -215,7 +216,7 @@ public class GameUtils {
 		
 		try {
 			bw = new BufferedWriter(new FileWriter(f));
-			bw.write(text);
+			textArea.write(bw);
 			System.out.println("Log file written successfully!");
 		} catch (IOException e) {
 			System.out.println("An error occurred when trying to write log file!");

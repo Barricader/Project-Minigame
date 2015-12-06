@@ -163,9 +163,7 @@ public class Server extends Thread {
 	 * @throws InterruptedException
 	 */
 	public void terminate() throws IOException, InterruptedException {
-		for (ServerClient sc : clients.values()) {
-			removeClient(sc.getID());
-		}
+		clients.clear();
 		running = false;
 		interrupt();
 		close();

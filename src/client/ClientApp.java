@@ -175,14 +175,14 @@ public class ClientApp extends JFrame {
 	}
 	
 	/**
-	 * Sizes out the application window and makes it visible to the screen.
+	 * Sizes out the application window and makes it visible to the screen
+	 * and makes sure that we close out the application nicely.
 	 */
 	private void createAndShowGUI() {
 		setSize(SIZE);
 		setMinimumSize(SIZE);
 		setTitle(TITLE);
 		setLocationRelativeTo(null);
-//		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setVisible(true);
 		
