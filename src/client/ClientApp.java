@@ -2,7 +2,6 @@ package client;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
@@ -34,8 +32,6 @@ import panels.LeaderBoardPanel;
 import panels.LoginPanel;
 import panels.StatePanel;
 import panels.minis.Enter;
-import panels.minis.KeyFinder;
-import panels.minis.Paint;
 import panels.minis.Pong;
 import panels.minis.RPS;
 import util.ErrorUtils;
@@ -181,10 +177,8 @@ public class ClientApp extends JFrame {
 	private void initMinis() {
 		minis = new ConcurrentHashMap<>(MiniGames.names.length);
 		minis.put(MiniGames.names[0], new Enter(this));
-		minis.put(MiniGames.names[1], new KeyFinder(this));
-		minis.put(MiniGames.names[2], new Paint(this));
-		minis.put(MiniGames.names[3], new Pong(this));
-		minis.put(MiniGames.names[4], new RPS(this));
+		minis.put(MiniGames.names[1], new Pong(this));
+		minis.put(MiniGames.names[2], new RPS(this));
 	}
 	
 	/**
