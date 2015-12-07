@@ -69,7 +69,7 @@ public class Enter extends BaseMiniPanel {
 		System.out.println(theButton.getWidth());
 		System.out.println(theButton.getX());
 		System.out.println("||||||");
-		theButton.setBounds(new Rectangle(80, 80, 52, 23));
+		theButton.setBounds(new Rectangle(80, 80, 60, 23));
 		System.out.println(theButton.getWidth());
 		theButton.getX();
 		theLabel.setBounds(396, 5, 150, 15);
