@@ -6,7 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Random;
 
-import javax.swing.JButton;
+import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
@@ -16,9 +16,10 @@ import javax.swing.border.LineBorder;
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
-import client.IOHandler;
 import gameobjects.NewPlayer;
 import panels.BaseMiniPanel;
+import util.BaseController;
+import util.DarkButton;
 import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
@@ -42,9 +43,9 @@ public class RPS extends BaseMiniPanel {
 	private String playerChoice;
 	private Random rng = new Random();
 	
-	private JButton rockBtn;
-	private JButton paperBtn;
-	private JButton scissorBtn;
+	private DarkButton rockBtn;
+	private DarkButton paperBtn;
+	private DarkButton scissorBtn;
 	private JLabel timerLabel;	// displays countdown
 	private JLabel playerChoiceLabel;
 	private JLabel compChoiceLabel;	// choice that the computer chose
@@ -66,6 +67,7 @@ public class RPS extends BaseMiniPanel {
 	public void init() {
 		wins = 0;
 		turnCount = 0;
+		controller = new Controller(app);
 		countdownTimer = new Timer(1000, null);
 		compTimer = new Timer(1000, null);
 		createComponents();
@@ -87,13 +89,14 @@ public class RPS extends BaseMiniPanel {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.weightx = 1.0;
-		c.gridwidth = 3;
+		c.gridwidth = 2;
 		c.gridy = 0;
 		c.ipady = 20;
 		add(playerChoiceLabel, c);
 		
 		// timer label
-		c.gridx = 3;
+		c.gridx = 2;
+		c.gridwidth = 4;
 		c.ipadx = 0;
 		c.gridy = 0;
 		c.ipady = 0;
@@ -101,6 +104,7 @@ public class RPS extends BaseMiniPanel {
 		
 		// comp choice
 		c.gridx = 6;
+		c.gridwidth = 2;
 		c.gridy = 0;
 		c.ipady = 20;
 		c.weighty = 1.0;
@@ -110,17 +114,28 @@ public class RPS extends BaseMiniPanel {
 		c.anchor = GridBagConstraints.SOUTH;
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
+		c.gridwidth = 2;
 		c.gridy = 5;
 		c.weighty = 1.0;
 		add(rockBtn, c);
 		
+		c.gridx = 2;
+		c.gridwidth = 1;
+		add(Box.createHorizontalStrut(20), c);
+		
 		// paper btn
 		c.gridx = 3;
+		c.gridwidth = 2;
 		c.gridy = 5;
 		add(paperBtn, c);
 		
+		c.gridx = 5;
+		c.gridwidth = 1;
+		add(Box.createHorizontalStrut(20), c);
+		
 		// scissors
 		c.gridx = 6;
+		c.gridwidth = 2;
 		c.gridy = 5;
 		add(scissorBtn, c);
 		
@@ -142,7 +157,9 @@ public class RPS extends BaseMiniPanel {
 	 * Creates GUI components and timer.
 	 */
 	private void createComponents() {
-		rockBtn = new JButton("Rock");
+		rockBtn = new DarkButton("Rock");
+		rockBtn.setForeground(Color.RED);
+		rockBtn.setBorder(new LineBorder(Color.RED));
 		rockBtn.setFont(new Font("Courier New", Font.BOLD, 40));
 		rockBtn.addActionListener(e -> {
 			playerChoice = "Rock";
@@ -150,7 +167,9 @@ public class RPS extends BaseMiniPanel {
 			compChoose();
 		});
 		
-		paperBtn = new JButton("Paper");
+		paperBtn = new DarkButton("Paper");
+		paperBtn.setForeground(Color.GREEN);
+		paperBtn.setBorder(new LineBorder(Color.GREEN));
 		paperBtn.setFont(new Font("Courier New", Font.BOLD, 40));
 		paperBtn.addActionListener(e -> {
 			playerChoice = "Paper";
@@ -158,7 +177,9 @@ public class RPS extends BaseMiniPanel {
 			compChoose();
 		});
 		
-		scissorBtn = new JButton("Scissor");
+		scissorBtn = new DarkButton("Scissor");
+		scissorBtn.setForeground(Color.BLUE);
+		scissorBtn.setBorder(new LineBorder(Color.BLUE));
 		scissorBtn.setFont(new Font("Courier New", Font.BOLD, 40));
 		scissorBtn.addActionListener(e -> {
 			playerChoice = "Scissor";
@@ -270,15 +291,15 @@ public class RPS extends BaseMiniPanel {
 		
 		playerChoice = "";
 		timerLabel = new JLabel("" + timeLeft);
-		timerLabel.setFont(new Font("Courier New", Font.BOLD, 40));
 		timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		app.colorize(timerLabel, null, 40);
 		
 		compChoiceLabel = new JLabel("Computer Choice");
 		compChoiceLabel.setFont(new Font("Courier New", Font.BOLD, 18));
 		compChoiceLabel.setOpaque(true);
 		compChoiceLabel.setBackground(Color.BLACK);
 		compChoiceLabel.setForeground(Color.CYAN);
-		compChoiceLabel.setBorder(new LineBorder(Color.CYAN, 2));
+		compChoiceLabel.setBorder(new LineBorder(Color.CYAN, 1));
 		compChoiceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		player = app.getBoardPanel().getClientPlayer();
@@ -287,10 +308,11 @@ public class RPS extends BaseMiniPanel {
 		playerChoiceLabel.setOpaque(true);
 		playerChoiceLabel.setBackground(Color.BLACK);
 		playerChoiceLabel.setForeground(PlayerStyles.getColor(player.getStyleID()));
-		playerChoiceLabel.setBorder(new LineBorder(playerChoiceLabel.getForeground(), 2));
+		playerChoiceLabel.setBorder(new LineBorder(playerChoiceLabel.getForeground(), 1));
 		playerChoiceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		turnLabel = new JLabel("Turn: " + (turnCount + 1) + " of " + MAX_TURNS);
+		
 		turnLabel.setForeground(GameUtils.colorFromHex("58D168"));
 		turnLabel.setFont(new Font("Courier New", Font.BOLD, 20));
 		
@@ -350,11 +372,16 @@ public class RPS extends BaseMiniPanel {
 		k.put(Keys.NAME, "rps");
 		isActive = false;
 		controller.send(k);
+		System.out.println("sent RPS update!");
 	}
 	
 	public void playerPressed() {}	// currently unused
 	
-	public class Controller extends IOHandler {
+	public class Controller extends BaseController {
+
+		public Controller(ClientApp app) {
+			super(app);
+		}
 
 		public void send(JSONObject out) {
 			app.getClient().getIOHandler().send(out);

@@ -12,7 +12,7 @@ import javax.swing.JButton;
 import javax.swing.border.LineBorder;
 
 public class DarkButton extends JButton {
-	public static final Color BG_COLOR = GameUtils.colorFromHex("#121212");
+	public static final Color BG_COLOR = Color.BLACK;
 	public static final Color FG_COLOR = Color.CYAN;
 	private boolean isHovered;
 	private boolean isPressed;
@@ -21,7 +21,7 @@ public class DarkButton extends JButton {
 	public DarkButton(String text) {
 		super(text);
 		setOpaque(true);
-		setBackground(GameUtils.colorFromHex("#121212"));
+		setBackground(BG_COLOR);
 //		setForeground(FG_COLOR);
 		setFocusable(false);
 		setFocusPainted(false);
