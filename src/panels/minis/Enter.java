@@ -1,14 +1,16 @@
 package panels.minis;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.Random;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
@@ -31,9 +33,11 @@ public class Enter extends BaseMiniPanel {
 	private int diff = 80;
 	private int counter = 0;
 	private boolean hasWon = false;
+	private Dimension d = null;
 	
 	public Enter(ClientApp app) {
 		super(app);
+		this.setLayout(null);
 		theButton = new DarkButton("PRESS ME");
 		theButton.addActionListener(e -> {
 			pressed++;
@@ -49,32 +53,40 @@ public class Enter extends BaseMiniPanel {
 		theLabel = new JLabel("Waiting for other players...");
 		theTime = new JLabel("Time left: 20");
 		add(theButton);
-		theButton.setForeground(PlayerStyles.colors[app.getBoardPanel().getClientPlayer().getStyleID()]);
 		add(theLabel);
 		add(theTime);
 		theLabel.setVisible(false);
 		theTime.setVisible(true);
 		moveButton();
-		theTime.setLocation(80, 80);
+		//theTime.setLocation(40, 20);
 		theTime.setForeground(Color.BLACK);
 		theLabel.setLocation(getWidth() / 2, 80);
 		theLabel.setForeground(Color.BLACK);
 	}
 	
 	public void init() {
+		d = app.getStatePanel().getSize();
+		System.out.println(theButton.getWidth());
+		System.out.println(theButton.getX());
+		System.out.println("||||||");
+		theButton.setBounds(new Rectangle(80, 80, 52, 23));
+		System.out.println(theButton.getWidth());
+		theButton.getX();
+		theLabel.setBounds(396, 5, 150, 15);
+		theTime.setBounds(417, 20, 100, 15);
+		theButton.setVisible(true);
 		moveButton();
 		theLabel.setVisible(false);
-		theLabel.setLocation(getWidth() / 2, 80);
 		theButton.setEnabled(true);
 		hasWon = false;
 		counter = 0;
+		theButton.setForeground(PlayerStyles.colors[app.getBoardPanel().getClientPlayer().getStyleID()]);
+		theButton.setBorder(new LineBorder(PlayerStyles.colors[app.getBoardPanel().getClientPlayer().getStyleID()], 2));
+		app.colorize(theTime);
+		app.colorize(theLabel);
 	}
 	
 	public void update() {
-		theTime.setLocation(new Point(80, 80));
-		theLabel.setLocation(new Point(getWidth() / 2, 80));
-		System.out.println(theTime.getLocation());
-		System.out.println(theLabel.getLocation());
 		if (!hasWon) {
 			if (counter % diff == 0) {
 				moveButton();
@@ -126,7 +138,8 @@ public class Enter extends BaseMiniPanel {
 			//theLabel.setLocation(getWidth() / 2, 80);
 			hasWon = true;
 			theButton.setEnabled(false);
-			theLabel.setEnabled(true);
+			theLabel.setVisible(true);
+			//theLabel.setLocation(new Point(theLabel.getLocation().x,theLabel.getLocation().y + 20));
 			clientPlayer = app.getBoardPanel().getClientPlayer();
 			
 			NewJSONObject k1 = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_UPDATE);
@@ -149,7 +162,7 @@ public class Enter extends BaseMiniPanel {
 	public void paintComponent(Graphics g) {
 		final Graphics2D g2d = (Graphics2D)g.create();
 		try {
-			g2d.setColor(GameUtils.colorFromHex("#C0C0C0"));
+			g2d.setColor(GameUtils.colorFromHex("#202020 "));
 			g2d.fillRect(0, 0, getWidth(), getHeight());
 			g2d.setColor(Color.BLACK);
 			g2d.setFont(new Font("Courier New", Font.BOLD, 50));
