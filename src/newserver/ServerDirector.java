@@ -256,8 +256,7 @@ public class ServerDirector {
 					
 					if (timeLeft == 0) {
 						timer.stop();
-						hasStarted = true;	// we've started the game now!
-						System.out.println("OK. CHANGE ALL CLIENTS STATE TO BOARD!!!!");
+						hasStarted = true;
 						changeClientState(BOARD);
 					} else {
 						timeLeft--;

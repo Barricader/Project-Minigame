@@ -124,6 +124,28 @@ public class BoardPanel extends JPanel {
 		if (newTileID >= tiles.size()) {
 			newTileID -= tiles.size();
 		}
+		
+		if (tiles.get(newTileID+1).getType() == 0) {
+			// If landed on a blue tile
+			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 1);
+			app.getLeaderPanel().updateList();
+		}
+		else if(tiles.get(newTileID+1).getType() == 1) {
+			// If landed on a red tile
+			players.get(player.getName()).setScore(players.get(player.getName()).getScore() - 1);
+			app.getLeaderPanel().updateList();
+		}
+		else {
+			// If landed on a green tile
+			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 5);
+			app.getLeaderPanel().updateList();
+		}
+		
+		if (movePath.contains(tiles.get(0)) && movePath.indexOf(tiles.get(0)) != 0) {
+			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 5);
+			app.getLeaderPanel().updateList();
+		}
+		
 		player.setTileID(newTileID);
 		return movePath;
 	}
@@ -213,7 +235,7 @@ public class BoardPanel extends JPanel {
 			else {
 				color = GameUtils.colorFromHex("#1DD147");	// green
 			}	
-			NewTile t = new NewTile(color, 0, NewTile.TILE_COUNT, x, y, tileWidth, tileHeight);
+			NewTile t = new NewTile(color, 0, NewTile.TILE_COUNT, x, y, c, tileWidth, tileHeight);
 			tiles.add(t.getID(), t);
 		}
 	}

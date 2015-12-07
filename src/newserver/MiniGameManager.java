@@ -13,7 +13,6 @@ import javax.swing.Timer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import gameobjects.PongBall;
 import util.GameUtils;
 import util.Keys;
 import util.MiniGames;
@@ -55,10 +54,8 @@ public class MiniGameManager {
 	private void initActionMap() {
 		actionMap = new HashMap<>();
 		actionMap.put(MiniGames.names[0], () -> handleEnter(miniObj));
-		actionMap.put(MiniGames.names[1], () -> handleKeyFinder(miniObj));
-		actionMap.put(MiniGames.names[2], () -> handlePaint(miniObj));
-		actionMap.put(MiniGames.names[3], () -> handlePong(miniObj));
-		actionMap.put(MiniGames.names[4], () -> handleRPS(miniObj));
+		actionMap.put(MiniGames.names[1], () -> handlePong(miniObj));
+		actionMap.put(MiniGames.names[2], () -> handleRPS(miniObj));
 	}
 	
 	/**
@@ -141,14 +138,6 @@ public class MiniGameManager {
 		// update leaderboard
 		String pName = (String) obj.get(Keys.PLAYER_NAME);
 		leaderboard.add(pName);
-	}
-	
-	private void handleKeyFinder(JSONObject obj) {
-
-	}
-
-	private void handlePaint(JSONObject obj) {
-
 	}
 
 	private void handlePong(JSONObject obj) {

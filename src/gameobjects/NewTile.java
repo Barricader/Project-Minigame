@@ -19,15 +19,17 @@ public class NewTile extends GameObject {
 	private Color color;
 	private int action;
 	private int ID;
+	private int type;
 	private Rectangle[] playerCells;	// quadrant rectangles for players
 	
-	public NewTile(Color color, int action, int ID, int x, int y, int width, int height) {
+	public NewTile(Color color, int action, int ID, int x, int y, int type, int width, int height) {
 		this.color = color;
 		this.action = action;
 		this.ID = ID;
 		// rect setup
 		this.x = x;
 		this.y = y;
+		this.type = type;
 		this.width = width;
 		this.height = height;
 		TILE_COUNT++;
@@ -85,24 +87,13 @@ public class NewTile extends GameObject {
 	 */
 	private void drawPlayerCells(Graphics2D g2d) {	
 		createPlayerCells();
-//		char[] letters = {'a', 'b', 'c', 'd'};	// cell letters, (DEBUG STUFF)
 
 		for (int i = 0; i < playerCells.length; i++) {
 			Rectangle r = playerCells[i];
 			g2d.setColor(new Color(0, 0, 0, 50));
 			g2d.fillRect(r.x, r.y, r.width, r.height);
-			
-			// DEBUG STUFF - Probably don't need, but keep for now.
-			// draw location ID
-//			String locID = ID + "" + letters[i];
-//			int w = g2d.getFontMetrics().stringWidth(locID);
-//			Point midPt = new Point(r.x + ((r.width + w) / 2) - w, r.y + (r.height / 2));	// pt to draw quad cell letter
-//			g2d.setColor(Color.WHITE);
-//			g2d.drawString(locID , midPt.x, midPt.y);
 		}
 	}
-	
-	// accessor methods
 	
 	public Color getColor() {
 		return color;
@@ -114,6 +105,10 @@ public class NewTile extends GameObject {
 
 	public int getID() {
 		return ID;
+	}
+	
+	public int getType() {
+		return type;
 	}
 
 	public Point getCellLocation(int ID) {
