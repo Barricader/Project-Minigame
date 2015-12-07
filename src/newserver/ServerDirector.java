@@ -83,6 +83,7 @@ public class ServerDirector {
 	public void removePlayer(JSONObject obj) {
 		NewPlayer p = NewPlayer.fromJSON(obj);
 		removePlayer(p);
+		PlayerStyles.taken[p.getStyleID()] = false;		// style is available again
 	}
 	
 	/**
@@ -243,6 +244,10 @@ public class ServerDirector {
 	private void checkCountdown() {
 		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.TIMER);
 		JSONObject timerObj = new JSONObject();
+		
+		if (players.size() < 2) {
+			hasStarted = false;		// we need to reset!
+		}
 		
 		if (!hasStarted) {
 			if (players.size() >= 2) {

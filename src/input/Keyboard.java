@@ -42,7 +42,6 @@ public class Keyboard implements KeyEventDispatcher {
 	 * Updates last key and also any modifier key flags.
 	 */
 	public void keyPressed(KeyEvent e) {
-		System.out.println("LAST KEY: " + e.getKeyCode());
 		lastKey = e.getKeyCode();
 		System.out.println(e.getKeyCode());
 

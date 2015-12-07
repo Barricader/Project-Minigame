@@ -275,6 +275,7 @@ public class ClientApp extends JFrame {
 			dicePanel.setVisible(false);
 			leaderPanel.setVisible(false);
 			boardPanel.getPlayers().clear();
+			globalColor.setColor(Color.GRAY);	// back to default
 			resetClient();
 			repaint();	
 		}
