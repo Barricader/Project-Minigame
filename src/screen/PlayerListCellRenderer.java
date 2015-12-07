@@ -10,6 +10,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.border.EmptyBorder;
 
 import gameobjects.NewPlayer;
+import util.GameUtils;
 import util.PlayerStyles;
 
 /**

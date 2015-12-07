@@ -18,7 +18,9 @@ import javax.swing.border.LineBorder;
 
 import client.ClientApp;
 import newserver.Server;
+import util.DarkButton;
 import util.ErrorUtils;
+import util.GameUtils;
 
 /**
  * This class contains the controls necessary to change the client--server 
@@ -37,7 +39,7 @@ public class SettingsPanel extends JPanel {
 	private JTextField addressField;
 	private JTextField portField;
 	private JTextField nameField;
-	private JButton applyBtn;
+	private DarkButton applyBtn;
 	
 	/**
 	 * Constructs a new SettingsPanel with a link to the main client.
@@ -46,7 +48,7 @@ public class SettingsPanel extends JPanel {
 	public SettingsPanel(ClientApp app) {
 		this.app = app;
 		init();
-		setBorder(new LineBorder(Color.LIGHT_GRAY));
+		setBackground(Color.BLACK);
 	}
 	
 	/**
@@ -78,6 +80,7 @@ public class SettingsPanel extends JPanel {
 		c.weightx = 1.0;
 		c.gridwidth = 4;
 		c.gridy = 1;
+		c.ipady = 5;
 		add(addressField, c);
 		
 		c.fill = GridBagConstraints.NONE;
@@ -105,30 +108,35 @@ public class SettingsPanel extends JPanel {
 	 */
 	private void createComponents() {
 		settingsLabel = new JLabel("Connection Settings: ");
-		settingsLabel.setFont(new Font("Courier New", Font.BOLD, 14));
 		settingsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		app.colorize(settingsLabel, null, 14);
 		
 		addressLabel = new JLabel("IP Address: ");
-		addressLabel.setFont(font);
 		addressLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		app.colorize(addressLabel, null, 14);
 		addressField = new JTextField();
-		addressField.setFont(font);
+		addressField.setBorder(new LineBorder(null));
 		addressField.setText(Server.HOST);
+		app.colorize(addressField, (LineBorder)addressField.getBorder(), 14);
 		addressField.addKeyListener(handleKey());
 		
 		portLabel = new JLabel("Port No: ");
-		portLabel.setFont(font);
 		portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		app.colorize(portLabel, null, 14);
 		portField = new JTextField("" + Server.PORT);
-		portField.setFont(font);
+		portField.setBorder(new LineBorder(null));
+		app.colorize(portField, (LineBorder)portField.getBorder(), 14);
 		portField.addKeyListener(handleKey());
 		
-		applyBtn = new JButton("Apply");
-		applyBtn.setFont(font);
+		applyBtn = new DarkButton("Apply");
+		GameUtils.customizeComp(applyBtn, GameUtils.colorFromHex("#121212"), Color.CYAN, 14);
 		applyBtn.setEnabled(false);	// disable initially, until we change values
+		app.colorize(applyBtn, new LineBorder(null));
 		applyBtn.addActionListener( e -> {
 			apply();
 		});
+		
+		app.colorize(this, new LineBorder(null));
 	}
 	
 	/**

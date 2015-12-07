@@ -1,18 +1,19 @@
 package panels;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
-import gameobjects.NewPlayer;
 import newserver.ServerDirector;
+import util.GameUtils;
 import util.Keys;
 
 /**
@@ -58,6 +59,7 @@ public class StatePanel extends JPanel {
 		c.weighty = 0.1;
 		add(newView, c);
 		app.revalidate();
+		newView.setBackground(Color.BLACK);
 	}
 	
 	/**

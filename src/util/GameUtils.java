@@ -93,6 +93,14 @@ public class GameUtils {
 		return new Color(red, green, blue);
 	}
 	
+	public static Color getAlphaColor(Color c, int a) {
+		int r = c.getRed();
+		int g = c.getGreen();
+		int b = c.getBlue();
+		
+		return new Color(r, g, b, a);
+	}
+	
 	/**
 	 * Customize labels to reduce some redundancy when applying styles. The font set is
 	 * Courier New BOLD.

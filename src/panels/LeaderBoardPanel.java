@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.DefaultListModel;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -21,7 +20,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
-import client.IOHandler;
 import gameobjects.NewPlayer;
 import util.DisabledItemSelectionModel;
 import util.GameUtils;
@@ -52,6 +50,7 @@ public class LeaderBoardPanel extends JPanel {
 		this.app = app;
 		init();
 		setPreferredSize(new Dimension(100, 100));
+		setBackground(Color.BLACK);
 	}
 	
 	/**
@@ -59,8 +58,7 @@ public class LeaderBoardPanel extends JPanel {
 	 */
 	private void init() {
 		createComponents();
-		
-		setBorder(new LineBorder(Color.LIGHT_GRAY));	
+
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
@@ -115,42 +113,39 @@ public class LeaderBoardPanel extends JPanel {
 		// leaderboard title label
 		titleLabel = new JLabel("Leaderboard");
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		titleLabel.setFont(new Font("Courier New", Font.BOLD, 16));
 		titleLabel.setOpaque(true);
-		titleLabel.setBackground(Color.BLACK);
-		titleLabel.setForeground(Color.CYAN);
-		titleLabel.setBorder(new LineBorder(Color.CYAN, 2));
+		app.colorize(titleLabel, new LineBorder(null, 2), 16);
 		
 		// name label
 		nameLabel = new JLabel(" Name");
-		nameLabel.setFont(new Font("Courier New", Font.BOLD, 14));
-		nameLabel.setBorder(new MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+//		nameLabel.setFont(new Font("Courier New", Font.BOLD, 14));
+//		nameLabel.setBorder(new MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+		app.colorize(nameLabel, new LineBorder(null), 14);
 		
 		// score label
 		scoreLabel = new JLabel("Score ");
-		scoreLabel.setFont(new Font("Courier New", Font.BOLD, 14));
+//		scoreLabel.setFont(new Font("Courier New", Font.BOLD, 14));
 		scoreLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		scoreLabel.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
+		app.colorize(scoreLabel, new LineBorder(null), 14);
+//		scoreLabel.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
 		
 		// name list
 		nameListModel = new DefaultListModel<>();
 		nameList = new JList<>(nameListModel);
 		nameList.setSelectionModel(new DisabledItemSelectionModel());
 		nameList.setPreferredSize(new Dimension(100, 100));
-		nameList.setBackground(GameUtils.colorFromHex("#D6D9DF"));
-		nameList.setFont(new Font("Courier New", Font.BOLD, 11));
-		nameList.setForeground(Color.DARK_GRAY);
-		nameList.setBorder(new MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+		nameList.setBackground(Color.BLACK);
+		app.colorize(nameList, new LineBorder(null), 11);
+
 		
 		// score list
 		scoreListModel = new DefaultListModel<>();
 		scoreList = new JList<>(scoreListModel);
 		scoreList.setSelectionModel(new DisabledItemSelectionModel());
 		scoreList.setPreferredSize(new Dimension(100, 100));
-		scoreList.setBackground(GameUtils.colorFromHex("#D6D9DF"));
-		scoreList.setFont(new Font("Courier New", Font.BOLD, 11));
-		scoreList.setForeground(Color.DARK_GRAY);
-		scoreList.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
+		app.colorize(scoreList, new LineBorder(null), 11);
+//		scoreList.setForeground(Color.DARK_GRAY);
+//		scoreList.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
 	}
 	
 	/**

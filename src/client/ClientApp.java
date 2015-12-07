@@ -1,6 +1,8 @@
 package client;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -12,10 +14,11 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
@@ -36,6 +39,8 @@ import panels.minis.Paint;
 import panels.minis.Pong;
 import panels.minis.RPS;
 import util.ErrorUtils;
+import util.GameUtils;
+import util.GlobalColor;
 import util.MiniGames;
 
 /**
@@ -49,6 +54,8 @@ public class ClientApp extends JFrame {
 	// connection settings
 	private String host = Server.HOST;
 	private int port = Server.PORT;
+	
+	private GlobalColor globalColor;
 	
 	private static final String TITLE = "Project Mini-Game by Jo & Kramer";
 	private static final Dimension SIZE = new Dimension(960, 800);	// min size
@@ -80,6 +87,7 @@ public class ClientApp extends JFrame {
 	 */
 	public ClientApp() {
 		client = new Client(this);
+		globalColor = new GlobalColor(Color.LIGHT_GRAY);	// default start color
 		errorHandler = new ErrorHandler();
 		init();
 		initMinis();
@@ -155,6 +163,7 @@ public class ClientApp extends JFrame {
 	 */
 	private void createComponents() {
 		panel = new JPanel();
+		panel.setBackground(Color.BLACK);
 		statePanel = new StatePanel(this);
 		chatPanel = new ChatPanel(this);
 		connPanel = new ConnectionPanel(this);
@@ -298,6 +307,19 @@ public class ClientApp extends JFrame {
 		minis.get(state).setKey(key);
 	}
 	
+	public void colorize(JComponent c) {
+		globalColor.add(c);
+	}
+	
+	public void colorize(JComponent c, LineBorder border) {
+		globalColor.add(c, border);
+	}
+	
+	public void colorize(JComponent c, LineBorder border, int fontSize) {
+		GameUtils.customizeComp(c, null, globalColor.getColor(), fontSize);
+		globalColor.add(c, border);
+	}
+	
 	// mutator methods
 	
 	public void setHost(String host) {
@@ -315,6 +337,7 @@ public class ClientApp extends JFrame {
 	public void setMini(String curMini) {
 		this.curMini = curMini;
 	}
+
 	
 	// accessor methods
 	
@@ -324,6 +347,10 @@ public class ClientApp extends JFrame {
 	
 	public String getHost() {
 		return host;
+	}
+	
+	public GlobalColor getGlobalColor() {
+		return globalColor;
 	}
 	
 	public int getPort() {
@@ -390,17 +417,6 @@ public class ClientApp extends JFrame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// change look and feel to nimbus
-		try {
-		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-		        if ("Nimbus".equals(info.getName())) {
-		            UIManager.setLookAndFeel(info.getClassName());
-		            break;
-		        }
-		    }
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
 		ClientApp app = new ClientApp();
 	}
 }

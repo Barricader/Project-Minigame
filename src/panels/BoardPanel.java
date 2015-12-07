@@ -47,6 +47,7 @@ public class BoardPanel extends JPanel {
 		init();
 		players = new ConcurrentHashMap<>();
 		controller = new Controller();
+		setBackground(Color.BLACK);
 	}
 	
 	/**

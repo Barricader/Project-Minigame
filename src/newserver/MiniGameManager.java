@@ -7,14 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.swing.Timer;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import gameobjects.PongBall;
 import util.GameUtils;
 import util.Keys;
 import util.MiniGames;
@@ -38,6 +37,8 @@ public class MiniGameManager {
 	private Map<String, Integer> temp;	// holds win values from mini-games
 	private Timer timer;
 	private int count = 0;	// TODO this is for counting packets. Remove me later!
+	
+	private ServerPongBall serverPongBall;
 	
 	public MiniGameManager(ServerDirector serverDir) {
 		this.serverDir = serverDir;
@@ -98,7 +99,8 @@ public class MiniGameManager {
 			ranNum = GameUtils.random.nextInt(MiniGames.names.length);
 		}
 		lastMini = ranNum;
-		return "enter";
+		return "pong";
+//		return "enter";
 		//return MiniGames.names[lastMini];
 	}
 	
@@ -150,8 +152,15 @@ public class MiniGameManager {
 	}
 
 	private void handlePong(JSONObject obj) {
+		//test
+//		if (serverPongBall == null) {
+//			serverPongBall = new ServerPongBall(this);
+//			serverPongBall.start();
+//		}
+		
 		System.out.println("Pong stuff...");
 		System.out.println(obj.toJSONString()); 		
+		
 		serverDir.getServer().echoAll(obj);
 		count++;
 		System.out.println("pong pkt count: " + count);
@@ -162,6 +171,14 @@ public class MiniGameManager {
 		int wins = (int) obj.get(Keys.WINS);
 		System.out.println("wins for : " + pName + ", is " + wins);
 		temp.put(pName, wins);
+	}
+	
+	public int getLastMini() {
+		return lastMini;
+	}
+	
+	public ServerDirector getServerDir() {
+		return serverDir;
 	}
 	
 	class TempComparator implements Comparator<String> {

@@ -12,6 +12,7 @@ import client.ClientApp;
 import gameobjects.NewPlayer;
 import screen.PlayerListCellRenderer;
 import util.DisabledItemSelectionModel;
+import util.GameUtils;
 
 /**
  * This class provides a list view of all connected players that
@@ -51,7 +52,7 @@ public class Lobby extends JList<NewPlayer> {
 		listModel = new DefaultListModel<>();
 		setCellRenderer(listRenderer);
 		setSelectionModel(new DisabledItemSelectionModel());
-		setBorder(new LineBorder(Color.LIGHT_GRAY));
+		setBorder(new LineBorder(Color.CYAN));
 		setModel(listModel);
 		repaint();
 	}

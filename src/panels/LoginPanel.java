@@ -23,10 +23,12 @@ import org.json.simple.JSONObject;
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
+import util.DarkButton;
 import util.ErrorUtils;
 import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
+import util.PlayerStyles;
 
 /**
  * The Login panel class allows the user to enter their name and connect to the server.
@@ -44,7 +46,7 @@ public class LoginPanel extends JPanel {
 	private JLabel timerLabel;
 	private JLabel nameLabel;
 	private JTextField nameField;
-	private JButton joinBtn;
+	private DarkButton joinBtn;
 	private Lobby lobby;
 	private SettingsPanel settingsPanel;
 	
@@ -56,7 +58,6 @@ public class LoginPanel extends JPanel {
 		this.app = app;
 		controller = new Controller();
 		init();
-		setBorder(new LineBorder(Color.LIGHT_GRAY));
 	}
 	
 	/**
@@ -101,6 +102,7 @@ public class LoginPanel extends JPanel {
 		add(nameLabel, c);
 		
 		// name field
+		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 1;
 		c.gridy = 1;
 		add(nameField, c);
@@ -108,6 +110,7 @@ public class LoginPanel extends JPanel {
 		// join btn
 		c.gridx = 2;
 		c.gridy = 1;
+		c.ipady = 5;
 		add(joinBtn, c);
 		
 		// timer label
@@ -115,6 +118,7 @@ public class LoginPanel extends JPanel {
 		c.gridx = 0;
 		c.gridwidth = 8;
 		c.gridy = 3;
+		c.ipady = 0;
 		add(timerLabel, c);
 		
 		// lobby
@@ -132,20 +136,19 @@ public class LoginPanel extends JPanel {
 	 */
 	private void createComponents() {
 		titleLabel = new JLabel("<Project Mini-Game>");
-		titleLabel.setFont(new Font("Courier New", Font.BOLD, 18));
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		app.colorize(titleLabel, null, 18);
 		
 		nameLabel = new JLabel("Name:");
-		nameLabel.setFont(new Font("Courier New", Font.BOLD, 20));
 		nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		app.colorize(nameLabel, null, 20);
 		
 		timerLabel = new JLabel(" ");
-		timerLabel.setFont(new Font("Courier New", Font.BOLD, 30));
-		timerLabel.setForeground(GameUtils.colorFromHex("#E82539"));
 		timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		app.colorize(timerLabel, null, 30);
 		
 		nameField = new JTextField(10);
-		nameField.setFont(new Font("Courier New", Font.BOLD, 20));
+		app.colorize(nameField, new LineBorder(Color.CYAN), 20);
 		nameField.addKeyListener(new KeyAdapter() {
 			
 			public void keyReleased(KeyEvent e) {
@@ -160,14 +163,17 @@ public class LoginPanel extends JPanel {
 			}
 		});
 		
-		joinBtn = new JButton("Join Game");
-		joinBtn.setFont(new Font("Courier New", Font.BOLD, 20));
+		joinBtn = new DarkButton("Join Game");
 		joinBtn.setEnabled(false);
+		joinBtn.setBorder(new LineBorder(app.getGlobalColor().getColor()));
+		app.colorize(joinBtn, (LineBorder)joinBtn.getBorder(), 20);
+		
 		joinBtn.addActionListener( e -> {
 			controller.joinPlayer();
 		});
 		
 		lobby = new Lobby(app);
+		app.colorize(lobby, (LineBorder)lobby.getBorder());
 		settingsPanel = new SettingsPanel(app);
 	}
 	
@@ -260,6 +266,8 @@ public class LoginPanel extends JPanel {
 				if (newPlayer.getName().equals(clientPlayer.getName())) {	// player belongs to this client!
 					clientPlayer = newPlayer;
 					app.getBoardPanel().setClientPlayer(clientPlayer);
+					app.getGlobalColor().setColor(PlayerStyles.getColor(clientPlayer.getStyleID()));
+					app.getDicePanel().colorizeDice(PlayerStyles.getColor(clientPlayer.getStyleID()));
 				}
 				app.getBoardPanel().addPlayer(newPlayer);
 				lobby.updateList();

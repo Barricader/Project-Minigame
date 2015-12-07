@@ -2,26 +2,35 @@ package panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.Caret;
+import javax.swing.text.JTextComponent;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
+import util.DarkButton;
+import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
+import util.ScrollBarUI;
 
 /**
  * Chat panel contains a text area where all messages that have been sent
@@ -36,7 +45,7 @@ public class ChatPanel extends JPanel {
 	private JScrollPane scrollPane;
 	private JTextArea chatArea;
 	private JTextField msgField;
-	private JButton sendBtn;
+	private DarkButton sendBtn;
 	private Controller controller;
 	
 	/**
@@ -47,6 +56,8 @@ public class ChatPanel extends JPanel {
 		this.app = app;
 		controller = new Controller(this);
 		init();
+		setBackground(Color.BLACK);
+		app.colorize(this, new LineBorder(null));
 	}
 	
 	/**
@@ -83,8 +94,10 @@ public class ChatPanel extends JPanel {
 		c.anchor = GridBagConstraints.SOUTHEAST;
 		c.fill = GridBagConstraints.VERTICAL;
 		c.gridx = 1;
+		c.ipadx = 20;
 		c.weightx = 0.0;
 		c.gridy = 1;
+		c.ipady = 10;
 		c.weighty = 0.0;
 		add(sendBtn, c);
 	}
@@ -98,9 +111,16 @@ public class ChatPanel extends JPanel {
 		chatArea.setWrapStyleWord(true);
 		chatArea.setLineWrap(true);
 		chatArea.setCaretPosition(chatArea.getDocument().getLength());	// scroll down
-		chatArea.setBorder(new LineBorder(Color.LIGHT_GRAY));
+		chatArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+		chatArea.setBackground(Color.BLACK);
+		chatArea.setFont(new Font("Courier New", Font.BOLD, 12));
+		app.colorize(chatArea);
 		
 		msgField = new JTextField();
+//		msgField.setBorder(new CompoundBorder(new LineBorder(Color.CYAN), new EmptyBorder(0, 5, 0, 5)));
+		app.colorize(msgField, new LineBorder(null), 12);
+		msgField.setCaretColor(app.getGlobalColor().getColor());
+		msgField.putClientProperty("caretWidth", 2);
 		msgField.addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent e) {
 				if (e.getKeyChar() == '\n') {
@@ -108,11 +128,13 @@ public class ChatPanel extends JPanel {
 				}
 			}
 		});
+		msgField.setBorder(new CompoundBorder(new LineBorder(msgField.getForeground()), new EmptyBorder(0, 5, 0, 5)));
 		
 		msgField.setFocusable(true);
 		msgField.requestFocus();
 		
-		sendBtn = new JButton("Send");
+		sendBtn = new DarkButton("Send");
+		app.colorize(sendBtn, new LineBorder(null), 16);
 		sendBtn.addActionListener( e -> {
 			controller.sendMessage();
 		});
@@ -120,6 +142,10 @@ public class ChatPanel extends JPanel {
 		scrollPane = new JScrollPane(chatArea);
 		scrollPane.setPreferredSize(new Dimension(1, 2));	// workaround for "jumping" glitch when resizing window
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.getVerticalScrollBar().setUI(new ScrollBarUI());
+		
+		app.colorize(scrollPane, new LineBorder(null), 12);
+		app.colorize(scrollPane.getVerticalScrollBar());
 	
 		controller.toggleUI(app.getClient().isConnected());
 	}

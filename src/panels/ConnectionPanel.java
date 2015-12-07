@@ -20,6 +20,7 @@ import client.Client;
 import client.ClientApp;
 import client.IOHandler;
 import newserver.Server;
+import util.DarkButton;
 import util.ErrorUtils;
 import util.GameUtils;
 import util.Keys;
@@ -35,7 +36,7 @@ public class ConnectionPanel extends JPanel {
 	private ClientApp app;
 	private Controller controller;
 	
-	private JButton connectBtn;
+	private DarkButton connectBtn;
 	private JLabel statusLabel;
 	
 	/**
@@ -48,6 +49,7 @@ public class ConnectionPanel extends JPanel {
 		init();
 		setPreferredSize(SIZE);
 		setMinimumSize(SIZE);
+		setBackground(Color.BLACK);
 	}
 	
 	/**
@@ -84,18 +86,21 @@ public class ConnectionPanel extends JPanel {
 	 * Creates GUI components.
 	 */
 	private void createComponents() {
-		connectBtn = new JButton("Connect");
+		connectBtn = new DarkButton("Connect");
 		connectBtn = controller.connect();
+		
+		app.colorize(connectBtn, new LineBorder(null), 14);
 		
 		statusLabel = new JLabel("Status: Not Connected!");
 		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		setBorder(new LineBorder(Color.LIGHT_GRAY));
+		app.colorize(statusLabel, null, 14);
+		app.colorize(this, new LineBorder(null));
 		setLayout(new GridBagLayout());
 	}
 	
 	// Accessor methods
 	
-	public JButton getConnectBtn() {
+	public DarkButton getConnectBtn() {
 		return connectBtn;
 	}
 	
@@ -146,7 +151,7 @@ public class ConnectionPanel extends JPanel {
 		 * 
 		 * @return connectBtn with connect action.
 		 */
-		public JButton connect() {
+		public DarkButton connect() {
 			clearActions(connectBtn);
 			connectBtn.setText("Connect");
 			connectBtn.addActionListener( e -> {
@@ -171,19 +176,20 @@ public class ConnectionPanel extends JPanel {
 		 * 
 		 * @return connectBtn with disconnect action.
 		 */
-		public JButton disconnect() {
+		public DarkButton disconnect() {
 			clearActions(connectBtn);
 			connectBtn.setText("Disconnect");
 			connectBtn.addActionListener( e -> {
-				try {
-					app.getStatePanel().getLoginPanel().getController().disconnectPlayer();
-					Client c = app.getClient();
-					c.terminate();
-				} catch (Exception e1) {
-					
-				} finally {
-					controller.updateStatus(STATUS_DISCONNECTED);
-					app.reset();
+				if (app.getStatePanel().getLoginPanel().getController().disconnectPlayer()) {
+					try {
+						Client c = app.getClient();
+						c.terminate();
+					} catch (Exception e1) {
+						
+					} finally {
+						controller.updateStatus(STATUS_DISCONNECTED);
+						app.reset();
+					}	
 				}
 			});
 			return connectBtn;

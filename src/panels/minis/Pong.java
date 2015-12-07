@@ -15,6 +15,7 @@ import org.json.simple.JSONObject;
 import com.sun.glass.events.KeyEvent;
 
 import client.ClientApp;
+import gameobjects.PongBall;
 import panels.BaseMiniPanel;
 import util.BaseController;
 import util.GameUtils;
@@ -30,6 +31,7 @@ public class Pong extends BaseMiniPanel {
 	private boolean didPressEnter;	// have we pressed enter already to exit?
 	
 	private ConcurrentHashMap<String, PongRect> playerRects;
+	private PongBall pongBall;
 	
 	/**
 	 * Constructs new Pong mini game with a link to the main ClientApp.
@@ -229,6 +231,7 @@ public class Pong extends BaseMiniPanel {
 					g2d.drawRect(r.x, r.y, r.width, r.height);
 				}
 			}
+			pongBall.draw(g2d);
 			g2d.setColor(Color.CYAN);
 			drawPlayers(g2d);
 		} finally {
@@ -276,9 +279,20 @@ public class Pong extends BaseMiniPanel {
 		}
 
 		public void receive(JSONObject in) {
+			if (in.containsKey("objectOnlyUpdate")) {
+				updateBall(in);
+				return;
+			}
+			
 			String pName = (String) in.get(Keys.PLAYER_NAME);
 			Color c = PlayerStyles.colors[(int) in.get(Keys.STYLE_ID)];	// color the rectangle
-
+			
+			// pong ball testing
+			
+			if (pongBall == null) {
+				pongBall = new PongBall();
+			}
+			
 			// update rectangle from received player
 			PongRect r = null;
 			if (playerRects.containsKey(pName)) {
@@ -293,6 +307,16 @@ public class Pong extends BaseMiniPanel {
 			r.setColor(c);
 			playerRects.put(pName, r);
 			repaint();
+		}
+		
+		private void updateBall(JSONObject in) {
+			if (pongBall == null) {
+				pongBall = new PongBall();
+			}
+			
+			JSONObject ball = (JSONObject)in.get("ball");
+			pongBall.x = (int) ball.get("x");
+			pongBall.y = (int) ball.get("y");
 		}
 	}	
 }

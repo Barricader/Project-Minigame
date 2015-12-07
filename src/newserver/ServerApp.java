@@ -221,7 +221,14 @@ public class ServerApp extends JFrame {
 			console.setFont(new Font("Courier New", Font.PLAIN, 12));
 			console.setWrapStyleWord(true);
 			console.setLineWrap(true);
-			console.setComponentPopupMenu(new SaveContextMenu());
+			console.addMouseListener(new MouseAdapter() {
+				public void mousePressed(MouseEvent e) {
+					if (SwingUtilities.isRightMouseButton(e)) {
+						SaveContextMenu m = new SaveContextMenu();
+						console.setComponentPopupMenu(m);
+					}
+				}
+			});
 			scrollPane = new JScrollPane(console);
 			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		}
@@ -231,10 +238,18 @@ public class ServerApp extends JFrame {
 			private JMenuItem menuItem;
 			
 			public SaveContextMenu() {
+				System.out.println("new context menu!");
 				menuItem = new JMenuItem("Save to log file");
+				
+				if (!console.getText().isEmpty()) {	// disable if nothing in console
+					menuItem.setEnabled(true);
+				} else {
+					menuItem.setEnabled(false);
+				}
+				
 				add(menuItem);
 				menuItem.addActionListener( e -> {
-					GameUtils.writeLogFile(console);
+					GameUtils.writeLogFile(console);	
 				});
 			}
 		}
@@ -289,10 +304,12 @@ public class ServerApp extends JFrame {
 			pList.addMouseListener(new MouseAdapter() {
 				public void mousePressed(MouseEvent e) {
 					if (SwingUtilities.isRightMouseButton(e)) {
-						JList list = (JList) e.getSource();
-						int row = list.locationToIndex(e.getPoint());
-						list.setSelectedIndex(row);
-						list.setComponentPopupMenu(new ContextMenu(row));
+						if (!listModel.isEmpty()) {
+							JList list = (JList) e.getSource();
+							int row = list.locationToIndex(e.getPoint());
+							list.setSelectedIndex(row);
+							list.setComponentPopupMenu(new ContextMenu(row));	
+						}
 					}
 				}
 			});
@@ -491,12 +508,13 @@ public class ServerApp extends JFrame {
 	public static void main(String[] args) {
 		// change look and feel to nimbus
 		try {
-		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-		        if ("Nimbus".equals(info.getName())) {
-		            UIManager.setLookAndFeel(info.getClassName());
-		            break;
-		        }
-		    }
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+//		        if ("Nimbus".equals(info.getName())) {
+//		            UIManager.setLookAndFeel(info.getClassName());
+//		            break;
+//		        }
+//		    }
 		} catch (Exception e) {
 		    e.printStackTrace();
 		}

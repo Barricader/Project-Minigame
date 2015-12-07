@@ -67,8 +67,29 @@ public class Dice extends Rectangle implements ActionListener {
 		}	
 		
 		if (!isEnabled) {	// gray out
-			g.setColor(new Color(85, 85, 85, 200));
+			g.setColor(new Color(0, 0, 0, 200));
 			g.fillRect(x, y, width, height);
+		}
+	}
+	
+	/**
+	 * Changes the cyan color from dice, to the specified color.
+	 * @param newColor
+	 */
+	public void colorizeDice(Color newColor) {
+		Color target = new Color(24, 24, 24);
+		for (int i = 1; i <= 6; i++) {
+			BufferedImage img = (BufferedImage) imgs[i];
+			
+			for (int x = 0; x < img.getWidth(); x++) {
+				for (int y = 0; y < img.getHeight(); y++) {
+					int pixel = img.getRGB(x, y);
+					System.out.println("pixel: " + pixel);
+					if (pixel != target.getRGB()) {
+						img.setRGB(x, y, newColor.getRGB());	
+					}
+				}
+			}
 		}
 	}
 	
