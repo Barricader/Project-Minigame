@@ -99,7 +99,7 @@ public class MiniGameManager {
 			ranNum = GameUtils.random.nextInt(MiniGames.names.length);
 		}
 		lastMini = ranNum;
-		return "pong";
+		return "enter";
 //		return "enter";
 		//return MiniGames.names[lastMini];
 	}
