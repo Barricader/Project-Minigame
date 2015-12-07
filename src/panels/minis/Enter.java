@@ -15,15 +15,18 @@ import org.json.simple.JSONObject;
 import client.ClientApp;
 import panels.BaseMiniPanel;
 import util.BaseController;
+import util.DarkButton;
 import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
+import util.PlayerStyles;
 
 public class Enter extends BaseMiniPanel {
 	private int pressed = 0;
 	private int rX = 0, rY = 0;
 	private Random r = new Random();
-	private JButton theButton;
+	//private JButton theButton;
+	private DarkButton theButton;
 	private JLabel theLabel, theTime;
 	private int diff = 80;
 	private int counter = 0;
@@ -31,7 +34,7 @@ public class Enter extends BaseMiniPanel {
 	
 	public Enter(ClientApp app) {
 		super(app);
-		theButton = new JButton("PRESS ME");
+		theButton = new DarkButton("PRESS ME");
 		theButton.addActionListener(e -> {
 			pressed++;
 			diff -= 15;
@@ -46,7 +49,9 @@ public class Enter extends BaseMiniPanel {
 		theLabel = new JLabel("Waiting for other players...");
 		theTime = new JLabel("Time left: 20");
 		add(theButton);
+		theButton.setForeground(PlayerStyles.colors[app.getBoardPanel().getClientPlayer().getStyleID()]);
 		add(theLabel);
+		add(theTime);
 		theLabel.setVisible(false);
 		theTime.setVisible(true);
 		moveButton();
