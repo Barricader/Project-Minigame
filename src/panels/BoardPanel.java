@@ -141,8 +141,9 @@ public class BoardPanel extends JPanel {
 			app.getLeaderPanel().updateList();
 		}
 		
+		// If passing start, give plus 3 score
 		if (movePath.contains(tiles.get(0)) && movePath.indexOf(tiles.get(0)) != 0) {
-			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 5);
+			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 3);
 			app.getLeaderPanel().updateList();
 		}
 		
