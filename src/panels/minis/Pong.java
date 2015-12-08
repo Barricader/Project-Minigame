@@ -25,6 +25,7 @@ import util.PlayerStyles;
 
 public class Pong extends BaseMiniPanel {
 	
+	private static final long serialVersionUID = 318748987007949296L;
 	private PongRect playerRect;	// the pong rectangle that belongs to the player
 	private boolean xAxis;	// movement restricted to x-axis
 	private boolean yAxis;	// movement restricted to y-axis
@@ -169,6 +170,7 @@ public class Pong extends BaseMiniPanel {
 	 * player's pongRect as well as the style id, so that it can be
 	 * colored easily.
 	 */
+	@SuppressWarnings("unchecked")
 	public void sendUpdate() {
 		NewJSONObject obj = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_UPDATE);
 		obj.put(Keys.NAME, "pong");
@@ -185,6 +187,7 @@ public class Pong extends BaseMiniPanel {
 	/**
 	 * Called whenever a key is pressed on the keyboard.
 	 */
+	@SuppressWarnings("unchecked")
 	public void playerPressed() {
 		if (isActive) {
 			if (xAxis) {
@@ -271,6 +274,10 @@ public class Pong extends BaseMiniPanel {
 	 *
 	 */
 	class PongRect extends Rectangle {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1659495291668720826L;
 		private Color color;
 		
 		public PongRect() {}

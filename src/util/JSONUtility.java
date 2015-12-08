@@ -69,6 +69,7 @@ public class JSONUtility {
 	 * @param key - Key to add
 	 * @param value - Value of key
 	 */
+	@SuppressWarnings("unchecked")
 	public void encode(String key, Object value) {
 		objectToSend.put(key, value);
 	}

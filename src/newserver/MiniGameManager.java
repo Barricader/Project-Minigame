@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.swing.Timer;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -34,10 +32,7 @@ public class MiniGameManager {
 	private int lastMini = -1;
 	private List<String> leaderboard;
 	private Map<String, Integer> temp;	// holds win values from mini-games
-	private Timer timer;
 	private int count = 0;	// TODO this is for counting packets. Remove me later!
-	
-	private ServerPongBall serverPongBall;
 	
 	public MiniGameManager(ServerDirector serverDir) {
 		this.serverDir = serverDir;
@@ -106,11 +101,12 @@ public class MiniGameManager {
 	 * packet update.
 	 * @return - JSONArray containing leaderboard wins by player name.
 	 */
+	@SuppressWarnings("unchecked")
 	public JSONArray getJSONLeaderboard() {
 		if (!temp.isEmpty()) {
 			//System.out.println("\n\n"+temp);
 			TempComparator tc = new TempComparator(temp);
-			TreeMap sorted = new TreeMap(tc);
+			TreeMap<String, Integer> sorted = new TreeMap<String, Integer>(tc);
 			sorted.putAll(temp);
 			//System.out.println(sorted);
 			leaderboard.addAll(sorted.keySet());
@@ -171,9 +167,9 @@ public class MiniGameManager {
 	}
 	
 	class TempComparator implements Comparator<String> {
-		Map base;
+		Map<String, Integer> base;
 		
-		public TempComparator(Map base) {
+		public TempComparator(Map<String, Integer> base) {
 			this.base = base;
 		}
 

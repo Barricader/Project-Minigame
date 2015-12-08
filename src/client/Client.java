@@ -19,7 +19,6 @@ import org.json.simple.JSONObject;
  *
  */
 public class Client extends Thread {
-	private ClientApp app;
 	protected boolean running = false;
 	protected boolean connected = false;
 	protected Socket socket;
@@ -40,7 +39,6 @@ public class Client extends Thread {
 	 * @param app - ClientApp
 	 */
 	public Client(ClientApp app) {
-		this.app = app;
 	}
 	
 	/**
@@ -50,7 +48,6 @@ public class Client extends Thread {
 	 * @param socket - Socket to connect to
 	 */
 	public Client(ClientApp app, int ID, Socket socket) {
-		this.app = app;
 		this.ID = ID;
 		this.socket = socket;
 	}

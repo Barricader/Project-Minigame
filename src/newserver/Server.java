@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.simple.JSONObject;
@@ -68,10 +67,9 @@ public class Server extends Thread {
 	public void run() {
 		while (running) {
 			try {
-				// wait and accept new clients
 				app.log("Waiting for client...");
 				addClient(serverSocket.accept());
-			} catch (SocketException e) {	// terminate if socket is closed!
+			} catch (SocketException e) {
 				running = false;
 			} catch (EOFException e) {
 				running = false;
@@ -105,6 +103,7 @@ public class Server extends Thread {
 	 * @param socket - Socket to allow server client to connect
 	 * @throws IOException
 	 */
+	@SuppressWarnings("unchecked")
 	public void addClient(Socket socket) throws IOException {
 		if (clients.size() < MAX_CLIENTS) {
 			int ID = serverDir.getPlayers().size();
@@ -112,9 +111,9 @@ public class Server extends Thread {
 			ServerClient sc = new ServerClient(ID, socket, this);
 			sc.open();
 			sc.start();
-			sc.echoID(); // echo ID to main client thread
-			NewJSONObject k = new NewJSONObject(ID, Keys.Commands.CONNECT);	// send connection status!
-			k.put(Keys.CONNECT_STATUS, 1);	// connection is good!
+			sc.echoID();
+			NewJSONObject k = new NewJSONObject(ID, Keys.Commands.CONNECT);
+			k.put(Keys.CONNECT_STATUS, 1);
 			sc.getIOHandler().send(k);
 			clients.put(ID, sc);
 			app.log("client: " + ID + ", added!");
@@ -149,7 +148,6 @@ public class Server extends Thread {
 		for (ServerClient sc : clients.values()) {
 			sc.getIOHandler().send(out);
 		}
-		// log, if applicable
 		if (out.containsKey(Keys.LOG)) {
 			if ((boolean)out.get(Keys.LOG)) {
 				app.log(out.toJSONString());
@@ -169,8 +167,6 @@ public class Server extends Thread {
 		close();
 		join();
 	}
-	
-	// accessor methods
 	
 	public ServerApp getServerApp() {
 		return app;

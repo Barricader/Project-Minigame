@@ -6,14 +6,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
 import newserver.ServerDirector;
-import util.GameUtils;
 import util.Keys;
 
 /**
@@ -24,6 +22,8 @@ import util.Keys;
  *
  */
 public class StatePanel extends JPanel {
+	private static final long serialVersionUID = -3438879693070540110L;
+
 	private ClientApp app;
 	
 	// initial login components

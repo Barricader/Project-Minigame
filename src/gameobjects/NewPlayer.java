@@ -33,7 +33,6 @@ public class NewPlayer extends GameObject {
 	
 	private String name;
 	private BufferedImage img;	// img representation of player
-	private Color color;	// color representation of player
 	private NewTile tile;	// what tile is player on?
 	private ArrayList<NewTile> movePath;	// path of tiles player will move on
 	private Point newLocation;	// new location that player will move to
@@ -99,7 +98,6 @@ public class NewPlayer extends GameObject {
 	@SuppressWarnings("static-access")	// it lies!
 	public void style(int colorNum) {
 		img = PlayerStyles.getInstance().imgs[colorNum];
-		color = PlayerStyles.getInstance().colors[colorNum];
 		styleID = colorNum;
 	}
 	
@@ -295,6 +293,7 @@ public class NewPlayer extends GameObject {
 	 * @return JSONObject containing all important values of a player to be
 	 * passed between other clients.
 	 */
+	@SuppressWarnings("unchecked")
 	public JSONObject toJSONObject() {
 		JSONObject player = new JSONObject();
 		player.put(Keys.ID, ID);

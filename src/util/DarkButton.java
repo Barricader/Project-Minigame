@@ -9,15 +9,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
-import javax.swing.border.LineBorder;
 
 public class DarkButton extends JButton {
+	private static final long serialVersionUID = 3153239231686497294L;
 	public static final Color BG_COLOR = Color.BLACK;
 	public static final Color FG_COLOR = Color.CYAN;
 	private boolean isHovered;
 	private boolean isPressed;
-	private LineBorder lineBorder;
-	
 	public DarkButton(String text) {
 		super(text);
 		setOpaque(true);

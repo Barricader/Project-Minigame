@@ -10,6 +10,8 @@ import javax.swing.DefaultListSelectionModel;
  */
 public class DisabledItemSelectionModel extends DefaultListSelectionModel {
 	
+	private static final long serialVersionUID = 5833807769675990703L;
+
 	/**
 	 * Whatever interval selection was made, this won't allow for a highlight
 	 * to be draw behind the element.

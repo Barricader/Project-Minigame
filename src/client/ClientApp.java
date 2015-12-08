@@ -47,6 +47,7 @@ import util.MiniGames;
  *
  */
 public class ClientApp extends JFrame {
+	private static final long serialVersionUID = 1417615047380477284L;
 	// connection settings
 	private String host = Server.HOST;
 	private int port = Server.PORT;
@@ -411,6 +412,7 @@ public class ClientApp extends JFrame {
 	 * Main method. Starts up client GUI app.
 	 * @param args
 	 */
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		ClientApp app = new ClientApp();
 	}

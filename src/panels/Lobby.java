@@ -12,7 +12,6 @@ import client.ClientApp;
 import gameobjects.NewPlayer;
 import screen.PlayerListCellRenderer;
 import util.DisabledItemSelectionModel;
-import util.GameUtils;
 
 /**
  * This class provides a list view of all connected players that
@@ -21,6 +20,7 @@ import util.GameUtils;
  *
  */
 public class Lobby extends JList<NewPlayer> {
+	private static final long serialVersionUID = -7947411849991637022L;
 	private ClientApp app;
 	private DefaultListModel<NewPlayer> listModel;
 	private PlayerListCellRenderer listRenderer;

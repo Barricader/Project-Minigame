@@ -16,8 +16,6 @@ public class Keyboard implements KeyEventDispatcher {
 	private boolean shiftFlag;
 	private boolean altFlag;
 	private boolean ctrlFlag;
-	private KeyboardFocusManager kfm;
-	
 	public boolean[] keys; // encompasses most used keys
 	
 	private BaseMiniPanel mp;
@@ -135,7 +133,6 @@ public class Keyboard implements KeyEventDispatcher {
 	}
 	
 	public void setKFM(KeyboardFocusManager kfm) {
-		this.kfm = kfm;
 		kfm.addKeyEventDispatcher(this);
 	}
 

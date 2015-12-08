@@ -6,10 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import org.json.simple.JSONObject;
-
 import client.ClientApp;
-import client.IOHandler;
 import gameobjects.NewPlayer;
 import input.Keyboard;
 import util.BaseController;

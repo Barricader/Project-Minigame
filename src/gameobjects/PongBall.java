@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import org.json.simple.JSONObject;
 
 public class PongBall extends GameObject {
+	private static final long serialVersionUID = 7246226056305104239L;
 	public static final int WIDTH = 10;
 	public static final int HEIGHT = 10;
 	public static final Color COLOR = Color.WHITE;
@@ -39,6 +40,7 @@ public class PongBall extends GameObject {
 		return yVel;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public JSONObject toJSONObject() {
 		JSONObject pongBall = new JSONObject();
 		pongBall.put("x", x);

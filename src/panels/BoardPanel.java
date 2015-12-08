@@ -5,14 +5,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.json.simple.JSONObject;
@@ -24,9 +22,9 @@ import gameobjects.NewTile;
 import main.Animator;
 import util.GameUtils;
 import util.Keys;
-import util.NewJSONObject;
 
 public class BoardPanel extends JPanel {
+	private static final long serialVersionUID = -6914840746257120219L;
 	public static final int HORIZONTAL_TILE_COUNT = 10;
 	public static final byte VERTICAL_TILE_COUNT = HORIZONTAL_TILE_COUNT / 2;
 	
@@ -37,9 +35,6 @@ public class BoardPanel extends JPanel {
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private NewPlayer clientPlayer;	// the player that belongs to this client!
 	private NewPlayer activePlayer;	// the player that is allowed to move / isMoving
-	private int maxTurns;
-	private int curTurn;
-	
 	/**
 	 * Constructs a new BoardPanel with a connection to the main client app
 	 * @param app - Target client app
@@ -57,9 +52,6 @@ public class BoardPanel extends JPanel {
 	 */
 	private void init() {
 		createTiles();
-		maxTurns = 10;
-		curTurn = 1;
-		
 		// handles resizing window event
 		addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {

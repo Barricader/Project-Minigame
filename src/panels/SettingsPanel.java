@@ -2,14 +2,12 @@ package panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -30,15 +28,14 @@ import util.GameUtils;
  *
  */
 public class SettingsPanel extends JPanel {
+	private static final long serialVersionUID = 2942424513827034832L;
 	private static final Dimension SIZE = new Dimension(200, 200);
-	private static final Font font = new Font("Courier New", Font.PLAIN, 12);
 	private ClientApp app;
 	private JLabel settingsLabel;
 	private JLabel addressLabel;
 	private JLabel portLabel;
 	private JTextField addressField;
 	private JTextField portField;
-	private JTextField nameField;
 	private DarkButton applyBtn;
 	
 	/**

@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -17,9 +16,6 @@ import javax.swing.JTextField;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.Caret;
-import javax.swing.text.JTextComponent;
 
 import org.json.simple.JSONObject;
 
@@ -27,7 +23,6 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import util.DarkButton;
-import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 import util.ScrollBarUI;
@@ -40,6 +35,8 @@ import util.ScrollBarUI;
  *
  */
 public class ChatPanel extends JPanel {
+	private static final long serialVersionUID = -917086496887711313L;
+
 	public ClientApp app;
 	
 	private JScrollPane scrollPane;
@@ -180,6 +177,7 @@ public class ChatPanel extends JPanel {
 		/**
 		 * Sends a message and echoes it to all other currently connected clients.
 		 */
+		@SuppressWarnings("unchecked")
 		public void sendMessage() {
 			String text = msgField.getText();
 			if (!text.isEmpty() && app.getClient().isConnected()) {

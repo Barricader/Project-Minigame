@@ -22,7 +22,6 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import main.Dice;
-import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 import util.PlayerStyles;
@@ -36,6 +35,7 @@ import util.PlayerStyles;
  *
  */
 public class DicePanel extends JPanel implements MouseListener, MouseMotionListener {
+	private static final long serialVersionUID = 677541060884598239L;
 	private static final Color BG_COLOR = Color.BLACK;
 	private Controller controller;
 	private ClientApp app;
@@ -105,6 +105,7 @@ public class DicePanel extends JPanel implements MouseListener, MouseMotionListe
 	/**
 	 * Handles dice rolling action, if we're allowed to roll.
 	 */
+	@SuppressWarnings("unchecked")
 	public void mouseClicked(MouseEvent e) {
 		if (canRoll) {
 			if (dice.contains(e.getPoint())) {

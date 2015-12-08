@@ -1,7 +1,6 @@
 package panels;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -15,11 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import org.json.simple.JSONObject;
 
@@ -43,6 +38,7 @@ import util.PlayerStyles;
  *
  */
 public class LoginPanel extends JPanel {
+	private static final long serialVersionUID = -459019336212020379L;
 	private ClientApp app;
 	private Controller controller;
 	private NewPlayer clientPlayer;	// player created by this client
@@ -316,6 +312,7 @@ public class LoginPanel extends JPanel {
 		/**
 		 * Joins the player to the server with the specified name.
 		 */
+		@SuppressWarnings("unchecked")
 		public void joinPlayer() {
 			if (!app.getClient().isConnected()) {
 				try {
@@ -340,6 +337,7 @@ public class LoginPanel extends JPanel {
 		/**
 		 * Disconnects a player and clears them out from server.
 		 */
+		@SuppressWarnings("unchecked")
 		public boolean disconnectPlayer() {
 			if (ErrorUtils.showDisconnectWarning(app)) {
 				NewJSONObject obj = new NewJSONObject(app.getClient().getID(), Keys.Commands.REM_PLAYER);

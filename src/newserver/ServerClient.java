@@ -3,8 +3,6 @@ package newserver;
 import java.io.IOException;
 import java.net.Socket;
 
-import javax.swing.Timer;
-
 import client.Client;
 
 public class ServerClient extends Client {

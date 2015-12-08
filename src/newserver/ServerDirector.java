@@ -39,9 +39,6 @@ public class ServerDirector {
 	private boolean hasStarted = false;	// have we started playing game yet?
 	private int timeLeft = WAIT_TIME;
 	private int stopCount;
-	private int turnCount;
-	private int over;	// count of clients finished with active mini game state
-	
 	/**
 	 * Constructs a new ServerDirector with a connection to the main server.
 	 * @param server - Main server that we're connected to

@@ -8,11 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
-import client.ClientApp;
-
 public class ScrollBarUI extends BasicScrollBarUI {
-	private ClientApp app;	// for colorizing
-	
 	private DarkButton decreaseButton;
 	private DarkButton increaseButton;
 	

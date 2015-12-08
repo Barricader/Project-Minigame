@@ -26,7 +26,6 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -45,6 +44,7 @@ import util.GameUtils;
  *
  */
 public class ServerApp extends JFrame {
+	private static final long serialVersionUID = -2344708429484611025L;
 	private static final Dimension SIZE = new Dimension(500, 300);
 	private Server server;
 	
@@ -183,6 +183,10 @@ public class ServerApp extends JFrame {
 	//********************************************************
 	
 	class ConsolePanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3553393261358707306L;
 		private JScrollPane scrollPane;
 		private JTextArea console;
 		
@@ -235,6 +239,10 @@ public class ServerApp extends JFrame {
 		
 		// simple popup menu for saving to a log file
 		private class SaveContextMenu extends JPopupMenu {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -6465455237069160011L;
 			private JMenuItem menuItem;
 			
 			public SaveContextMenu() {
@@ -265,6 +273,10 @@ public class ServerApp extends JFrame {
 	//********************************************************
 	
 	class ListPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -649187484490265766L;
 		private DefaultListModel<String> listModel;
 		private JList<String> pList;
 		
@@ -305,7 +317,7 @@ public class ServerApp extends JFrame {
 				public void mousePressed(MouseEvent e) {
 					if (SwingUtilities.isRightMouseButton(e)) {
 						if (!listModel.isEmpty()) {
-							JList list = (JList) e.getSource();
+							JList<?> list = (JList<?>) e.getSource();
 							int row = list.locationToIndex(e.getPoint());
 							list.setSelectedIndex(row);
 							list.setComponentPopupMenu(new ContextMenu(row));	
@@ -337,6 +349,10 @@ public class ServerApp extends JFrame {
 		//********************************************************
 		
 		private class ContextMenu extends JPopupMenu {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 6640232593931525416L;
 			private JMenuItem menuItem;
 			
 			/**
@@ -363,6 +379,10 @@ public class ServerApp extends JFrame {
 	//********************************************************
 	
 	class ControlPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1373736300158124118L;
 		private JButton startBtn;
 		private JButton stopBtn;
 		private JLabel statusLabel;
@@ -455,6 +475,10 @@ public class ServerApp extends JFrame {
 	//********************************************************
 	
 	class InfoPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1637195408694824028L;
 		private JLabel hostLabel;
 		private JLabel portLabel;
 		
@@ -505,6 +529,7 @@ public class ServerApp extends JFrame {
 	 * to provide GUI controls for server operations.
 	 * @param args
 	 */
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		// change look and feel to nimbus
 		try {

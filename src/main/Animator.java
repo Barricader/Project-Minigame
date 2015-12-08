@@ -3,9 +3,6 @@ package main;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-
 import gameobjects.NewPlayer;
 import panels.BoardPanel;
 import util.Keys;
@@ -19,10 +16,8 @@ import util.NewJSONObject;
  */
 public class Animator {
 	public static final int SPEED = 10;	// timer update speed (affects how fast player movement is rendered)
-	private Timer animateTimer;	// timer to control animation
 	
 	public Animator() {
-		animateTimer = new Timer(0, null);	// default initialization
 	}
 	
 //	/**

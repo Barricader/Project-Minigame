@@ -2,7 +2,6 @@ package panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Iterator;
@@ -14,7 +13,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -31,6 +29,7 @@ import util.Keys;
  *
  */
 public class LeaderBoardPanel extends JPanel {
+	private static final long serialVersionUID = -1829679317958988559L;
 	private ClientApp app;
 	private NewPlayer[] players;	// holds players, in sorted order by their score
 	private DefaultListModel<String> nameListModel;

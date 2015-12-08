@@ -18,6 +18,7 @@ import client.ClientApp;
  */
 public class ErrorUtils {
 	
+	@SuppressWarnings("unchecked")
 	public static NewJSONObject createJSONError(int id, String title, String msg) {
 		NewJSONObject obj = new NewJSONObject(id, Keys.Commands.ERROR);
 		JSONObject error = new JSONObject();

@@ -10,6 +10,7 @@ import java.awt.Rectangle;
 import org.json.simple.JSONObject;
 
 public class NewTile extends GameObject {
+	private static final long serialVersionUID = 8437476105163408680L;
 	// Actions
 	public static final int ACTION_ADDSCORE1 = 0;
 	public static final int ACTION_SUBTRACT = 1;

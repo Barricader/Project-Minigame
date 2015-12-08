@@ -14,9 +14,9 @@ public class ServerPongBall extends Thread {
 		pongBall = new PongBall();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void run() {
 		while (MiniGames.names[miniMngr.getLastMini()].equals("pong")) {
-			//System.out.println("SERVER PONG BALL RUNNING!");
 			pongBall.x += pongBall.getXVel();
 			
 			if (pongBall.x >= 600 || pongBall.x <= 0) {

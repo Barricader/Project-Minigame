@@ -32,6 +32,7 @@ import util.Keys;
  *
  */
 public class ConnectionPanel extends JPanel {
+	private static final long serialVersionUID = -3560932539593930881L;
 	private static final Dimension SIZE = new Dimension(200, 30);
 	private ClientApp app;
 	private Controller controller;

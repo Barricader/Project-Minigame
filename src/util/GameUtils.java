@@ -138,6 +138,7 @@ public class GameUtils {
 	 * @param c - The class type that the map values contain
 	 * @return - An array, based off values stored in map
 	 */
+	@SuppressWarnings("unchecked")
 	public static <K, V> V[] mapToArray(Map<K, V> map, Class<V> c) {
 		V[] temp = (V[]) Array.newInstance(c, map.size());
 		Iterator<V> iterator = map.values().iterator();

@@ -34,6 +34,7 @@ import util.PlayerStyles;
  *
  */
 public class RPS extends BaseMiniPanel {
+	private static final long serialVersionUID = 1552274782392228091L;
 	private static final int MAX_TURNS = 3;	// should only go 3 times
 	private static final int WAIT_TIME = 10;
 	private int timeLeft = WAIT_TIME;
@@ -359,6 +360,7 @@ public class RPS extends BaseMiniPanel {
 	/**
 	 * Sends a JSON packet with the win count for this player.
 	 */
+	@SuppressWarnings("unchecked")
 	public void sendUpdate() {
 		NewJSONObject obj = new NewJSONObject(player.getID(), Keys.Commands.MINI_UPDATE);
 		obj.put(Keys.PLAYER_NAME, player.getName());

@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
  *
  */
 public abstract class GameObject extends Rectangle {
+	private static final long serialVersionUID = -560460568245926318L;
 	protected JSONObject jsonObj;
 	
 	/**

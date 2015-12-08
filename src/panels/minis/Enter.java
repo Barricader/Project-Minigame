@@ -1,7 +1,6 @@
 package panels.minis;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -24,6 +23,7 @@ import util.NewJSONObject;
 import util.PlayerStyles;
 
 public class Enter extends BaseMiniPanel {
+	private static final long serialVersionUID = -4671069316923044090L;
 	private int pressed = 0;
 	private int rX = 0, rY = 0;
 	private Random r = new Random();
@@ -33,7 +33,6 @@ public class Enter extends BaseMiniPanel {
 	private int diff = 80;
 	private int counter = 0;
 	private boolean hasWon = false;
-	private Dimension d = null;
 	
 	public Enter(ClientApp app) {
 		super(app);
@@ -65,7 +64,6 @@ public class Enter extends BaseMiniPanel {
 	}
 	
 	public void init() {
-		d = app.getStatePanel().getSize();
 		theButton.setBounds(new Rectangle(80, 80, 70, 23));
 		theLabel.setBounds(396, 5, 150, 15);
 		theTime.setBounds(417, 20, 100, 15);
@@ -128,6 +126,7 @@ public class Enter extends BaseMiniPanel {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void end() {
 		if (isActive) {
 			//theLabel.setLocation(getWidth() / 2, 80);
