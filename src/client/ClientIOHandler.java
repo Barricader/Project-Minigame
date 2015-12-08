@@ -54,12 +54,14 @@ public class ClientIOHandler extends IOHandler {
 	 * Sends a JSONObject using the clients ObjectOutputStream.
 	 */
 	public void send(JSONObject out) {
-		try {
-			app.getClient().getOutputStream().writeObject(out);
-			app.getClient().getOutputStream().flush();
-			app.getClient().getOutputStream().reset();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (app.getClient().getOutputStream() != null) {
+			try {
+				app.getClient().getOutputStream().writeObject(out);
+				app.getClient().getOutputStream().flush();
+				app.getClient().getOutputStream().reset();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
 		}
 	}
 

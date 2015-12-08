@@ -1,6 +1,7 @@
 package panels;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -14,13 +15,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
+import newserver.ServerClient;
 import util.DarkButton;
 import util.ErrorUtils;
 import util.GameUtils;
@@ -100,19 +106,20 @@ public class LoginPanel extends JPanel {
 		add(nameLabel, c);
 		
 		// name field
-		c.fill = GridBagConstraints.BOTH;
+		c.fill = GridBagConstraints.VERTICAL;
+		c.ipadx = 10;
 		c.gridx = 1;
 		c.gridy = 1;
 		add(nameField, c);
 		
 		// join btn
+		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 2;
 		c.gridy = 1;
 		c.ipady = 5;
 		add(joinBtn, c);
 		
 		// timer label
-		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
 		c.gridwidth = 8;
 		c.gridy = 3;
@@ -145,11 +152,29 @@ public class LoginPanel extends JPanel {
 		timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		app.colorize(timerLabel, null, 30);
 		
-		nameField = new JTextField(10);
+		nameField = new JTextField(ServerClient.MAX_NAME_LENGTH);
+		nameField.setTransferHandler(null);	// disable copy paste
+		
 		app.colorize(nameField, new LineBorder(Color.CYAN), 20);
 		nameField.addKeyListener(new KeyAdapter() {
 			
 			public void keyReleased(KeyEvent e) {
+				if (!nameField.getText().isEmpty()) {
+					joinBtn.setEnabled(true);
+				} else {
+					joinBtn.setEnabled(false);
+				}
+			}
+			
+			public void keyPressed(KeyEvent e) {
+				// if they hit back space, we can allow the msg field to be editable.
+				if (nameField.getText().length() >= ServerClient.MAX_NAME_LENGTH 
+						&& e.getKeyCode() != KeyEvent.VK_BACK_SPACE) {
+					nameField.setEditable(false);
+				} else {
+					nameField.setEditable(true);
+				}
+				
 				if (!nameField.getText().isEmpty()) {
 					joinBtn.setEnabled(true);
 					if (e.getKeyChar() == '\n') {
@@ -308,6 +333,7 @@ public class LoginPanel extends JPanel {
 			obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
 			send(obj);
 			nameField.setText(""); 	// clear out
+			joinBtn.setEnabled(false);
 		}
 		
 		/**

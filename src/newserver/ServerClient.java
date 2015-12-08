@@ -8,6 +8,7 @@ import javax.swing.Timer;
 import client.Client;
 
 public class ServerClient extends Client {
+	public static final int MAX_NAME_LENGTH = 10;	// max allowed name characters
 	private Server server;
 	
 	/**
