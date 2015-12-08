@@ -125,27 +125,29 @@ public class BoardPanel extends JPanel {
 			newTileID -= tiles.size();
 		}
 		
-		if (tiles.get(newTileID+1).getType() == 0) {
-			// If landed on a blue tile
-			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 1);
-			app.getLeaderPanel().updateList();
-		}
-		else if(tiles.get(newTileID+1).getType() == 1) {
-			// If landed on a red tile
-			players.get(player.getName()).setScore(players.get(player.getName()).getScore() - 1);
-			app.getLeaderPanel().updateList();
+		if (newTileID != 0) {
+			switch (tiles.get(newTileID-1).getType()) {
+				case 0:
+					players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 1);
+					break;
+				case 1:
+					players.get(player.getName()).setScore(players.get(player.getName()).getScore() - 1);
+					break;
+				case 2:
+					players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 5);
+					break;
+			}
 		}
 		else {
-			// If landed on a green tile
-			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 5);
-			app.getLeaderPanel().updateList();
+			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 1);
 		}
 		
 		// If passing start, give plus 3 score
 		if (movePath.contains(tiles.get(0)) && movePath.indexOf(tiles.get(0)) != 0) {
 			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 3);
-			app.getLeaderPanel().updateList();
 		}
+		
+		app.getLeaderPanel().updateList();
 		
 		player.setTileID(newTileID);
 		return movePath;
