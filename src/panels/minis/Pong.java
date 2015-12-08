@@ -9,9 +9,12 @@ import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.json.simple.JSONObject;
 
+import com.sun.corba.se.spi.orbutil.threadpool.ThreadPool;
 import com.sun.glass.events.KeyEvent;
 
 import client.ClientApp;
@@ -142,17 +145,18 @@ public class Pong extends BaseMiniPanel {
 	}
 	
 	public void update() {
+		System.out.println("Updating");
 		pongBall.x += pongBall.getXVel();
 		pongBall.y += pongBall.getYVel();
 		
 		// check collision
 		
-		for (PongRect p : playerRects.values()) {
-			if (p.contains(pongBall)) {
-				pongBall.setXVel(pongBall.getXVel() * -1);
-				pongBall.setYVel(pongBall.getYVel() * - 1);
-			}
-		}
+//		for (PongRect p : playerRects.values()) {
+//			if (p.contains(pongBall)) {
+//				pongBall.setXVel(pongBall.getXVel() * -1);
+//				pongBall.setYVel(pongBall.getYVel() * - 1);
+//			}
+//		}
 		
 		if (pongBall.x >= getWidth() - PongBall.WIDTH || pongBall.x <= 0 + PongBall.WIDTH) {
 			pongBall.setXVel(pongBall.getXVel() * -1);
