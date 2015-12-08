@@ -143,17 +143,18 @@ public class Pong extends BaseMiniPanel {
 	}
 	
 	public void update() {
+		System.out.println("Updating");
 		pongBall.x += pongBall.getXVel();
 		pongBall.y += pongBall.getYVel();
 		
 		// check collision
 		
-		for (PongRect p : playerRects.values()) {
-			if (p.contains(pongBall)) {
-				pongBall.setXVel(pongBall.getXVel() * -1);
-				pongBall.setYVel(pongBall.getYVel() * - 1);
-			}
-		}
+//		for (PongRect p : playerRects.values()) {
+//			if (p.contains(pongBall)) {
+//				pongBall.setXVel(pongBall.getXVel() * -1);
+//				pongBall.setYVel(pongBall.getYVel() * - 1);
+//			}
+//		}
 		
 		if (pongBall.x >= getWidth() - PongBall.WIDTH || pongBall.x <= 0 + PongBall.WIDTH) {
 			pongBall.setXVel(pongBall.getXVel() * -1);

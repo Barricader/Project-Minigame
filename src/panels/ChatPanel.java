@@ -11,11 +11,15 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.CompoundBorder;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import org.json.simple.JSONObject;
 
@@ -25,6 +29,7 @@ import gameobjects.NewPlayer;
 import util.DarkButton;
 import util.Keys;
 import util.NewJSONObject;
+import util.PlayerStyles;
 import util.ScrollBarUI;
 
 /**
@@ -40,7 +45,7 @@ public class ChatPanel extends JPanel {
 	public ClientApp app;
 	
 	private JScrollPane scrollPane;
-	private JTextArea chatArea;
+	private JTextPane chatArea;
 	private JTextField msgField;
 	private DarkButton sendBtn;
 	private Controller controller;
@@ -103,10 +108,8 @@ public class ChatPanel extends JPanel {
 	 * Creates GUI components.
 	 */
 	private void createComponents() {
-		chatArea = new JTextArea();
+		chatArea = new JTextPane();
 		chatArea.setEditable(false);
-		chatArea.setWrapStyleWord(true);
-		chatArea.setLineWrap(true);
 		chatArea.setCaretPosition(chatArea.getDocument().getLength());	// scroll down
 		chatArea.setBorder(new EmptyBorder(5, 5, 5, 5));
 		chatArea.setBackground(Color.BLACK);
@@ -114,7 +117,6 @@ public class ChatPanel extends JPanel {
 		app.colorize(chatArea);
 		
 		msgField = new JTextField();
-//		msgField.setBorder(new CompoundBorder(new LineBorder(Color.CYAN), new EmptyBorder(0, 5, 0, 5)));
 		app.colorize(msgField, new LineBorder(null), 12);
 		msgField.setCaretColor(app.getGlobalColor().getColor());
 		msgField.putClientProperty("caretWidth", 2);
@@ -125,8 +127,6 @@ public class ChatPanel extends JPanel {
 				}
 			}
 		});
-		msgField.setBorder(new CompoundBorder(new LineBorder(msgField.getForeground()), new EmptyBorder(0, 5, 0, 5)));
-		
 		msgField.setFocusable(true);
 		msgField.requestFocus();
 		
@@ -139,10 +139,12 @@ public class ChatPanel extends JPanel {
 		scrollPane = new JScrollPane(chatArea);
 		scrollPane.setPreferredSize(new Dimension(1, 2));	// workaround for "jumping" glitch when resizing window
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.getVerticalScrollBar().setUI(new ScrollBarUI());
+		scrollPane.getHorizontalScrollBar().setUI(new ScrollBarUI(SwingConstants.HORIZONTAL));
+		scrollPane.getVerticalScrollBar().setUI(new ScrollBarUI(SwingConstants.VERTICAL));
 		
 		app.colorize(scrollPane, new LineBorder(null), 12);
 		app.colorize(scrollPane.getVerticalScrollBar());
+		app.colorize(scrollPane.getHorizontalScrollBar());
 	
 		controller.toggleUI(app.getClient().isConnected());
 	}
@@ -155,11 +157,21 @@ public class ChatPanel extends JPanel {
 	 * Prints specified message to the chat area.
 	 * @param msg
 	 */
-	public void printMessage(String msg) {
-		String msgArea = chatArea.getText();
-		msgArea += msg + "\n";
-		chatArea.setText(msgArea);
-		chatArea.setCaretPosition(chatArea.getDocument().getLength());	// move scroll bar down to bottom
+	public void printMessage(String msg, Color c) {
+		MutableAttributeSet attrs = chatArea.getInputAttributes();
+		StyleConstants.setForeground(attrs, c);
+		StyledDocument doc = chatArea.getStyledDocument();
+		
+		int offset = doc.getLength();
+		int length = msg.length();
+		try {
+			doc.insertString(offset, msg + "\n", attrs);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+		
+		chatArea.setCaretPosition(chatArea.getDocument().getLength());	// make sure we're always at btm
+		doc.setParagraphAttributes(offset, length, attrs, false);	// apply color style
 	}
 	
 	/**
@@ -219,7 +231,10 @@ public class ChatPanel extends JPanel {
 		public void receive(JSONObject in) {
 			String text = (String)in.get(Keys.TEXT);
 			String name = (String)in.get(Keys.NAME);
-			cp.printMessage(name + " >: " + text);
+			int styleID = app.getBoardPanel().getPlayers().get(name).getStyleID();
+			Color c = PlayerStyles.colors[styleID];
+			String msg = name + " >: " + text;
+			printMessage(msg, c);
 		}
 	}
 	

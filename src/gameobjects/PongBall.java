@@ -15,8 +15,10 @@ public class PongBall extends GameObject {
 	private int yVel;
 	
 	public PongBall() {
-		xVel = 1;
-		yVel = 1;
+		xVel = 5;
+		yVel = 5;
+		width = WIDTH;
+		height = HEIGHT;
 	}
 	
 	public void draw(Graphics2D g2d) {
