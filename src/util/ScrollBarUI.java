@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
 import client.ClientApp;
@@ -16,14 +17,23 @@ public class ScrollBarUI extends BasicScrollBarUI {
 	private DarkButton decreaseButton;
 	private DarkButton increaseButton;
 	
-//	public ScrollBarUI(ClientApp app) {
-//		this.app = app;
-//	}
-	
-	public ScrollBarUI() {
-		decreaseButton = new DarkButton("▲");
+	public ScrollBarUI(int orientation) {
+		
+		switch (orientation) {
+		case SwingConstants.HORIZONTAL:
+			decreaseButton = new DarkButton("◄");
+			increaseButton = new DarkButton("►");
+			break;
+			
+		case SwingConstants.VERTICAL:
+			decreaseButton = new DarkButton("▲");
+			increaseButton = new DarkButton("▼");
+			break;
+			default:
+				throw new IllegalArgumentException("Orientation must be a "
+						+ "SwingConstants field of horizontal or vertical!");
+		}
 		decreaseButton.setBorderPainted(false);
-		increaseButton = new DarkButton("▼");
 		increaseButton.setBorderPainted(false);
 	}
 	
