@@ -57,6 +57,10 @@ public class Pong extends BaseMiniPanel {
 		int h = app.getStatePanel().getHeight();
 		int w = app.getStatePanel().getWidth();
 		
+		pongBall = new PongBall();
+		pongBall.x = (w + PongBall.WIDTH) / 2;
+		pongBall.y = (h + PongBall.HEIGHT) / 2;
+		
 		switch (id) {
 		case 0:
 			System.out.println("player rect should be on left");
@@ -137,7 +141,28 @@ public class Pong extends BaseMiniPanel {
 		return true;	// within boundaries
 	}
 	
-	public void update() {}	// this method unused. we use sendUpdate instead
+	public void update() {
+		pongBall.x += pongBall.getXVel();
+		pongBall.y += pongBall.getYVel();
+		
+		// check collision
+		
+		for (PongRect p : playerRects.values()) {
+			if (p.contains(pongBall)) {
+				pongBall.setXVel(pongBall.getXVel() * -1);
+				pongBall.setYVel(pongBall.getYVel() * - 1);
+			}
+		}
+		
+		if (pongBall.x >= getWidth() - PongBall.WIDTH || pongBall.x <= 0 + PongBall.WIDTH) {
+			pongBall.setXVel(pongBall.getXVel() * -1);
+		}
+		
+		if (pongBall.y >= getHeight() - PongBall.HEIGHT || pongBall.y <= 0 + PongBall.HEIGHT) {
+			pongBall.setYVel(pongBall.getYVel() * -1);
+		}
+		repaint();
+	}	
 	
 	/**
 	 * Sends a JSONObject update with the coordinates and size of this
@@ -286,12 +311,6 @@ public class Pong extends BaseMiniPanel {
 			
 			String pName = (String) in.get(Keys.PLAYER_NAME);
 			Color c = PlayerStyles.colors[(int) in.get(Keys.STYLE_ID)];	// color the rectangle
-			
-			// pong ball testing
-			
-			if (pongBall == null) {
-				pongBall = new PongBall();
-			}
 			
 			// update rectangle from received player
 			PongRect r = null;

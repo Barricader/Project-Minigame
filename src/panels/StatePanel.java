@@ -132,6 +132,7 @@ public class StatePanel extends JPanel {
 				size.height += 2;
 				app.setSize(size);
 				app.repaint();	
+				fixedBoardGlitch = true;
 			}
 		}
 		

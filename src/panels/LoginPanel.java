@@ -1,7 +1,6 @@
 package panels;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
