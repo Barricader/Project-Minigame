@@ -66,24 +66,24 @@ public class Pong extends BaseMiniPanel {
 		
 		switch (id) {
 		case 0:
-			System.out.println("player rect should be on left");
+			//System.out.println("player rect should be on left");
 			yAxis = true;
 			playerRect = new PongRect(5, h / 100, 30, 100);
 			break;
 		case 1: 
 			yAxis = true;
 			playerRect = new PongRect(w - 35, h / 100, 30, 100);
-			System.out.println("player rect should be on right!");
+			//System.out.println("player rect should be on right!");
 			break;
 		case 2:
 			xAxis = true;
 			playerRect = new PongRect(w / 2, 0, 100, 30);
-			System.out.println("player rect should be on top!");
+			//System.out.println("player rect should be on top!");
 			break;
 		case 3:
 			xAxis = true;
 			playerRect = new PongRect(w / 2, h - 30, 100, 30);
-			System.out.println("player rect should be on bottom!");
+			//System.out.println("player rect should be on bottom!");
 		}
 		
 		// set color of rectangle

@@ -37,6 +37,8 @@ public class BoardPanel extends JPanel {
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private NewPlayer clientPlayer;	// the player that belongs to this client!
 	private NewPlayer activePlayer;	// the player that is allowed to move / isMoving
+	private int maxTurns;
+	private int curTurn;
 	
 	/**
 	 * Constructs a new BoardPanel with a connection to the main client app
@@ -55,6 +57,8 @@ public class BoardPanel extends JPanel {
 	 */
 	private void init() {
 		createTiles();
+		maxTurns = 10;
+		curTurn = 1;
 		
 		// handles resizing window event
 		addComponentListener(new ComponentAdapter() {
@@ -71,7 +75,6 @@ public class BoardPanel extends JPanel {
 	 * @param p - Player to add
 	 */
 	public void addPlayer(NewPlayer p) {
-		System.out.println("board addplayer!");
 		p.style(p.getStyleID());	// make sure player is styled!
 		p.setTile(tiles.get(tiles.size()-1));	// default starting location!
 		p.setLocation(tiles.get(tiles.size()-1).getCellLocation(p.getID()));
@@ -320,11 +323,11 @@ public class BoardPanel extends JPanel {
 			String cmdKey = (String)in.get(Keys.CMD);
 			NewPlayer p = NewPlayer.fromJSON(in);
 			p.style(p.getStyleID());	// make sure player is always styled!
-			System.out.println("board panel received: " + p.toJSONObject().toJSONString());
+			//System.out.println("board panel received: " + p.toJSONObject().toJSONString());
 			
 			switch (cmdKey) {
 			case Keys.Commands.MOVE:
-				System.out.println("Should be moving player!");
+				//System.out.println("Should be moving player!");
 				movePlayer(in, p);
 				break;
 			case Keys.Commands.UPDATE:
@@ -346,7 +349,7 @@ public class BoardPanel extends JPanel {
 			Animator animator = new Animator();
 			players.put(p.getName(), p);
 			setActive(p.getName());
-			System.out.println("ACTIVE PLAYER TILE NUM: " + p.getTileID());
+			//System.out.println("ACTIVE PLAYER TILE NUM: " + p.getTileID());
 			int temp = (int) in.get(Keys.ROLL_AMT);
 			if (p.getTileID() > 0) {
 				p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));	
@@ -364,7 +367,7 @@ public class BoardPanel extends JPanel {
 		 * @param p - Player to update
 		 */
 		public void updatePlayer(NewPlayer p) {
-			System.out.println("updating player: " + p.toJSONObject().toJSONString() + ", on board panel!");
+			//System.out.println("updating player: " + p.toJSONObject().toJSONString() + ", on board panel!");
 			if (p.getTileID() > 0) {
 				p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));
 			}

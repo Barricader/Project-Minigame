@@ -33,7 +33,7 @@ public class Keyboard implements KeyEventDispatcher {
 		lastKey = 0;
 
 		keys = new boolean[120];
-		System.out.println("New keyboard for : " + mp);
+		//System.out.println("New keyboard for : " + mp);
 		this.mp = mp;
 		mp.setKey(this);
 	}
@@ -43,7 +43,7 @@ public class Keyboard implements KeyEventDispatcher {
 	 */
 	public void keyPressed(KeyEvent e) {
 		lastKey = e.getKeyCode();
-		System.out.println(e.getKeyCode());
+		//System.out.println(e.getKeyCode());
 
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_ALT:

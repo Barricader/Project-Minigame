@@ -365,14 +365,14 @@ public class RPS extends BaseMiniPanel {
 		obj.put(Keys.NAME, "rps");
 		obj.put(Keys.WINS, wins);
 		controller.send(obj);
-		System.out.println("should be sending update: " + obj.toJSONString());
+		//System.out.println("should be sending update: " + obj.toJSONString());
 	
 		NewJSONObject k = new NewJSONObject(player.getID(), Keys.Commands.MINI_STOPPED);
 		k.put(Keys.PLAYER_NAME, player.getName());
 		k.put(Keys.NAME, "rps");
 		isActive = false;
 		controller.send(k);
-		System.out.println("sent RPS update!");
+		//System.out.println("sent RPS update!");
 	}
 	
 	public void playerPressed() {}	// currently unused

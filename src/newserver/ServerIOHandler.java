@@ -72,7 +72,7 @@ public class ServerIOHandler extends IOHandler {
 	public void receive(JSONObject in) {
 		String cmdKey = (String) in.get(Keys.CMD);
 		input = in;
-		System.out.println("ServerIOReceived: " + in.toJSONString());
+		System.out.println("Server received: " + in.toJSONString());
 		if (actionMap.containsKey(cmdKey)) {
 			actionMap.get(cmdKey).execute();
 		}

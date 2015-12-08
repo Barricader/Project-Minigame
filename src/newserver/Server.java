@@ -187,30 +187,4 @@ public class Server extends Thread {
 	public void setPort(int portNo) {
 		this.portNo = portNo;
 	}
-	
-	/* Main method isn't used because we now have a ServerGUI app that starts the
-	 * server, that way.
-	 */
-	
-//	/**
-//	 * Main method of the application, that starts the server. If another instance of 
-//	 * a server in running on the same Host and port, the server launch attempt will
-//	 * quietly terminate.
-//	 * @param args
-//	 */
-//	public static void main(String[] args) {
-//		Server server = new Server();
-////		int port = Integer.parseInt(args[0]);
-////		server.setPort(port);
-//		try {
-//			server.open();
-//		} catch (BindException e) {
-//			System.out.println("Launch aborted! Another Server Instance Is Already Running On: "
-//					+ HOST + ":" + PORT);
-////			System.exit(1);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		server.start();
-//	}
 }

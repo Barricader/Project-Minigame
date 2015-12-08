@@ -227,9 +227,9 @@ public class GameUtils {
 			try {
 				bw = new BufferedWriter(new FileWriter(f));
 				textArea.write(bw);
-				System.out.println("Log file written successfully!");
+				//System.out.println("Log file written successfully!");
 			} catch (IOException e) {
-				System.out.println("An error occurred when trying to write log file!");
+				//System.out.println("An error occurred when trying to write log file!");
 				e.printStackTrace();
 			} finally {
 				try {
@@ -240,5 +240,4 @@ public class GameUtils {
 			}	
 		}
 	}
-	
 }

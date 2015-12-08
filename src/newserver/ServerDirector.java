@@ -124,7 +124,7 @@ public class ServerDirector {
 		out.put(Keys.PLAYER, p.toJSONObject());
 		out.put(Keys.ROLL_AMT, p.getLastRoll());
 		players.put(p.getName(), p);	// update player map!
-		System.out.println("should be echoing to move players: " + out.toJSONString());
+		//System.out.println("should be echoing to move players: " + out.toJSONString());
 		server.echoAll(out);
 	}
 	
@@ -212,7 +212,7 @@ public class ServerDirector {
 			out = new NewJSONObject(p.getID(), Keys.Commands.ADD_PLAYER);
 			out.put(Keys.ID, p.getID());
 			out.put(Keys.PLAYER, p.toJSONObject());	
-			System.out.println("echoing all players: " + p.toJSONObject().toJSONString());
+			//System.out.println("echoing all players: " + p.toJSONObject().toJSONString());
 			server.echoAll(out);
 		}
 	}

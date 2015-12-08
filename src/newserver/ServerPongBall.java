@@ -16,7 +16,7 @@ public class ServerPongBall extends Thread {
 	
 	public void run() {
 		while (MiniGames.names[miniMngr.getLastMini()].equals("pong")) {
-			System.out.println("SERVER PONG BALL RUNNING!");
+			//System.out.println("SERVER PONG BALL RUNNING!");
 			pongBall.x += pongBall.getXVel();
 			
 			if (pongBall.x >= 600 || pongBall.x <= 0) {
@@ -27,7 +27,7 @@ public class ServerPongBall extends Thread {
 			obj.put(Keys.NAME, "pong");
 			obj.put("objectOnlyUpdate", "ball");
 			obj.put("ball", pongBall.toJSONObject());
-			System.out.println("should be echoing ball!");
+			//System.out.println("should be echoing ball!");
 			miniMngr.getServerDir().getServer().echoAll(obj);
 			
 			try {

@@ -108,11 +108,11 @@ public class MiniGameManager {
 	 */
 	public JSONArray getJSONLeaderboard() {
 		if (!temp.isEmpty()) {
-			System.out.println("\n\n"+temp);
+			//System.out.println("\n\n"+temp);
 			TempComparator tc = new TempComparator(temp);
 			TreeMap sorted = new TreeMap(tc);
 			sorted.putAll(temp);
-			System.out.println(sorted);
+			//System.out.println(sorted);
 			leaderboard.addAll(sorted.keySet());
 		}
 		
@@ -147,8 +147,8 @@ public class MiniGameManager {
 //			serverPongBall.start();
 //		}
 		
-		System.out.println("Pong stuff...");
-		System.out.println(obj.toJSONString()); 		
+		//System.out.println("Pong stuff...");
+		System.out.println("Pong stuff: " + obj.toJSONString()); 		
 		
 		serverDir.getServer().echoAll(obj);
 		count++;

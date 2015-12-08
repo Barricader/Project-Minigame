@@ -90,8 +90,8 @@ public class Enter extends BaseMiniPanel {
 				theTime.setText("Time Left: " + (1200/60 - counter/60));
 			}
 			counter++;
-		}// change me back to 1201 == 1200
-		if (counter % 31 == 30) {
+		}
+		if (counter % 1201 == 1200) {
 			end();
 		}
 	}
