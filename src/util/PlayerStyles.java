@@ -55,11 +55,11 @@ public class PlayerStyles {
 	public static Color[] colors = 
 		{ 	new Color(255, 0, 0),
 		 	new Color(0, 255, 0),
-		 	new Color(28, 126, 255),
+		 	new Color(61, 140, 245),
 		 	new Color(255, 255, 0),
 		 	new Color(0, 255, 255),
 		 	new Color(255, 127, 0),
-		 	new Color(127, 0, 255),	
+		 	new Color(150, 5, 247),	
 		 	new Color(255, 0, 255),
 		};
 	

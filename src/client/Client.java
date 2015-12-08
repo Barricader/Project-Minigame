@@ -19,7 +19,6 @@ import org.json.simple.JSONObject;
  *
  */
 public class Client extends Thread {
-	private ClientApp app;
 	protected boolean running = false;
 	protected boolean connected = false;
 	protected Socket socket;
@@ -40,17 +39,15 @@ public class Client extends Thread {
 	 * @param app - ClientApp
 	 */
 	public Client(ClientApp app) {
-		this.app = app;
 	}
 	
 	/**
 	 * Constructs a client with link to main app, and specified ID and socket.
-	 * @param app - ClientAPp
+	 * @param app - ClientApp
 	 * @param ID - ID to assign
 	 * @param socket - Socket to connect to
 	 */
 	public Client(ClientApp app, int ID, Socket socket) {
-		this.app = app;
 		this.ID = ID;
 		this.socket = socket;
 	}
@@ -82,7 +79,6 @@ public class Client extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -132,12 +128,21 @@ public class Client extends Thread {
 	 * @throws InterruptedException
 	 */
 	public void terminate() throws IOException, InterruptedException {
-		//TODO send terminate command using JSON
 		running = false;
 		connected = false;
 		interrupt();
 		close();
 		join();
+	}
+	
+	// Mutator methods
+	
+	public void setIOHandler(IOHandler handler) {
+		this.ioHandler = handler;
+	}
+	
+	public void setID(int ID) {
+		this.ID = ID;
 	}
 	
 	// Accessor methods
@@ -164,17 +169,6 @@ public class Client extends Thread {
 	
 	public int getID() {
 		return ID;
-	}
-	
-	
-	// Mutator methods
-	
-	public void setIOHandler(IOHandler handler) {
-		this.ioHandler = handler;
-	}
-	
-	public void setID(int ID) {
-		this.ID = ID;
 	}
 	
 }

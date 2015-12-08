@@ -10,7 +10,6 @@ import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
@@ -21,6 +20,8 @@ import client.Client;
 import client.ClientApp;
 import client.IOHandler;
 import newserver.Server;
+import util.DarkButton;
+import util.ErrorUtils;
 import util.GameUtils;
 import util.Keys;
 
@@ -31,21 +32,30 @@ import util.Keys;
  *
  */
 public class ConnectionPanel extends JPanel {
+	private static final long serialVersionUID = -3560932539593930881L;
 	private static final Dimension SIZE = new Dimension(200, 30);
 	private ClientApp app;
 	private Controller controller;
 	
-	private JButton connectBtn;
+	private DarkButton connectBtn;
 	private JLabel statusLabel;
 	
+	/**
+	 * Creates a new connection panel with a link to the ClientApp.
+	 * @param app - Target client app
+	 */
 	public ConnectionPanel(ClientApp app) { 
 		this.app = app;
 		controller = new Controller();
 		init();
 		setPreferredSize(SIZE);
 		setMinimumSize(SIZE);
+		setBackground(Color.BLACK);
 	}
 	
+	/**
+	 * Initializes and lays out components using GridBagLayout.
+	 */
 	private void init() {
 		createComponents();
 		
@@ -73,25 +83,25 @@ public class ConnectionPanel extends JPanel {
 		add(connectBtn, c);
 	}
 	
+	/**
+	 * Creates GUI components.
+	 */
 	private void createComponents() {
-		connectBtn = new JButton("Connect");
+		connectBtn = new DarkButton("Connect");
 		connectBtn = controller.connect();
+		
+		app.colorize(connectBtn, new LineBorder(null), 14);
 		
 		statusLabel = new JLabel("Status: Not Connected!");
 		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		setBorder(new LineBorder(Color.LIGHT_GRAY));
+		app.colorize(statusLabel, null, 14);
+		app.colorize(this, new LineBorder(null));
 		setLayout(new GridBagLayout());
 	}
 	
-	public void showConnectionError() {
-		JOptionPane.showMessageDialog(app, "Unable to connect... Server may not have been started!"
-				, "Connection Error", JOptionPane.ERROR_MESSAGE);
-	}
-	
-	
 	// Accessor methods
 	
-	public JButton getConnectBtn() {
+	public DarkButton getConnectBtn() {
 		return connectBtn;
 	}
 	
@@ -103,6 +113,12 @@ public class ConnectionPanel extends JPanel {
 		return controller;
 	}
 	
+	/**
+	 * Controller for handling connection information from the server, such as
+	 * the status of this client's connection.
+	 * @author David Kramer
+	 *
+	 */
 	public class Controller extends IOHandler {
 		public static final int STATUS_ERROR = -1;
 		public static final int STATUS_DISCONNECTED = 0;
@@ -129,14 +145,14 @@ public class ConnectionPanel extends JPanel {
 		}
 
 		public void send(JSONObject out) {
-			
+			// currently unused
 		}
 		
 		/**
 		 * 
 		 * @return connectBtn with connect action.
 		 */
-		public JButton connect() {
+		public DarkButton connect() {
 			clearActions(connectBtn);
 			connectBtn.setText("Connect");
 			connectBtn.addActionListener( e -> {
@@ -150,7 +166,7 @@ public class ConnectionPanel extends JPanel {
 					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
-					showConnectionError();
+					ErrorUtils.showConnectionError(app);
 					updateStatus(STATUS_ERROR);
 				}
 			});
@@ -161,23 +177,29 @@ public class ConnectionPanel extends JPanel {
 		 * 
 		 * @return connectBtn with disconnect action.
 		 */
-		public JButton disconnect() {
+		public DarkButton disconnect() {
 			clearActions(connectBtn);
 			connectBtn.setText("Disconnect");
 			connectBtn.addActionListener( e -> {
-				try {
-					Client c = app.getClient();
-					c.terminate();
-				} catch (Exception e1) {
-					
-				} finally {
-					controller.updateStatus(STATUS_DISCONNECTED);
-					reset();
+				if (app.getStatePanel().getLoginPanel().getController().disconnectPlayer()) {
+					try {
+						Client c = app.getClient();
+						c.terminate();
+					} catch (Exception e1) {
+						
+					} finally {
+						controller.updateStatus(STATUS_DISCONNECTED);
+						app.reset();
+					}	
 				}
 			});
 			return connectBtn;
 		}
 		
+		/**
+		 * Updates the status label with the specified status code
+		 * @param statusCode - Connection status code
+		 */
 		public void updateStatus(int statusCode) {
 			Color statusColor = null;
 			String status = "Status: ";
@@ -203,13 +225,6 @@ public class ConnectionPanel extends JPanel {
 			statusLabel.setText(status);
 			app.getChatPanel().getController().toggleUI(app.getClient().isConnected());
 			repaint();
-		}
-		
-		public void reset() {
-			app.resetClient();
-			app.getBoardPanel().getPlayers().clear();
-			app.getStatePanel().getLoginPanel().getLobbyPanel().removeAll();
-			app.repaint();
 		}
 		
 		public IOHandler getIOHandler() {

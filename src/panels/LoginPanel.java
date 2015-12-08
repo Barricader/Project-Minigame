@@ -1,19 +1,15 @@
 package panels;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -25,39 +21,39 @@ import org.json.simple.JSONObject;
 import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
-import newserver.Server;
+import newserver.ServerClient;
+import util.DarkButton;
 import util.ErrorUtils;
 import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
+import util.PlayerStyles;
 
 /**
- * Login panel that allows the user to enter their name and connect to the server.
- * This class will also contain the lobby, which shows players that are already
- * connected to the server.
+ * The Login panel class allows the user to enter their name and connect to the server.
+ * This class also contains the lobby, which shows players that are already connected 
+ * to the server. Once 2+ players are connected, the server echoes a countdown timer,
+ * which will is also displayed here, before the transition is made to the board.
  * @author David Kramer
  *
  */
 public class LoginPanel extends JPanel {
-	private static final Dimension SIZE = new Dimension(400, 200);
+	private static final long serialVersionUID = -459019336212020379L;
 	private ClientApp app;
 	private Controller controller;
-	private NewPlayer clientPlayer;	// the player that is created by the client
-	private LobbyPanel lobbyPanel;	// show waiting players when we login
+	private NewPlayer clientPlayer;	// player created by this client
 	private JLabel titleLabel;
-	private JLabel nameLabel;
 	private JLabel timerLabel;
-	private JButton joinBtn;
-	// server config setting stuff
-	private JPanel settingsPanel;
-	private JLabel settingsLabel;
-	private JLabel addressLabel;
-	private JLabel portLabel;
-	private JTextField addressField;
-	private JTextField portField;
+	private JLabel nameLabel;
 	private JTextField nameField;
-	private JButton applyBtn;
+	private DarkButton joinBtn;
+	private Lobby lobby;
+	private SettingsPanel settingsPanel;
 	
+	/**
+	 * Constructs a new LoginPanel with a link to the ClientApp.
+	 * @param app - Target client app.
+	 */
 	public LoginPanel(ClientApp app) {
 		this.app = app;
 		controller = new Controller();
@@ -71,92 +67,111 @@ public class LoginPanel extends JPanel {
 		createComponents();
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(5, 10, 5, 10);
+		c.insets = new Insets(10, 10, 10, 10);	// 10 px margin
 		
-		// title
+		// title label
 		c.anchor = GridBagConstraints.NORTH;
+		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
-		c.gridwidth = 10;
+		c.weightx = 1.0;
+		c.gridwidth = 8;
 		c.gridy = 0;
+		c.gridheight = 1;
 		add(titleLabel, c);
 		
-		// timer label
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.anchor = GridBagConstraints.CENTER;
-		c.gridx = 0;
-		c.gridy = 1;
-//		c.weighty = 1.0;
-		add(timerLabel, c);
+		// settings panel
+		c.anchor = GridBagConstraints.NORTHEAST;
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 8;
+		c.weightx = 0.4;
+		c.ipadx = 40;
+		c.gridwidth = 2;
+		c.gridy = 0;
+		c.gridheight = 4;
+		add(settingsPanel, c);
 		
 		// name label
+		c.anchor = GridBagConstraints.CENTER;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
-		c.gridwidth = 2;
-		c.gridy = 2;
-//		c.weighty = 1.0;
-		c.ipady = 10;
+		c.ipadx = 0;
+		c.weightx = 1.0;
+		c.gridwidth = 1;
+		c.gridy = 1;
+		c.gridheight = 1;
 		add(nameLabel, c);
-	
+		
 		// name field
-		c.gridx = 2;
-		c.gridwidth = 6;
-		c.gridy = 2;
+		c.fill = GridBagConstraints.BOTH;
+		c.ipadx = 10;
+		c.gridx = 1;
+		c.gridy = 1;
 		add(nameField, c);
 		
 		// join btn
-		c.gridx = 8;
-		c.gridwidth = 2;
-		c.gridy = 2;
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 2;
+		c.gridy = 1;
+		c.ipady = 5;
 		add(joinBtn, c);
 		
-		// lobby panel
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.anchor = GridBagConstraints.SOUTHWEST;
+		// timer label
 		c.gridx = 0;
 		c.gridwidth = 8;
-		c.weightx = 0.8;
 		c.gridy = 3;
-		c.ipady = 85;
-		add(lobbyPanel, c);
+		c.ipady = 0;
+		add(timerLabel, c);
 		
-		// settings panel
-		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.gridx = 8;
-		c.gridwidth = 2;
-		c.weightx = 0.2;
-		c.gridy = 3;
-		c.ipady = 40;
-		add(settingsPanel, c);
-		
+		// lobby
 		c.anchor = GridBagConstraints.SOUTH;
+		c.gridx = 0;
+		c.gridwidth = 10;
+		c.ipadx = 0;
 		c.gridy = 4;
-//		c.weighty = 1.0;
-		
-		add(Box.createVerticalStrut(10), c);
-	
+		c.weighty = 1.0;
+		add(lobby, c);
 	}
 	
 	/**
-	 * Creates GUI components.
+	 * Creates GUI components for this LoginPanel.
 	 */
 	private void createComponents() {
 		titleLabel = new JLabel("<Project Mini-Game>");
-		titleLabel.setFont(new Font("Courier New", Font.BOLD, 20));
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		app.colorize(titleLabel, null, 18);
 		
-		nameLabel = new JLabel("Enter Player Name: ");
-		nameLabel.setFont(new Font("Courier New", Font.BOLD, 20));
-		nameLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		nameLabel = new JLabel("Name:");
+		nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		app.colorize(nameLabel, null, 20);
 		
 		timerLabel = new JLabel(" ");
-		timerLabel.setFont(new Font("Courier New", Font.BOLD, 30));
-		timerLabel.setForeground(GameUtils.colorFromHex("#E82539"));
 		timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		app.colorize(timerLabel, null, 30);
 		
-		nameField = new JTextField(10);
-		nameField.setFont(new Font("Courier New", Font.BOLD, 20));
-		nameField.addKeyListener(new KeyListener() {
+		nameField = new JTextField(ServerClient.MAX_NAME_LENGTH);
+		nameField.setCaretColor(Color.WHITE);
+		nameField.setTransferHandler(null);	// disable copy paste
 		
+		app.colorize(nameField, new LineBorder(Color.CYAN), 20);
+		nameField.addKeyListener(new KeyAdapter() {
+			
 			public void keyReleased(KeyEvent e) {
+				if (!nameField.getText().isEmpty()) {
+					joinBtn.setEnabled(true);
+				} else {
+					joinBtn.setEnabled(false);
+				}
+			}
+			
+			public void keyPressed(KeyEvent e) {
+				// if they hit back space, we can allow the msg field to be editable.
+				if (nameField.getText().length() >= ServerClient.MAX_NAME_LENGTH 
+						&& e.getKeyCode() != KeyEvent.VK_BACK_SPACE) {
+					nameField.setEditable(false);
+				} else {
+					nameField.setEditable(true);
+				}
+				
 				if (!nameField.getText().isEmpty()) {
 					joinBtn.setEnabled(true);
 					if (e.getKeyChar() == '\n') {
@@ -166,153 +181,30 @@ public class LoginPanel extends JPanel {
 					joinBtn.setEnabled(false);
 				}
 			}
-			// unused
-			public void keyTyped(KeyEvent e) {}
-			public void keyPressed(KeyEvent e) {}
 		});
 		
-		joinBtn = new JButton("Join Game");
-		joinBtn.setFont(new Font("Courier New", Font.BOLD, 20));
+		joinBtn = new DarkButton("Join Game");
 		joinBtn.setEnabled(false);
+		joinBtn.setBorder(new LineBorder(app.getGlobalColor().getColor()));
+		app.colorize(joinBtn, (LineBorder)joinBtn.getBorder(), 20);
+		
 		joinBtn.addActionListener( e -> {
 			controller.joinPlayer();
 		});
 		
-		lobbyPanel = new LobbyPanel(app);
-		
-		createSettingsPanel();
+		lobby = new Lobby(app);
+		app.colorize(lobby, (LineBorder)lobby.getBorder());
+		settingsPanel = new SettingsPanel(app);
 	}
 	
-	private void createSettingsPanel() {
-		settingsLabel = new JLabel("Connection Settings: ");
-		settingsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		
-		addressLabel = new JLabel("IP Address: ");
-		addressLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		addressField = new JTextField();
-		addressField.setText(Server.HOST);
-		addressField.addKeyListener(handleKey());
-		
-		portLabel = new JLabel("Port No: ");
-		portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		portField = new JTextField("" + Server.PORT);
-		portField.addKeyListener(handleKey());
-		
-		applyBtn = new JButton("Apply");
-		applyBtn.setEnabled(false);	// disable initially, until we change values
-		applyBtn.addActionListener( e -> {
-			applySettings();
-		});
-		
-		settingsPanel = new JPanel();
-		settingsPanel.setPreferredSize(new Dimension(100, 100));
-		settingsPanel.setMaximumSize(new Dimension(100, 100));
-		settingsPanel.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(0, 5, 0, 5);
-		
-		// settings label
-		c.anchor = GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridwidth = 2;
-		c.gridy = 0;
-		c.weighty = 1.0;
-		settingsPanel.add(settingsLabel, c);
-		
-		// address label
-		c.anchor = GridBagConstraints.CENTER;
-		c.fill = GridBagConstraints.BOTH;
-		c.gridx = 0;
-		c.weightx = 0.3;
-		c.gridwidth = 1;
-		c.gridy = 1;
-		c.weighty = 1.0;
-		settingsPanel.add(addressLabel, c);
-		
-		// address field
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 1;
-		c.weightx = 0.5;
-		c.gridy = 1;
-		settingsPanel.add(addressField, c);
-		
-		// port label
-		c.fill = GridBagConstraints.BOTH;
-		c.gridx = 0;
-		c.weightx = 0.2;
-		c.gridy = 2;
-		settingsPanel.add(portLabel, c);
-		
-		// port field
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 1;
-		c.weightx = 0.9;
-		c.gridy = 2;
-		settingsPanel.add(portField, c);
-		
-		// apply btn
-		c.anchor = GridBagConstraints.SOUTH;
-		c.gridx = 0;
-		c.weightx = 1.0;
-		c.gridwidth = 2;
-		c.gridy = 3;
-		c.weighty = 1.0;
-		settingsPanel.add(applyBtn, c);
-		
-		settingsPanel.setBorder(new LineBorder(Color.LIGHT_GRAY));
-		
-	}
+	// accessor methods
 	
-	private KeyListener handleKey() {
-		KeyListener key = new KeyListener() {
-			
-			public void keyTyped(KeyEvent e) {
-				applyBtn.setEnabled(true);
-			}
-			
-			public void keyReleased(KeyEvent e) {}
-		
-			public void keyPressed(KeyEvent e) {}
-		};
-		return key;
-	}
-	
-	private void applySettings() {
-		// make sure fields aren't empty
-		String address = addressField.getText();
-		String port = portField.getText();
-		int portNo = 0;
-		
-		if (address.isEmpty() || port.isEmpty()) {
-			ErrorUtils.showCustomError(app, "Connection settings fields cannot be blank!");
-			return;
-		} else {
-			try {
-				portNo = Integer.parseInt(port);
-			} catch (NumberFormatException e) {
-				ErrorUtils.showInvalidPortError(app);
-				return;
-			}
-			
-			if (portNo < 1024 || portNo > 65536) {
-				ErrorUtils.showInvalidPortError(app);
-				return;
-			}
-		}
-		// we're good. change up values!
-		app.setHost(address);
-		app.setPort(portNo);
-		applyBtn.setEnabled(false);	// disable, until value changes again in the future!
-	
+	public Lobby getLobby() {
+		return lobby;
 	}
 	
 	public Controller getController() {
 		return controller;
-	}
-	
-	public LobbyPanel getLobbyPanel() {
-		return lobbyPanel;
 	}
 	
 	public NewPlayer getClientPlayer() {
@@ -320,8 +212,8 @@ public class LoginPanel extends JPanel {
 	}
 	
 	/**
-	 * IOHandler for handling player add/remove as well as updating the countdown
-	 * timer.
+	 * Controller for handling connection events such as adding / removing players,
+	 * as well as the initial countdown to the start of the game.
 	 * @author David Kramer
 	 *
 	 */
@@ -333,6 +225,10 @@ public class LoginPanel extends JPanel {
 			app.getClient().getIOHandler().send(out);
 		}
 
+		/**
+		 * Processes incoming JSONObjects that deal with players or game
+		 * transitions.
+		 */
 		public void receive(JSONObject in) {
 			System.out.println("login panel received: " + in.toJSONString());
 			String cmd = (String) in.get(Keys.CMD);	
@@ -390,9 +286,11 @@ public class LoginPanel extends JPanel {
 				if (newPlayer.getName().equals(clientPlayer.getName())) {	// player belongs to this client!
 					clientPlayer = newPlayer;
 					app.getBoardPanel().setClientPlayer(clientPlayer);
+					app.getGlobalColor().setColor(PlayerStyles.getColor(clientPlayer.getStyleID()));
+					app.getDicePanel().colorizeDice(PlayerStyles.getColor(clientPlayer.getStyleID()));
 				}
 				app.getBoardPanel().addPlayer(newPlayer);
-				lobbyPanel.updateList();
+				lobby.updateList();
 			}
 		}
 		
@@ -401,21 +299,28 @@ public class LoginPanel extends JPanel {
 		 * @param player - Player to remove
 		 */
 		public void removePlayer(NewPlayer player) {
+			if (player.getName().equals(app.getBoardPanel().getClientPlayer().getName())) {
+				Runnable r = () -> { app.reset(); };
+				new Thread(r).start();	// disconnect everything in background
+				ErrorUtils.showDisconnectMessage(app);
+				app.reset();
+			}
 			app.getBoardPanel().getPlayers().remove(player.getName());
-			lobbyPanel.updateList();
+			lobby.updateList();
 		}
 		
 		/**
 		 * Joins the player to the server with the specified name.
 		 */
+		@SuppressWarnings("unchecked")
 		public void joinPlayer() {
 			if (!app.getClient().isConnected()) {
 				try {
 					app.connectClient();
 				} catch (ConnectException e) {
-					app.getConnPanel().showConnectionError();
+					ErrorUtils.showConnectionError(app);
 				} catch (IOException e) {
-					app.getConnPanel().showConnectionError();
+					ErrorUtils.showConnectionError(app);
 				}
 			}
 			
@@ -426,17 +331,18 @@ public class LoginPanel extends JPanel {
 			obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
 			send(obj);
 			nameField.setText(""); 	// clear out
+			joinBtn.setEnabled(false);
 		}
 		
 		/**
 		 * Disconnects a player and clears them out from server.
 		 */
-		public void disconnectPlayer() {
+		@SuppressWarnings("unchecked")
+		public boolean disconnectPlayer() {
 			if (ErrorUtils.showDisconnectWarning(app)) {
 				NewJSONObject obj = new NewJSONObject(app.getClient().getID(), Keys.Commands.REM_PLAYER);
 				obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
 				send(obj);
-				app.reset();
 				// setup to join again
 				GameUtils.clearActions(joinBtn);
 				nameField.setEnabled(true);
@@ -445,7 +351,9 @@ public class LoginPanel extends JPanel {
 				joinBtn.addActionListener(e -> {
 					joinPlayer();
 				});
+				return true;
 			}
+			return false;
 		}
 		
 		/**
@@ -455,7 +363,7 @@ public class LoginPanel extends JPanel {
 		 */
 		private void updateTimer(boolean reset, int timeLeft) {
 			if (reset) {
-				timerLabel.setVisible(false);
+				timerLabel.setText(" ");	// don't setVisible(false), but blank text, otherwise it can mess w/ layout
 			} else {
 				timerLabel.setVisible(true);
 				String endStr = " seconds";

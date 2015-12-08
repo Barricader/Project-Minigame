@@ -4,6 +4,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -12,7 +16,9 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.Timer;
 
 import gameobjects.NewPlayer;
@@ -87,6 +93,14 @@ public class GameUtils {
 		return new Color(red, green, blue);
 	}
 	
+	public static Color getAlphaColor(Color c, int a) {
+		int r = c.getRed();
+		int g = c.getGreen();
+		int b = c.getBlue();
+		
+		return new Color(r, g, b, a);
+	}
+	
 	/**
 	 * Customize labels to reduce some redundancy when applying styles. The font set is
 	 * Courier New BOLD.
@@ -124,6 +138,7 @@ public class GameUtils {
 	 * @param c - The class type that the map values contain
 	 * @return - An array, based off values stored in map
 	 */
+	@SuppressWarnings("unchecked")
 	public static <K, V> V[] mapToArray(Map<K, V> map, Class<V> c) {
 		V[] temp = (V[]) Array.newInstance(c, map.size());
 		Iterator<V> iterator = map.values().iterator();
@@ -190,4 +205,40 @@ public class GameUtils {
 		}
 	}
 	
+	/**
+	 * Utility method that writes a string of text to a log file and
+	 * provides a GUI save dialog.
+	 * @param text - Textarea containing text to write.
+	 */
+	public static void writeLogFile(JTextArea textArea) {
+		JFileChooser chooser = new JFileChooser();
+		int choice = chooser.showSaveDialog(null);
+		// they didn't cancel out dialog
+		if (choice == JFileChooser.APPROVE_OPTION) {
+			File f = chooser.getSelectedFile();
+			String filePath = f.getAbsolutePath();
+		
+			// add.log extension if not exists!
+			if (!filePath.endsWith(".log")) {
+				f = new File(filePath + ".log");
+			}
+			
+			BufferedWriter bw = null;
+			
+			try {
+				bw = new BufferedWriter(new FileWriter(f));
+				textArea.write(bw);
+				//System.out.println("Log file written successfully!");
+			} catch (IOException e) {
+				//System.out.println("An error occurred when trying to write log file!");
+				e.printStackTrace();
+			} finally {
+				try {
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}	
+		}
+	}
 }

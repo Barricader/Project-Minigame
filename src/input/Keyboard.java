@@ -5,7 +5,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 
 import panels.BaseMiniPanel;
-import panels.minis.Enter;
 
 /**
  * Basic keyboard class that listens to and keeps track of keyboard input.
@@ -17,8 +16,6 @@ public class Keyboard implements KeyEventDispatcher {
 	private boolean shiftFlag;
 	private boolean altFlag;
 	private boolean ctrlFlag;
-	private KeyboardFocusManager kfm;
-	
 	public boolean[] keys; // encompasses most used keys
 	
 	private BaseMiniPanel mp;
@@ -34,8 +31,9 @@ public class Keyboard implements KeyEventDispatcher {
 		lastKey = 0;
 
 		keys = new boolean[120];
-		//System.out.println("UUUUUUUUUUUUUUUH");
+		//System.out.println("New keyboard for : " + mp);
 		this.mp = mp;
+		mp.setKey(this);
 	}
 
 	/**
@@ -43,7 +41,7 @@ public class Keyboard implements KeyEventDispatcher {
 	 */
 	public void keyPressed(KeyEvent e) {
 		lastKey = e.getKeyCode();
-		System.out.println(e.getKeyCode());
+		//System.out.println(e.getKeyCode());
 
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_ALT:
@@ -60,10 +58,7 @@ public class Keyboard implements KeyEventDispatcher {
 		if (!spacePressed && e.getKeyCode() == KeyEvent.VK_SPACE) {
 			spacePressed = true;
 		}
-		if (!enterPressed && e.getKeyCode() == KeyEvent.VK_ENTER) {
-			enterPressed = true;
-			mp.playerPressed();
-		}
+		mp.playerPressed();
 	}
 
 	/**
@@ -138,18 +133,15 @@ public class Keyboard implements KeyEventDispatcher {
 	}
 	
 	public void setKFM(KeyboardFocusManager kfm) {
-		this.kfm = kfm;
 		kfm.addKeyEventDispatcher(this);
 	}
 
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
-			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-				if (mp.isActive()) {
-					mp.playerPressed();	
-				}
-			}
+			keyPressed(e);
+		} else if (e.getID() == KeyEvent.KEY_RELEASED) {
+			keyReleased(e);
 		}
 		return false;
 	}

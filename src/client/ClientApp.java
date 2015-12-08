@@ -1,20 +1,22 @@
 package client;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
@@ -30,30 +32,34 @@ import panels.LeaderBoardPanel;
 import panels.LoginPanel;
 import panels.StatePanel;
 import panels.minis.Enter;
-import panels.minis.KeyFinder;
-import panels.minis.Paint;
 import panels.minis.Pong;
 import panels.minis.RPS;
 import util.ErrorUtils;
+import util.GameUtils;
+import util.GlobalColor;
 import util.MiniGames;
 
 /**
  * This will be the new "MAIN" application that the client will run to use
  * to connect to the server and play the game. 
  * @author David Kramer
+ * @author JoJones
  *
  */
 public class ClientApp extends JFrame {
+	private static final long serialVersionUID = 1417615047380477284L;
 	// connection settings
 	private String host = Server.HOST;
 	private int port = Server.PORT;
+	
+	private GlobalColor globalColor;
 	
 	private static final String TITLE = "Project Mini-Game by Jo & Kramer";
 	private static final Dimension SIZE = new Dimension(960, 800);	// min size
 	private static ClientApp instance = null;
 	private Client client;
 	
-	private Keyboard key;
+	private Keyboard key;	// keyboard to give mini games access to, when we switch to them.
 	
 	// GUI stuff
 	private JPanel panel;	// main container panel for all other panels
@@ -64,20 +70,29 @@ public class ClientApp extends JFrame {
 	private ConnectionPanel connPanel;
 	private LeaderBoardPanel leaderPanel;
 	private ConcurrentHashMap<String, BaseMiniPanel> minis;
-	private String curMini = "null";
+	
+	/* default start value, so that ClientIOHandler map doesn't throw a 
+	 * NullPointException when accessing a non-existent minigame 
+	 */
+	private String curMini = MiniGames.names[0];
 	
 	private ErrorHandler errorHandler;
 	
+	/**
+	 * Constructs a new ClientApp that has a client ready to be connected
+	 * to the server.
+	 */
 	public ClientApp() {
 		client = new Client(this);
+		globalColor = new GlobalColor(Color.LIGHT_GRAY);	// default start color
 		errorHandler = new ErrorHandler();
 		init();
+		initMinis();
 		createAndShowGUI();
 		client.setIOHandler(new ClientIOHandler(this));
 		instance = this;
 		setFocusable(true);
 		requestFocus();
-		initMinis();
 	}
 	
 	/**
@@ -145,6 +160,7 @@ public class ClientApp extends JFrame {
 	 */
 	private void createComponents() {
 		panel = new JPanel();
+		panel.setBackground(Color.BLACK);
 		statePanel = new StatePanel(this);
 		chatPanel = new ChatPanel(this);
 		connPanel = new ConnectionPanel(this);
@@ -154,15 +170,16 @@ public class ClientApp extends JFrame {
 		dicePanel.setVisible(false);
 		leaderPanel = new LeaderBoardPanel(this);
 		leaderPanel.setVisible(false);
-		minis = new ConcurrentHashMap<>();
 	}
 	
+	/**
+	 * Initializes the mini games for this app.
+	 */
 	private void initMinis() {
+		minis = new ConcurrentHashMap<>(MiniGames.names.length);
 		minis.put(MiniGames.names[0], new Enter(this));
-		minis.put(MiniGames.names[1], new KeyFinder(this));
-		minis.put(MiniGames.names[2], new Paint(this));
-		minis.put(MiniGames.names[3], new Pong(this));
-		minis.put(MiniGames.names[4], new RPS(this));
+		minis.put(MiniGames.names[1], new Pong(this));
+		minis.put(MiniGames.names[2], new RPS(this));
 	}
 	
 	/**
@@ -173,8 +190,28 @@ public class ClientApp extends JFrame {
 		setMinimumSize(SIZE);
 		setTitle(TITLE);
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+//		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setVisible(true);
+		
+		// window close - make sure to disconnect nicely!
+		addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    	if (client.isConnected()) {
+		    		if(statePanel.getLoginPanel().getController().disconnectPlayer()) {
+		    			dispose();
+		    			System.exit(0);
+		    		} else {
+		    			// they canceled their decision to disconnect. don't close window!
+		    			return;
+		    		}
+		    	} else {
+		    		// not connected, just close out window!
+			    	dispose();
+			    	System.exit(0);	
+		    	}
+		    }
+		});
 	}
 	
 	/**
@@ -227,10 +264,16 @@ public class ClientApp extends JFrame {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		statePanel.getLoginPanel().getLobbyPanel().removeAll();
-		boardPanel.getPlayers().clear();
-		resetClient();
-		repaint();
+		finally {
+			statePanel.reset();
+			chatPanel.getController().toggleUI(false);
+			dicePanel.setVisible(false);
+			leaderPanel.setVisible(false);
+			boardPanel.getPlayers().clear();
+			globalColor.setColor(Color.GRAY);	// back to default
+			resetClient();
+			repaint();	
+		}
 	}
 	
 	/**
@@ -257,6 +300,20 @@ public class ClientApp extends JFrame {
 	public void updateKey(String state) {
 		key = new Keyboard(minis.get(state));
 		key.setKFM(KeyboardFocusManager.getCurrentKeyboardFocusManager());
+		minis.get(state).setKey(key);
+	}
+	
+	public void colorize(JComponent c) {
+		globalColor.add(c);
+	}
+	
+	public void colorize(JComponent c, LineBorder border) {
+		globalColor.add(c, border);
+	}
+	
+	public void colorize(JComponent c, LineBorder border, int fontSize) {
+		GameUtils.customizeComp(c, null, globalColor.getColor(), fontSize);
+		globalColor.add(c, border);
 	}
 	
 	// mutator methods
@@ -276,11 +333,24 @@ public class ClientApp extends JFrame {
 	public void setMini(String curMini) {
 		this.curMini = curMini;
 	}
+
 	
 	// accessor methods
 	
 	public Client getClient() {
 		return client;
+	}
+	
+	public String getHost() {
+		return host;
+	}
+	
+	public GlobalColor getGlobalColor() {
+		return globalColor;
+	}
+	
+	public int getPort() {
+		return port;
 	}
 	
 	public StatePanel getStatePanel() {
@@ -342,18 +412,8 @@ public class ClientApp extends JFrame {
 	 * Main method. Starts up client GUI app.
 	 * @param args
 	 */
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
-		// change look and feel to nimbus
-		try {
-		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-		        if ("Nimbus".equals(info.getName())) {
-		            UIManager.setLookAndFeel(info.getClassName());
-		            break;
-		        }
-		    }
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
 		ClientApp app = new ClientApp();
 	}
 }

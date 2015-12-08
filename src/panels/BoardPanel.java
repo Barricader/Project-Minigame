@@ -3,15 +3,14 @@ package panels;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.json.simple.JSONObject;
@@ -23,9 +22,9 @@ import gameobjects.NewTile;
 import main.Animator;
 import util.GameUtils;
 import util.Keys;
-import util.NewJSONObject;
 
-public class BoardPanel extends JPanel implements ComponentListener {
+public class BoardPanel extends JPanel {
+	private static final long serialVersionUID = -6914840746257120219L;
 	public static final int HORIZONTAL_TILE_COUNT = 10;
 	public static final byte VERTICAL_TILE_COUNT = HORIZONTAL_TILE_COUNT / 2;
 	
@@ -34,21 +33,33 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	
 	private ArrayList<NewTile> tiles;
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
-	private NewPlayer clientPlayer;	// the player that belong to this client!
-	private NewPlayer activePlayer;
-	
+	private NewPlayer clientPlayer;	// the player that belongs to this client!
+	private NewPlayer activePlayer;	// the player that is allowed to move / isMoving
+	/**
+	 * Constructs a new BoardPanel with a connection to the main client app
+	 * @param app - Target client app
+	 */
 	public BoardPanel(ClientApp app) {
 		this.app = app;
 		init();
 		players = new ConcurrentHashMap<>();
 		controller = new Controller();
-		
-		controller.setBP(this);
-		addComponentListener(this);
+		setBackground(Color.BLACK);
 	}
 	
+	/**
+	 * Initializes all necessary items for this boardpanel.
+	 */
 	private void init() {
 		createTiles();
+		// handles resizing window event
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				resizeTiles();
+				resizePlayers();
+				repaint();
+			}
+		});
 	}
 	
 	/**
@@ -56,7 +67,6 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 * @param p - Player to add
 	 */
 	public void addPlayer(NewPlayer p) {
-		System.out.println("board addplayer!");
 		p.style(p.getStyleID());	// make sure player is styled!
 		p.setTile(tiles.get(tiles.size()-1));	// default starting location!
 		p.setLocation(tiles.get(tiles.size()-1).getCellLocation(p.getID()));
@@ -109,6 +119,31 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		if (newTileID >= tiles.size()) {
 			newTileID -= tiles.size();
 		}
+		
+		if (newTileID != 0) {
+			switch (tiles.get(newTileID-1).getType()) {
+				case 0:
+					players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 1);
+					break;
+				case 1:
+					players.get(player.getName()).setScore(players.get(player.getName()).getScore() - 1);
+					break;
+				case 2:
+					players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 5);
+					break;
+			}
+		}
+		else {
+			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 1);
+		}
+		
+		// If passing start, give plus 3 score
+		if (movePath.contains(tiles.get(0)) && movePath.indexOf(tiles.get(0)) != 0) {
+			players.get(player.getName()).setScore(players.get(player.getName()).getScore() + 3);
+		}
+		
+		app.getLeaderPanel().updateList();
+		
 		player.setTileID(newTileID);
 		return movePath;
 	}
@@ -146,12 +181,15 @@ public class BoardPanel extends JPanel implements ComponentListener {
 	 */
 	private void drawPlayers(Graphics g) {
 		for (NewPlayer p : players.values()) {
-			p.draw(g);
+			if (!p.getName().equals(activePlayer.getName())) {
+				p.draw(g);
+			}
 		}
+		activePlayer.draw(g);	// draw active player last, so that it's on top!
 	}
 	
 	/**
-	 * Creates all the board tiles
+	 * Creates all the board tiles as specified in the tiles.map file.
 	 */
 	private void createTiles() {
 		tiles = new ArrayList<>();
@@ -195,7 +233,7 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			else {
 				color = GameUtils.colorFromHex("#1DD147");	// green
 			}	
-			NewTile t = new NewTile(color, 0, NewTile.TILE_COUNT, x, y, tileWidth, tileHeight);
+			NewTile t = new NewTile(color, 0, NewTile.TILE_COUNT, x, y, c, tileWidth, tileHeight);
 			tiles.add(t.getID(), t);
 		}
 	}
@@ -227,36 +265,20 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			}
 		}
 	}
-
-	/**
-	 * Resize any GUI elements.
-	 */
-	public void componentResized(ComponentEvent e) {
-		resizeTiles();
-		resizePlayers();
-		System.out.println(ClientApp.getInstance().getSize());
-		repaint();
-	}
-
-	// unused component listener methods
-	public void componentMoved(ComponentEvent e) {}
-	public void componentShown(ComponentEvent e) {}
-	public void componentHidden(ComponentEvent e) {}
 	
-	public Controller getController() {
-		return controller;
-	}
+	// mutator methods
 	
 	public void setActive(String name) {
 		activePlayer = players.get(name);
-		activePlayer.setActive(true);	// draw the active indicator!
+		activePlayer.setActive(true);	// draws the active indicator!
 		repaint();
 	}
 	
 	public void setClientPlayer(NewPlayer player) {
 		this.clientPlayer = player;
-//		controller.firstUpdate();
 	}
+	
+	// accessor methods
 	
 	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
 		return players;
@@ -274,12 +296,16 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		return clientPlayer;
 	}
 	
+	public Controller getController() {
+		return controller;
+	}
+	
+	/**
+	 * Controller for handling player movements and updates on this board panel.
+	 * @author David Kramer
+	 *
+	 */
 	public class Controller extends IOHandler {
-		private BoardPanel bp;
-		
-		public void setBP(BoardPanel bp) {
-			this.bp = bp;
-		}
 
 		public void send(JSONObject out) {
 			app.getClient().getIOHandler().send(out);
@@ -288,13 +314,12 @@ public class BoardPanel extends JPanel implements ComponentListener {
 		public void receive(JSONObject in) {
 			String cmdKey = (String)in.get(Keys.CMD);
 			NewPlayer p = NewPlayer.fromJSON(in);
-//			players.put(p.getName(), p);
 			p.style(p.getStyleID());	// make sure player is always styled!
-			System.out.println("board panel received: " + p.toJSONObject().toJSONString());
+			//System.out.println("board panel received: " + p.toJSONObject().toJSONString());
 			
 			switch (cmdKey) {
 			case Keys.Commands.MOVE:
-				System.out.println("Should be moving player!");
+				//System.out.println("Should be moving player!");
 				movePlayer(in, p);
 				break;
 			case Keys.Commands.UPDATE:
@@ -306,12 +331,17 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			}
 		}
 		
+		/**
+		 * Moves the player, using an Animator object, based on a specified 
+		 * roll amount for specified player
+		 * @param in - JSONObject containing roll amt
+		 * @param p - Target player we need to animate
+		 */
 		public void movePlayer(JSONObject in, NewPlayer p) {
 			Animator animator = new Animator();
-//			p.setLocation(tiles.get(p.getTileID()).getCellLocation(p.getID()));
 			players.put(p.getName(), p);
 			setActive(p.getName());
-			System.out.println("ACTIVE PLAYER TILE NUM: " + p.getTileID());
+			//System.out.println("ACTIVE PLAYER TILE NUM: " + p.getTileID());
 			int temp = (int) in.get(Keys.ROLL_AMT);
 			if (p.getTileID() > 0) {
 				p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));	
@@ -323,8 +353,13 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			animator.animatePlayer(BoardPanel.this, p);
 		}
 		
+		/**
+		 * Updates specified player by setting their tile location
+		 * on their tile ID.
+		 * @param p - Player to update
+		 */
 		public void updatePlayer(NewPlayer p) {
-			System.out.println("updating player: " + p.toJSONObject().toJSONString() + ", on board panel!");
+			//System.out.println("updating player: " + p.toJSONObject().toJSONString() + ", on board panel!");
 			if (p.getTileID() > 0) {
 				p.setLocation(tiles.get(p.getTileID() - 1).getCellLocation(p.getID()));
 			}
@@ -334,13 +369,5 @@ public class BoardPanel extends JPanel implements ComponentListener {
 			players.put(p.getName(), p);
 			repaint();
 		}
-		
-		public void update() {
-			activePlayer.setActive(false);
-			NewJSONObject update = new NewJSONObject(activePlayer.getID(), Keys.Commands.UPDATE);
-			update.put(Keys.PLAYER, activePlayer.toJSONObject());
-			send(update);
-		}
-		
 	}
 }

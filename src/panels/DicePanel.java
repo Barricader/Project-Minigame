@@ -22,13 +22,21 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import main.Dice;
-import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 import util.PlayerStyles;
 
+/**
+ * Dice panel contains the dice, needed for player movement. The player
+ * can click on the dice if it is their turn, and then whatever roll amt
+ * they get, will be sent to the server to update other players about
+ * this player's roll.
+ * @author David Kramer
+ *
+ */
 public class DicePanel extends JPanel implements MouseListener, MouseMotionListener {
-	private static final Color BG_COLOR = GameUtils.colorFromHex("#D6D9DF");	// gray
+	private static final long serialVersionUID = 677541060884598239L;
+	private static final Color BG_COLOR = Color.BLACK;
 	private Controller controller;
 	private ClientApp app;
 	private Dice dice;
@@ -42,9 +50,12 @@ public class DicePanel extends JPanel implements MouseListener, MouseMotionListe
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		setPreferredSize(new Dimension(100, 100));
-		setBorder(new LineBorder(Color.LIGHT_GRAY));
+		app.colorize(this, new LineBorder(null));
 	}
 	
+	/**
+	 * Initializes and lays out components using GridBagLayout.
+	 */
 	private void init() {
 		createComponents();
 		setLayout(new GridBagLayout());
@@ -59,6 +70,9 @@ public class DicePanel extends JPanel implements MouseListener, MouseMotionListe
 		add(statusLabel, c);
 	}
 	
+	/**
+	 * Creates GUI components.
+	 */
 	private void createComponents() {
 		dice = new Dice(0, 0, this);
 		dice.setEnabled(false);
@@ -70,7 +84,6 @@ public class DicePanel extends JPanel implements MouseListener, MouseMotionListe
 		statusLabel.setFont(new Font("Courier New", Font.BOLD, 16));
 		statusLabel.setMaximumSize(new Dimension(100, 50));
 		statusLabel.setText(" ");
-		statusLabel.setBorder(new LineBorder(Color.BLACK, 2));
 	}
 	
 	/**
@@ -85,9 +98,14 @@ public class DicePanel extends JPanel implements MouseListener, MouseMotionListe
 		System.out.println("dice enabled ? " + dice.isEnabled());
 	}
 	
+	public void colorizeDice(Color color) {
+		dice.colorizeDice(color);	
+	}
+	
 	/**
 	 * Handles dice rolling action, if we're allowed to roll.
 	 */
+	@SuppressWarnings("unchecked")
 	public void mouseClicked(MouseEvent e) {
 		if (canRoll) {
 			if (dice.contains(e.getPoint())) {
@@ -161,10 +179,15 @@ public class DicePanel extends JPanel implements MouseListener, MouseMotionListe
 				canRoll = true;
 				statusLabel.setVisible(true);
 				statusLabel.setText("Your turn!");
+				statusLabel.setForeground(Color.BLACK);
+				statusLabel.setBackground(PlayerStyles.getColor(p.getStyleID()));
 				dice.setEnabled(true);
 			} else {
 				statusLabel.setText(p.getName() + "'s turn");
 				statusLabel.setVisible(true);
+				statusLabel.setOpaque(true);
+				statusLabel.setForeground(PlayerStyles.getColor(p.getStyleID()));
+				statusLabel.setBackground(Color.BLACK);
 				dice.setEnabled(false);
 			}
 			Color c = PlayerStyles.getColor(p.getStyleID());
@@ -174,9 +197,6 @@ public class DicePanel extends JPanel implements MouseListener, MouseMotionListe
 			} else {
 				setForeground(Color.WHITE);
 			}
-			statusLabel.setBackground(PlayerStyles.getColor(p.getStyleID()));
-			statusLabel.setOpaque(true);
-			statusLabel.setBorder(new LineBorder(statusLabel.getForeground(), 2));
 			repaint();
 		}
 		

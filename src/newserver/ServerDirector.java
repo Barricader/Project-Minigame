@@ -1,151 +1,93 @@
 package newserver;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import gameobjects.NewPlayer;
 import util.GameUtils;
 import util.Keys;
-import util.MiniGames;
 import util.NewJSONObject;
 import util.PlayerStyles;
 
+/**
+ * The ServerDirector class is responsible for managing players and alternating
+ * between 2 states: Board and MiniGame. This class keeps track of players who
+ * have rolled for the current round. This class also handles adding / removing
+ * players of the game.
+ * @author David Kramer
+ *
+ */
 @SuppressWarnings({ "static-access", "unchecked" })	// hide stupid warnings!!
 public class ServerDirector {
+	/* Game States */
 	public static final int BOARD = 0;
 	public static final int MINIGAME = 1;
 	
 	private static final int MAX_PLAYERS = 4;
-	private static final int WAIT_TIME = 3;	// TODO change back to 20 secs
-	private int timeLeft = WAIT_TIME;	// time remaining
+	private static final int WAIT_TIME = 3;	// countdown time, until we start game!
 	private Server server;
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
-	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;	// players that have rolled;
-	private NewPlayer activePlayer;		// we will probably need this. Haven't used it yet though.
-	private String curMini = "null";
-	private String[] nameMinis = MiniGames.names;
-	private List<NewPlayer> leaderboard;
-	
-	private HashMap<Integer, NewPlayer> temp;
-	
-	private int lastMini = -1;
-	private int stopped;
-	private int over;
-	private int turnCount;	// how many turns are we in?
-	
+	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;
+	private NewPlayer activePlayer;
 	private Timer timer;	// timer for controlling events
 	
+	private MiniGameManager miniMngr;	// manager to deal with mini-game stuff
+	
+	private boolean hasStarted = false;	// have we started playing game yet?
+	private int timeLeft = WAIT_TIME;
+	private int stopCount;
+	/**
+	 * Constructs a new ServerDirector with a connection to the main server.
+	 * @param server - Main server that we're connected to
+	 */
 	public ServerDirector(Server server) {
 		this.server = server;
 		players = new ConcurrentHashMap<>();
 		rolledPlayers = new ConcurrentHashMap<>();
-		temp = new HashMap<>();
-
-		stopped = 0;
-		turnCount = 0;
-		leaderboard = Collections.synchronizedList(new ArrayList<NewPlayer>());
+		miniMngr = new MiniGameManager(this);
 	}
 	
 	/**
-	 * Adds a player to the server array of players, from a JSONObject. Checks
-	 * to make sure that the player is valid (i.e. no duplicate name and we
-	 * haven't reached the max player limit.)
-	 * @param obj
+	 * Adds a player to the player map, from a JSONObject.
+	 * @param obj - JSONObject containing player to add
 	 */
 	public void addPlayer(JSONObject obj) {
 		NewPlayer p = NewPlayer.fromJSON(obj);
-		NewJSONObject out = null;
-		JSONObject error = new JSONObject();	// for any errors that might occur
+		
 		if (players.size() < MAX_PLAYERS) {
 			if (!checkDuplicate(p)) {
 				p.setID(players.size());
 				p.style(PlayerStyles.getInstance().getStyle());
 				players.put(p.getName(), p);
 				echoAllPlayers();	// update to all players
+				server.getServerApp().getListPanel().getListModel().addElement(p.getName());
 			} else {
-				out = new NewJSONObject(p.getID(), Keys.Commands.ERROR);	// duplicate error
-				error.put(Keys.ERROR_TITLE, "Duplicate name!");
-				error.put(Keys.ERROR_MSG, "Another player already exists with name: " 
-						+ p.getName() + ". Try another name!");
-				out.put(Keys.Commands.ERROR, error);
-				server.echoAll(out);
+				// TODO duplicate error!
 			}
 		} else {
-			out = new NewJSONObject(p.getID(), Keys.Commands.ERROR);	// max player limit error
-			error.put(Keys.ERROR_TITLE, "Player refused!");
-			error.put(Keys.ERROR_MSG, "Max player limit reached!");
-			out.put(Keys.Commands.ERROR, error);
-			server.echoAll(out);
+			// TODO max player error!
 		}
 		checkCountdown();
 	}
 	
 	/**
-	 * Checks the countdown for starting the game.
-	 */
-	private void checkCountdown() {
-		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.TIMER);
-		JSONObject timerObj = new JSONObject();
-		if (players.size() >= 2) {
-			timeLeft = WAIT_TIME;
-			GameUtils.resetTimer(timer);
-			
-			if (players.size() == 4) {
-				timeLeft = 5;	// shorten time, we have reached player limit
-			}
-			timer = new Timer(1000, e -> {
-				
-				if (timeLeft == 0) {
-					timer.stop();
-					System.out.println("OK. CHANGE ALL CLIENTS STATE TO BOARD!!!!");
-					changeClientState(BOARD);
-				} else {
-					timeLeft--;
-					// create timer packet and send to all clients.
-					timerObj.put(Keys.TIME, timeLeft);
-					obj.put(Keys.Commands.TIMER, timerObj);
-					server.echoAll(obj);
-				}
-		
-			});
-			timer.start();	
-		} else {
-			GameUtils.resetTimer(timer);
-			timerObj.put(Keys.TIME, "reset");
-			obj.put(Keys.Commands.TIMER, timerObj);
-			server.echoAll(obj);
-		}
-	}
-	
-	/**
-	 * Sends a command to client to change to a new state.
-	 * @param state - Name of state to change to.
-	 */
-	private void changeClientState(int state) {
-		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
-		obj.put(Keys.STATE, state);
-//		JSONObject stateObj = new JSONObject();
-//		stateObj.put(Keys.STATE, state);
-		server.echoAll(obj);
-		nextPlayer();	// assign next player
-	}
-	
-	/**
-	 * Removes a player, and resets the countdown timer.
-	 * @param obj - JSONObject containing the player to remove.
+	 * Removes a player from the player map, from a JSONObject.
+	 * @param obj - JSONObject containing player to remove
 	 */
 	public void removePlayer(JSONObject obj) {
-		System.out.println("should be removing player from server!");
 		NewPlayer p = NewPlayer.fromJSON(obj);
+		removePlayer(p);
+		PlayerStyles.taken[p.getStyleID()] = false;		// style is available again
+	}
+	
+	/**
+	 * Removes a player from the map, from a Player object itself.
+	 * @param p - Player to remove (if it exists in map by the name)
+	 */
+	public void removePlayer(NewPlayer p) {
 		NewJSONObject out = null;
 		
 		if (players.containsKey(p.getName())) {
@@ -154,55 +96,37 @@ public class ServerDirector {
 			out = new NewJSONObject(p.getID(), Keys.Commands.REM_PLAYER);
 			out.put(Keys.PLAYER, p.toJSONObject());
 			server.echoAll(out);
+			
+			// if the active player was what we just removed, go to the next player!
+			if (activePlayer != null) {
+				if (activePlayer.getName().equals(p.getName())) {
+					nextPlayer();
+				}
+			}
+			server.getServerApp().getListPanel().updateList();	// update list with players still here!
 		}
 		checkCountdown();
 	}
 	
 	/**
-	 * Updates a player from a JSONObject.
-	 * @param obj - JSONObject containing player
+	 * Sends a move command to all clients to request that they animate
+	 * a player.
+	 * @param obj - JSONObject containing a player
 	 */
-	public void updatePlayer(JSONObject obj) {
+	public void movePlayer(JSONObject obj) {
 		NewPlayer p = NewPlayer.fromJSON(obj);
-		players.put(p.getName(), p);
-		System.out.println("SERVER UPDATE PLAYER RECEIVED: " + p.toJSONObject().toJSONString());
-		// echo back
-		NewJSONObject update = new NewJSONObject(p.getID(), Keys.Commands.UPDATE);
-		update.put(Keys.PLAYER, p.toJSONObject());
-		server.echoAll(update);
+		p.setLastRoll((int)obj.get(Keys.ROLL_AMT));
+		p.setHasRolled(true);
+		NewJSONObject out = new NewJSONObject(p.getID(), Keys.Commands.MOVE);
+		out.put(Keys.PLAYER, p.toJSONObject());
+		out.put(Keys.ROLL_AMT, p.getLastRoll());
+		players.put(p.getName(), p);	// update player map!
+		//System.out.println("should be echoing to move players: " + out.toJSONString());
+		server.echoAll(out);
 	}
 	
 	/**
-	 * Echoes all players that exist in the array, so that newly connected
-	 * clients receive them.
-	 */
-	private void echoAllPlayers() {
-		for (NewPlayer p : players.values()) {
-			NewJSONObject out = new NewJSONObject(p.getID(), Keys.Commands.ADD_PLAYER);
-			out = new NewJSONObject(p.getID(), Keys.Commands.ADD_PLAYER);
-			out.put(Keys.ID, p.getID());
-			out.put(Keys.PLAYER, p.toJSONObject());	
-			server.echoAll(out);
-		}
-	}
-	
-	/**
-	 * Checks the specified player for duplicate names against the player
-	 * array.
-	 * @param p - Player name to check
-	 * @return true if duplicate found, false otherwise
-	 */
-	private boolean checkDuplicate(NewPlayer p) {
-		return players.containsKey(p.getName());
-	}
-	
-	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
-		return players;
-	}
-	
-	/**
-	 * Selects the next active player and sends a request for the player 
-	 * to roll the dice.
+	 * Advances to the next player which hasn't rolled recently.
 	 */
 	public void nextPlayer() {
 		for (NewPlayer p : players.values()) {
@@ -219,147 +143,22 @@ public class ServerDirector {
 	}
 	
 	/**
-	 * Resets players back to not having rolled, typically after a new round.
+	 * Changes between specified state which is either BOARD or MINIGAME. A
+	 * mini game state can be anyone of the available defined names as
+	 * specified in the MiniGames.names array.
+	 * @param state - State type to change to.
 	 */
-	private void reset() {
-		activePlayer.setHasRolled(false);
-		rolledPlayers.clear();
-	}
-	
-	/**
-	 * Sends a request to all clients to animate and move the player.
-	 * @param in - Player JSONObject that is the active player to move
-	 */
-	public void movePlayer(JSONObject in) {
-		NewPlayer p = NewPlayer.fromJSON(in);
-		p.setLastRoll((int)in.get(Keys.ROLL_AMT));
-		p.setHasRolled(true);
-		NewJSONObject obj = new NewJSONObject(p.getID(), Keys.Commands.MOVE);
-		obj.put(Keys.PLAYER, p.toJSONObject());
-		obj.put(Keys.ROLL_AMT, p.getLastRoll());
-		players.put(p.getName(), p);	// update player map
-		server.echoAll(obj);
-	}
-	
-//	/**
-//	 * Changes the state and lets the clients know
-//	 * @param state - State to change to
-//	 */
-//	public void changeState(int state) {
-//		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
-//		k.put("state", state);
-//		if (state == BOARD) {
-//			// Sort the HashMap by values and sort the players into the leaderboard
-//			if (!temp.isEmpty()) {
-//				System.out.println("temp shouldn't be empty!");
-//				List<Integer> sortedKeys = new ArrayList<Integer>(temp.keySet());
-//				Collections.sort(sortedKeys);
-//				leaderboard.addAll(temp.values());
-//			}
-//			
-//			// Create a JSON array in the JSONObject that we want to send
-//			JSONArray players = new JSONArray();
-//			for (int i = 0; i < leaderboard.size(); i++) {
-//				JSONObject temp = new JSONObject();
-//				String name = leaderboard.get(i).getName();
-//				temp.put("name", name);
-//				temp.put("place", i);		// Place is not necessary, just for testing
-//				players.add(temp);
-//			}
-//			
-//			k.put("leaderboard", players);
-//		}
-//		else if (state == MINIGAME) {
-//			// Choose a random minigame that wasn't the last one played
-//			int ranNum = lastMini;
-//			while (ranNum == lastMini) {
-//				ranNum = new Random().nextInt(nameMinis.length);
-//				curMini = nameMinis[ranNum];
-//			}
-////			k.put("mini", nameMinis[ranNum]);
-//			k.put("mini", "rps");
-//			lastMini = ranNum;
-//		}
-//		server.echoAll(k);
-//		leaderboard.clear();
-//		temp.clear();
-//	}
-	
 	public void changeState(int state) {
 		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
 		k.put(Keys.STATE, state);
 		
 		if (state == BOARD) {
-			JSONArray pArray = createLeaderBoard();
-			k.put("leaderboard", pArray);
+			k.put("leaderboard", miniMngr.getJSONLeaderboard());
 		} else if (state == MINIGAME) {
-			int ranNum = lastMini;
-			while (ranNum == lastMini) {
-				ranNum = new Random().nextInt(nameMinis.length);
-				curMini = nameMinis[ranNum];
-			}
-//			k.put("mini", nameMinis[ranNum]);
-			k.put("mini", "rps");	//TODO change back to above. This locks on RPS game!
-			lastMini = ranNum;
+			k.put("mini", miniMngr.randMini());
 		}
 		server.echoAll(k);
-	}
-	
-	private JSONArray createLeaderBoard() {
-		JSONArray pArray = new JSONArray();
-		NewPlayer[] temp = GameUtils.mapToArray(players, NewPlayer.class);
-		GameUtils.sortPlayersByName(temp);
-		for (NewPlayer p : temp) {
-			pArray.add(p);
-		}
-		return pArray;
-	}
-	
-	public void updateMinigame(JSONObject in) {
-		String name = (String) in.get("name");
-		if (name.equals(MiniGames.names[0])) {
-			handleEnter(in);
-		}
-		else if (name.equals(MiniGames.names[1])) {
-			handleKeyFinder(in);
-		}
-		else if (name.equals(MiniGames.names[2])) {
-			handlePaint(in);
-		}
-		else if (name.equals(MiniGames.names[3])) {
-			handlePong(in);
-		}
-		else if (name.equals(MiniGames.names[4])) {
-			handleRPS(in);
-		}
-		else {
-			// Not a known minigame, send error
-			handleError();
-		}
-	}
-	
-	private void handleEnter(JSONObject in) {
-		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));
-	}
-	
-	private void handleKeyFinder(JSONObject in) {
-		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));	// CHANGEME
-	}
-	
-	private void handlePaint(JSONObject in) {
-		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));	// CHANGEME
-	}
-	
-	private void handlePong(JSONObject in) {
-		leaderboard.add(players.get((String) in.get(Keys.PLAYER_NAME)));	// CHANGEME
-	}
-	
-	private void handleRPS(JSONObject in) {
-		temp.put((Integer) in.get(Keys.WINS), players.get((String) in.get(Keys.PLAYER_NAME)));
-	}
-	
-	private void handleError() {
-		System.out.println("ERROR: Not a valid minigame");
+		miniMngr.clearLeaderboard();
 	}
 	
 	/**
@@ -368,27 +167,143 @@ public class ServerDirector {
 	 * change to a mini-game state.
 	 */
 	public void isStopped() {
-		stopped++;
-		if (stopped == players.size()) {
-			stopped = 0;
-			activePlayer.setHasRolled(true);			
+		stopCount++;
+
+		if (stopCount == players.size()) {
+			stopCount = 0;
+			activePlayer.setHasRolled(true);		
+			
 			if (rolledPlayers.size() == players.size()) {
 				reset();
-				changeState(MINIGAME);
+				// slight delay when transitioning
+				GameUtils.resetTimer(timer);
+				timer = new Timer(1500, e -> {
+					changeState(MINIGAME);
+					nextPlayer();
+				});
+				timer.setRepeats(false);
+				timer.start();
+				return;
 			}
 			nextPlayer();
 		}
 	}
 	
 	/**
-	 * Called when a client is finished with a minigame. If all players have finished
-	 * the minigame, we need to move onto the board state
+	 * Clears out all players, and resets hasStarted flag to false.
+	 * This should be called if we need to restart the server game.
 	 */
-	public void isMinigameOver() {
-		over++;
-		if (over == players.size()) {
-			over = 0;
-			changeState(BOARD);
+	public void clearAll() {
+		players.clear();
+		rolledPlayers.clear();
+		activePlayer = null;
+		hasStarted = false;
+	}
+	
+	/**
+	 * Echoes all players that are stored on this server to all clients.
+	 */
+	private void echoAllPlayers() {
+		for (NewPlayer p : players.values()) {
+			NewJSONObject out = new NewJSONObject(p.getID(), Keys.Commands.ADD_PLAYER);
+			out = new NewJSONObject(p.getID(), Keys.Commands.ADD_PLAYER);
+			out.put(Keys.ID, p.getID());
+			out.put(Keys.PLAYER, p.toJSONObject());	
+			//System.out.println("echoing all players: " + p.toJSONObject().toJSONString());
+			server.echoAll(out);
 		}
 	}
+	
+	/**
+	 * Checks the specified player for duplicate names against the player
+	 * array.
+	 * @param p - Player name to check
+	 * @return true if duplicate found, false otherwise
+	 */
+	private boolean checkDuplicate(NewPlayer p) {
+		return players.containsKey(p.getName());
+	}
+	
+	/**
+	 * Resets players back to not having rolled, typically after a new round.
+	 */
+	private void reset() {
+		activePlayer.setHasRolled(false);
+		rolledPlayers.clear();
+	}
+	
+	/**
+	 * Checks the countdown for starting the game. If 2+ players are connected,
+	 * the timer sends JSON packets to clients, counting down the time before
+	 * the game launches into the BoardState. If players join during countdown,
+	 * timer resets, unless there are 4 players, and time is reduced to 5 secs.
+	 */
+	private void checkCountdown() {
+		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.TIMER);
+		JSONObject timerObj = new JSONObject();
+		
+		if (players.size() < 2) {
+			hasStarted = false;		// we need to reset!
+		}
+		
+		if (!hasStarted) {
+			if (players.size() >= 2) {
+				timeLeft = WAIT_TIME;
+				GameUtils.resetTimer(timer);
+				
+				if (players.size() == 4 && timeLeft > 5) {
+					timeLeft = 5;	// shorten time, we have reached player limit
+				}
+				timer = new Timer(1000, e -> {
+					
+					if (timeLeft == 0) {
+						timer.stop();
+						hasStarted = true;
+						changeClientState(BOARD);
+					} else {
+						timeLeft--;
+						// create timer packet and send to all clients.
+						timerObj.put(Keys.TIME, timeLeft);
+						obj.put(Keys.Commands.TIMER, timerObj);
+						server.echoAll(obj);
+					}
+			
+				});
+				timer.start();	
+			} else {
+				GameUtils.resetTimer(timer);
+				timerObj.put(Keys.TIME, "reset");
+				hasStarted = false;
+				obj.put(Keys.Commands.TIMER, timerObj);
+				server.echoAll(obj);
+			}	
+		}
+	}
+	
+	/**
+	 * Sends a state update command to all clients to change to either board
+	 * or mini-game state.
+	 * @param state - State type to change to.
+	 */
+	private void changeClientState(int state) {
+		NewJSONObject k = new NewJSONObject(-1, Keys.Commands.STATE_UPDATE);
+		k.put(Keys.STATE, state);
+		server.echoAll(k);
+		nextPlayer();	// assign next player!
+	}
+	
+	// accessor methods
+	
+	public Server getServer() {
+		return server;
+	}
+	
+	public ConcurrentHashMap<String, NewPlayer> getPlayers() {
+		return players;
+	}
+	
+	public MiniGameManager getMiniMngr() {
+		return miniMngr;
+	}
+	
 }

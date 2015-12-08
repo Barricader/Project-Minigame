@@ -2,28 +2,26 @@ package panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.DefaultListModel;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
-import client.IOHandler;
 import gameobjects.NewPlayer;
+import util.DisabledItemSelectionModel;
 import util.GameUtils;
+import util.Keys;
 
 /**
  * This class will display all the current player's scores.
@@ -31,8 +29,8 @@ import util.GameUtils;
  *
  */
 public class LeaderBoardPanel extends JPanel {
+	private static final long serialVersionUID = -1829679317958988559L;
 	private ClientApp app;
-	private Controller controller;
 	private NewPlayer[] players;	// holds players, in sorted order by their score
 	private DefaultListModel<String> nameListModel;
 	private DefaultListModel<Integer> scoreListModel;
@@ -49,9 +47,9 @@ public class LeaderBoardPanel extends JPanel {
 	 */
 	public LeaderBoardPanel(ClientApp app) {
 		this.app = app;
-		controller = new Controller();
 		init();
 		setPreferredSize(new Dimension(100, 100));
+		setBackground(Color.BLACK);
 	}
 	
 	/**
@@ -59,8 +57,7 @@ public class LeaderBoardPanel extends JPanel {
 	 */
 	private void init() {
 		createComponents();
-		
-		setBorder(new LineBorder(Color.LIGHT_GRAY));	
+
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
@@ -115,42 +112,39 @@ public class LeaderBoardPanel extends JPanel {
 		// leaderboard title label
 		titleLabel = new JLabel("Leaderboard");
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		titleLabel.setFont(new Font("Courier New", Font.BOLD, 16));
 		titleLabel.setOpaque(true);
-		titleLabel.setBackground(Color.BLACK);
-		titleLabel.setForeground(Color.CYAN);
-		titleLabel.setBorder(new LineBorder(Color.CYAN, 2));
+		app.colorize(titleLabel, new LineBorder(null, 2), 16);
 		
 		// name label
 		nameLabel = new JLabel(" Name");
-		nameLabel.setFont(new Font("Courier New", Font.BOLD, 14));
-		nameLabel.setBorder(new MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+//		nameLabel.setFont(new Font("Courier New", Font.BOLD, 14));
+//		nameLabel.setBorder(new MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+		app.colorize(nameLabel, new LineBorder(null), 14);
 		
 		// score label
 		scoreLabel = new JLabel("Score ");
-		scoreLabel.setFont(new Font("Courier New", Font.BOLD, 14));
+//		scoreLabel.setFont(new Font("Courier New", Font.BOLD, 14));
 		scoreLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		scoreLabel.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
+		app.colorize(scoreLabel, new LineBorder(null), 14);
+//		scoreLabel.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
 		
 		// name list
 		nameListModel = new DefaultListModel<>();
 		nameList = new JList<>(nameListModel);
 		nameList.setSelectionModel(new DisabledItemSelectionModel());
 		nameList.setPreferredSize(new Dimension(100, 100));
-		nameList.setBackground(GameUtils.colorFromHex("#D6D9DF"));
-		nameList.setFont(new Font("Courier New", Font.BOLD, 11));
-		nameList.setForeground(Color.DARK_GRAY);
-		nameList.setBorder(new MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+		nameList.setBackground(Color.BLACK);
+		app.colorize(nameList, new LineBorder(null), 11);
+
 		
 		// score list
 		scoreListModel = new DefaultListModel<>();
 		scoreList = new JList<>(scoreListModel);
 		scoreList.setSelectionModel(new DisabledItemSelectionModel());
 		scoreList.setPreferredSize(new Dimension(100, 100));
-		scoreList.setBackground(GameUtils.colorFromHex("#D6D9DF"));
-		scoreList.setFont(new Font("Courier New", Font.BOLD, 11));
-		scoreList.setForeground(Color.DARK_GRAY);
-		scoreList.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
+		app.colorize(scoreList, new LineBorder(null), 11);
+//		scoreList.setForeground(Color.DARK_GRAY);
+//		scoreList.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
 	}
 	
 	/**
@@ -179,40 +173,19 @@ public class LeaderBoardPanel extends JPanel {
 		app.repaint();
 	}
 	
+	/**
+	 * Updates the list using a JSONObject that contains leaderboard scores.
+	 * @param in - JSONObject player win scores
+	 */
 	public void updateList(JSONObject in) {
-		JSONArray leaderBoard = (JSONArray) in.get("leaderboard");
+		JSONArray leaderboard = (JSONArray) in.get("leaderboard");
 		Map<String, NewPlayer> players = app.getBoardPanel().getPlayers();
 		
-		for (int i = 0; i < leaderBoard.size(); i++) {
-			NewPlayer p = (NewPlayer) leaderBoard.get(i);
-			players.get(p.getName()).setScore(players.get(p.getName()).getScore() + players.size() - i);
-			
+		for (int i = 0; i < leaderboard.size(); i++) {
+			JSONObject obj = (JSONObject) leaderboard.get(i);
+			String name = (String) obj.get(Keys.NAME);
+			players.get(name).setScore(players.get(name).getScore() + players.size() - i);
 		}
 		updateList();
-	}
-	
-	/**
-	 * This class just makes it so that you can't click and highlight a 
-	 * value in the leader board list.
-	 * @author David Kramer
-	 *
-	 */
-	class DisabledItemSelectionModel extends DefaultListSelectionModel {
-		public void setSelectionInterval(int index0, int index1) {
-			super.setSelectionInterval(-1, -1);
-		}
-	}
-	
-	public class Controller extends IOHandler {
-
-		@Override
-		public void send(JSONObject out) {
-		}
-
-		@Override
-		public void receive(JSONObject in) {
-
-		}
-		
 	}
 }

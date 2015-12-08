@@ -19,6 +19,10 @@ public class ClientIOHandler extends IOHandler {
 	private ClientApp app;
 	private HashMap<String, IOHandler> handlerMap;
 	
+	/**
+	 * Constructs a new ClientIOHandler with a link to the main ClientApp.
+	 * @param app - Target ClientApp
+	 */
 	public ClientIOHandler(ClientApp app) {
 		super();
 		this.app = app;
@@ -50,12 +54,14 @@ public class ClientIOHandler extends IOHandler {
 	 * Sends a JSONObject using the clients ObjectOutputStream.
 	 */
 	public void send(JSONObject out) {
-		try {
-			app.getClient().getOutputStream().writeObject(out);
-			app.getClient().getOutputStream().flush();
-			app.getClient().getOutputStream().reset();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (app.getClient().getOutputStream() != null) {
+			try {
+				app.getClient().getOutputStream().writeObject(out);
+				app.getClient().getOutputStream().flush();
+				app.getClient().getOutputStream().reset();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
 		}
 	}
 
@@ -64,10 +70,14 @@ public class ClientIOHandler extends IOHandler {
 	 * handler map, depending on the key(s) received.
 	 */
 	public void receive(JSONObject in) {
-		System.out.println("Client Handler received: " + in);
-		
+		System.out.println("Client received: " + in);
 		String cmdKey = (String)in.get(Keys.CMD);
-		System.out.println("command key: " + cmdKey);
+		
+		// have to handle mini updates here, otherwise it points to wrong thing.
+		if (cmdKey.equals(Keys.Commands.MINI_UPDATE)) {
+			handlerMap.put(Keys.Commands.MINI_UPDATE, app.getMinis().get(app.getMini()).getController());
+		}
+		
 		if (handlerMap.containsKey(cmdKey)) {
 			handlerMap.get(cmdKey).receive(in);
 		}

@@ -16,6 +16,15 @@ import util.Keys;
 import util.PlayerStyles;
 import util.Vector;
 
+/**
+ * A player should be created from the main start state. A player has a random name,
+ * color, and score. During game play, players can move from tile to tile in the board.
+ * Depending on what spaces they land on, their scores can be affected by the action
+ * of that particular tile. 
+ * @author JoJones
+ * @author David Kramer
+ *
+ */
 public class NewPlayer extends GameObject {
 	private static final long serialVersionUID = 1L;
 	// players should be uniform size
@@ -24,7 +33,6 @@ public class NewPlayer extends GameObject {
 	
 	private String name;
 	private BufferedImage img;	// img representation of player
-	private Color color;	// color representation of player
 	private NewTile tile;	// what tile is player on?
 	private ArrayList<NewTile> movePath;	// path of tiles player will move on
 	private Point newLocation;	// new location that player will move to
@@ -90,7 +98,6 @@ public class NewPlayer extends GameObject {
 	@SuppressWarnings("static-access")	// it lies!
 	public void style(int colorNum) {
 		img = PlayerStyles.getInstance().imgs[colorNum];
-		color = PlayerStyles.getInstance().colors[colorNum];
 		styleID = colorNum;
 	}
 	
@@ -186,6 +193,8 @@ public class NewPlayer extends GameObject {
 		}
 	}
 	
+	// mutator methods
+	
 	/**
 	 * Sets new location for this player.
 	 * @param p
@@ -229,6 +238,8 @@ public class NewPlayer extends GameObject {
 	public void setHasRolled(boolean b) {
 		hasRolled = b;
 	}
+	
+	// accessor methods
 	
 	public int getID() {
 		return ID;
@@ -278,6 +289,11 @@ public class NewPlayer extends GameObject {
 		return score;
 	}
 	
+	/**
+	 * @return JSONObject containing all important values of a player to be
+	 * passed between other clients.
+	 */
+	@SuppressWarnings("unchecked")
 	public JSONObject toJSONObject() {
 		JSONObject player = new JSONObject();
 		player.put(Keys.ID, ID);

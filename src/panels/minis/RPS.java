@@ -6,24 +6,35 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Random;
 
-import javax.swing.JButton;
+import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.LineBorder;
 
 import org.json.simple.JSONObject;
 
 import client.ClientApp;
-import client.IOHandler;
 import gameobjects.NewPlayer;
 import panels.BaseMiniPanel;
+import util.BaseController;
+import util.DarkButton;
 import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 import util.PlayerStyles;
 
+/**
+ * Basic rock paper scissors game. Each player goes through 3 rounds of
+ * rock paper scissors, and they have to try and beat the computer, which
+ * is at random chance. There is a countdown timer, and if they don't choose
+ * within the allotted time, their choice is also randomized. 
+ * @author David Kramer
+ *
+ */
 public class RPS extends BaseMiniPanel {
+	private static final long serialVersionUID = 1552274782392228091L;
 	private static final int MAX_TURNS = 3;	// should only go 3 times
 	private static final int WAIT_TIME = 10;
 	private int timeLeft = WAIT_TIME;
@@ -33,14 +44,16 @@ public class RPS extends BaseMiniPanel {
 	private String playerChoice;
 	private Random rng = new Random();
 	
-	private JButton rockBtn;
-	private JButton paperBtn;
-	private JButton scissorBtn;
+	private DarkButton rockBtn;
+	private DarkButton paperBtn;
+	private DarkButton scissorBtn;
 	private JLabel timerLabel;	// displays countdown
 	private JLabel playerChoiceLabel;
 	private JLabel compChoiceLabel;	// choice that the computer chose
 	private JLabel turnLabel;	// displays what turn we're on
-	private Timer timer;	
+	private JLabel statusLabel;	// displays if we're done, but waiting
+	private Timer countdownTimer;
+	private Timer compTimer;	// timer to delay comp choice
 	
 	private int turnCount;	// what turn are we currently on?
 	private int wins;
@@ -55,10 +68,12 @@ public class RPS extends BaseMiniPanel {
 	public void init() {
 		wins = 0;
 		turnCount = 0;
-		timer = new Timer(1000, null);
+		controller = new Controller(app);
+		countdownTimer = new Timer(1000, null);
+		compTimer = new Timer(1000, null);
 		createComponents();
 		updateView();
-		timer.start();
+		countdownTimer.start();
 	}
 	
 	/**
@@ -71,57 +86,69 @@ public class RPS extends BaseMiniPanel {
 		GridBagConstraints c = new GridBagConstraints();
 		
 		// player choice
-		c.anchor = GridBagConstraints.NORTHWEST;
+		c.anchor = GridBagConstraints.NORTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
-		c.ipadx = 10;
 		c.weightx = 1.0;
+		c.gridwidth = 2;
 		c.gridy = 0;
 		c.ipady = 20;
 		add(playerChoiceLabel, c);
 		
 		// timer label
-		c.anchor = GridBagConstraints.NORTH;
-		c.gridx = 1;
+		c.gridx = 2;
+		c.gridwidth = 4;
 		c.ipadx = 0;
 		c.gridy = 0;
 		c.ipady = 0;
 		add(timerLabel, c);
 		
 		// comp choice
-		c.anchor = GridBagConstraints.NORTHEAST;
-		c.gridx = 2;
-		c.ipadx = 10;
+		c.gridx = 6;
+		c.gridwidth = 2;
 		c.gridy = 0;
 		c.ipady = 20;
+		c.weighty = 1.0;
 		add(compChoiceLabel, c);
 		
-		// rock
-		c.anchor = GridBagConstraints.CENTER;
-		c.fill = GridBagConstraints.HORIZONTAL;
+		// rock btn
+		c.anchor = GridBagConstraints.SOUTH;
+		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
-		c.gridy = 1;
-		c.ipady = 50;
+		c.gridwidth = 2;
+		c.gridy = 5;
 		c.weighty = 1.0;
 		add(rockBtn, c);
 		
-		// paper
-		c.gridx = 0;
-		c.gridy = 2;
-		c.weighty = 1.0;
+		c.gridx = 2;
+		c.gridwidth = 1;
+		add(Box.createHorizontalStrut(20), c);
+		
+		// paper btn
+		c.gridx = 3;
+		c.gridwidth = 2;
+		c.gridy = 5;
 		add(paperBtn, c);
 		
-		// scissor
-		c.gridx = 0;
-		c.gridy = 3;
-		c.weighty = 1.0;
+		c.gridx = 5;
+		c.gridwidth = 1;
+		add(Box.createHorizontalStrut(20), c);
+		
+		// scissors
+		c.gridx = 6;
+		c.gridwidth = 2;
+		c.gridy = 5;
 		add(scissorBtn, c);
 		
-		// turn label
-		c.anchor = GridBagConstraints.SOUTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridwidth = 3;
-		c.gridy = 5;
+		c.gridy = 6;
 		add(turnLabel, c);
+		
+		c.gridx = 3;
+		c.gridwidth = 6;
+		add(statusLabel, c);
 		
 		revalidate();
 		repaint();
@@ -131,29 +158,49 @@ public class RPS extends BaseMiniPanel {
 	 * Creates GUI components and timer.
 	 */
 	private void createComponents() {
-		rockBtn = new JButton("Rock");
+		rockBtn = new DarkButton("Rock");
+		rockBtn.setForeground(Color.RED);
+		rockBtn.setBorder(new LineBorder(Color.RED));
+		rockBtn.setFont(new Font("Courier New", Font.BOLD, 40));
 		rockBtn.addActionListener(e -> {
 			playerChoice = "Rock";
-			playerChoiceLabel.setText(playerChoiceLabel.getText() + playerChoice);
-			compChoose(false);
+			playerChoiceLabel.setText(playerChoice);
+			compChoose();
 		});
 		
-		paperBtn = new JButton("Paper");
+		paperBtn = new DarkButton("Paper");
+		paperBtn.setForeground(Color.GREEN);
+		paperBtn.setBorder(new LineBorder(Color.GREEN));
+		paperBtn.setFont(new Font("Courier New", Font.BOLD, 40));
 		paperBtn.addActionListener(e -> {
 			playerChoice = "Paper";
-			playerChoiceLabel.setText(playerChoiceLabel.getText() + playerChoice);
-			compChoose(false);
+			playerChoiceLabel.setText(playerChoice);
+			compChoose();
 		});
 		
-		scissorBtn = new JButton("Scissor");
+		scissorBtn = new DarkButton("Scissor");
+		scissorBtn.setForeground(Color.BLUE);
+		scissorBtn.setBorder(new LineBorder(Color.BLUE));
+		scissorBtn.setFont(new Font("Courier New", Font.BOLD, 40));
 		scissorBtn.addActionListener(e -> {
 			playerChoice = "Scissor";
-			playerChoiceLabel.setText(playerChoiceLabel.getText() + playerChoice);
-			compChoose(false);
+			playerChoiceLabel.setText(playerChoice);
+			compChoose();
 		});
 		
 		reset();
-		timer.start();
+		countdownTimer.start();
+	}
+	
+	/**
+	 * Disables buttons, after a user has made their choice. This toggles
+	 * the comp timer and causes a slight delay, before the results are 
+	 * determined.
+	 */
+	private void compChoose() {
+		toggleButtons(false);
+		resetCompTimer();
+		compTimer.start();
 	}
 	
 	/**
@@ -161,17 +208,17 @@ public class RPS extends BaseMiniPanel {
 	 * @param choosePlayer - flag to set if we should also choose player
 	 */
 	private void compChoose(boolean choosePlayer) {
-		timer.stop();
-		turnCount++;
+		countdownTimer.stop();
+		compTimer.stop();
 		
 		// choose for player
 		if (choosePlayer) {
 			playerChoice = choices[rng.nextInt(choices.length)];
-			playerChoiceLabel.setText(playerChoiceLabel.getText() + playerChoice);
+			playerChoiceLabel.setText(playerChoice);
 		}
 		
 		String compChoice = choices[rng.nextInt(choices.length)];
-		compChoiceLabel.setText(compChoiceLabel.getText() + compChoice);
+		compChoiceLabel.setText(compChoice);
 		boolean tied = false;
 		boolean compWon = false;
 		boolean playerWon = false;
@@ -211,56 +258,85 @@ public class RPS extends BaseMiniPanel {
 			}	
 		}
 		
-		if (turnCount >= MAX_TURNS) {
+		turnCount++;
+		
+		// we're done with the game, have to wait for others to finish!
+		if (turnCount == MAX_TURNS) {
+			countdownTimer.stop();
+			compTimer.stop();
+			toggleButtons(false);	// disable buttons
 			sendUpdate();
+			statusLabel.setVisible(true);
 			return;
 		}
 		reset();	
 	}
 	
 	/**
+	 * Enables or disables buttons depending on boolean value.
+	 * @param b - Boolean value to assign to enabled state on buttons
+	 */
+	private void toggleButtons(boolean b) {
+		rockBtn.setEnabled(b);
+		paperBtn.setEnabled(b);
+		scissorBtn.setEnabled(b);
+	}
+	
+	/**
 	 * Resets the view / labels, and the timer.
 	 */
 	private void reset() {
-		resetTimer();
+		resetCountTimer();
+		resetCompTimer();
+		toggleButtons(true);
+		
 		playerChoice = "";
 		timerLabel = new JLabel("" + timeLeft);
-		timerLabel.setFont(new Font("Courier New", Font.BOLD, 40));
+		timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		app.colorize(timerLabel, null, 40);
 		
-		compChoiceLabel = new JLabel("Computer Choice: ");
-		compChoiceLabel.setFont(new Font("Courier New", Font.BOLD, 20));
+		compChoiceLabel = new JLabel("Computer Choice");
+		compChoiceLabel.setFont(new Font("Courier New", Font.BOLD, 18));
 		compChoiceLabel.setOpaque(true);
 		compChoiceLabel.setBackground(Color.BLACK);
 		compChoiceLabel.setForeground(Color.CYAN);
-		compChoiceLabel.setBorder(new LineBorder(Color.CYAN, 2));
+		compChoiceLabel.setBorder(new LineBorder(Color.CYAN, 1));
+		compChoiceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		player = app.getBoardPanel().getClientPlayer();
-		playerChoiceLabel = new JLabel(player.getName() + " Choice: ");
-		playerChoiceLabel.setFont(new Font("Courier New", Font.BOLD, 20));
+		playerChoiceLabel = new JLabel(player.getName() + " Choice");
+		playerChoiceLabel.setFont(new Font("Courier New", Font.BOLD, 18));
 		playerChoiceLabel.setOpaque(true);
 		playerChoiceLabel.setBackground(Color.BLACK);
 		playerChoiceLabel.setForeground(PlayerStyles.getColor(player.getStyleID()));
-		playerChoiceLabel.setBorder(new LineBorder(playerChoiceLabel.getForeground(), 2));
+		playerChoiceLabel.setBorder(new LineBorder(playerChoiceLabel.getForeground(), 1));
+		playerChoiceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
-		turnLabel = new JLabel("Turn : " + turnCount + " of " + MAX_TURNS);
+		turnLabel = new JLabel("Turn: " + (turnCount + 1) + " of " + MAX_TURNS);
+		
 		turnLabel.setForeground(GameUtils.colorFromHex("58D168"));
 		turnLabel.setFont(new Font("Courier New", Font.BOLD, 20));
+		
+		statusLabel = new JLabel("Finished. Waiting for other clients!");
+		statusLabel.setFont(new Font("Courier New", Font.BOLD, 20));
+		statusLabel.setForeground(GameUtils.colorFromHex("#58D168"));
+		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		statusLabel.setVisible(false);
 		
 		updateView();
 		
 		if (turnCount < MAX_TURNS) {
-			timer.start();	
+			countdownTimer.start();	
 		}
 	}
 	
 	/**
 	 * Resets the timer and time left!
 	 */
-	private void resetTimer() {
+	private void resetCountTimer() {
 		timeLeft = WAIT_TIME;
-		GameUtils.resetTimer(timer);
-		timer = new Timer(1000, e -> {
-			System.out.println("timer: " + timer + ", action performed!");
+		GameUtils.resetTimer(countdownTimer);
+		countdownTimer = new Timer(1000, e -> {
 			timeLeft--;
 			if (timeLeft == 0) {
 				compChoose(true);
@@ -271,61 +347,43 @@ public class RPS extends BaseMiniPanel {
 		});
 	}
 	
-	public void update() {
+	private void resetCompTimer() {
+		GameUtils.resetTimer(compTimer);
+		compTimer = new Timer(1200, e -> {
+			compChoose(false);
+		});
+		compTimer.setRepeats(false);	// only run once!
 	}
+	
+	public void update() {}	// active update not used this game!
 	
 	/**
 	 * Sends a JSON packet with the win count for this player.
 	 */
+	@SuppressWarnings("unchecked")
 	public void sendUpdate() {
 		NewJSONObject obj = new NewJSONObject(player.getID(), Keys.Commands.MINI_UPDATE);
 		obj.put(Keys.PLAYER_NAME, player.getName());
 		obj.put(Keys.NAME, "rps");
 		obj.put(Keys.WINS, wins);
 		controller.send(obj);
-		System.out.println("should be sending update: " + obj.toJSONString());
+		//System.out.println("should be sending update: " + obj.toJSONString());
 	
 		NewJSONObject k = new NewJSONObject(player.getID(), Keys.Commands.MINI_STOPPED);
 		k.put(Keys.PLAYER_NAME, player.getName());
 		k.put(Keys.NAME, "rps");
 		isActive = false;
 		controller.send(k);
+		//System.out.println("sent RPS update!");
 	}
 	
-	public void playerPressed() {
-		// Send JSON here
-		// must put name key with player name
-//		if (isActive) {
-//			System.out.println("Player pressed!");
-//			clientPlayer = app.getBoardPanel().getClientPlayer();
-//			NewJSONObject k = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_STOPPED);
-//			k.put(Keys.NAME, clientPlayer.getName());
-//			controller.send(k);
-//			isActive = false;
-//		}
-	}
+	public void playerPressed() {}	// currently unused
 	
-//	/**
-//	 * Draws tiles and players to the screen.
-//	 * @param g - Graphics context to draw to
-//	 */
-//	public void paintComponent(Graphics g) {
-//		final Graphics2D g2d = (Graphics2D)g.create();
-//		try {
-//			g2d.setColor(GameUtils.colorFromHex("#C0C0C0"));
-//			g2d.fillRect(0, 0, getWidth(), getHeight());
-//			g2d.setColor(GameUtils.getRandomColor());
-//			g2d.fillOval(40, 40, 20, 60);
-//			g2d.setFont(new Font("Courier New", Font.BOLD, 50));
-//			g2d.drawString("Rock Paper Scissors", app.getStatePanel().getWidth() / 3, app.getStatePanel().getHeight() / 3);
-//			g2d.setColor(Color.CYAN);
-//			drawPlayers(g2d);
-//		} finally {
-//			g2d.dispose();
-//		}
-//	}
-	
-	public class Controller extends IOHandler {
+	public class Controller extends BaseController {
+
+		public Controller(ClientApp app) {
+			super(app);
+		}
 
 		public void send(JSONObject out) {
 			app.getClient().getIOHandler().send(out);
