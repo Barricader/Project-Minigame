@@ -106,7 +106,7 @@ public class LoginPanel extends JPanel {
 		add(nameLabel, c);
 		
 		// name field
-		c.fill = GridBagConstraints.VERTICAL;
+		c.fill = GridBagConstraints.BOTH;
 		c.ipadx = 10;
 		c.gridx = 1;
 		c.gridy = 1;
@@ -153,6 +153,7 @@ public class LoginPanel extends JPanel {
 		app.colorize(timerLabel, null, 30);
 		
 		nameField = new JTextField(ServerClient.MAX_NAME_LENGTH);
+		nameField.setCaretColor(Color.WHITE);
 		nameField.setTransferHandler(null);	// disable copy paste
 		
 		app.colorize(nameField, new LineBorder(Color.CYAN), 20);
