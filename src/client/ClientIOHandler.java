@@ -70,7 +70,7 @@ public class ClientIOHandler extends IOHandler {
 	 * handler map, depending on the key(s) received.
 	 */
 	public void receive(JSONObject in) {
-		System.out.println("Client Handler received: " + in);
+		System.out.println("Client received: " + in);
 		String cmdKey = (String)in.get(Keys.CMD);
 		
 		// have to handle mini updates here, otherwise it points to wrong thing.

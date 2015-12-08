@@ -238,7 +238,7 @@ public class ServerApp extends JFrame {
 			private JMenuItem menuItem;
 			
 			public SaveContextMenu() {
-				System.out.println("new context menu!");
+				//System.out.println("new context menu!");
 				menuItem = new JMenuItem("Save to log file");
 				
 				if (!console.getText().isEmpty()) {	// disable if nothing in console
