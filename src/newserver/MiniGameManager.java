@@ -33,6 +33,7 @@ public class MiniGameManager {
 	private List<String> leaderboard;
 	private Map<String, Integer> temp;	// holds win values from mini-games
 	private int count = 0;	// TODO this is for counting packets. Remove me later!
+	private int index = -1;
 	
 	public MiniGameManager(ServerDirector serverDir) {
 		this.serverDir = serverDir;
@@ -91,7 +92,11 @@ public class MiniGameManager {
 			ranNum = GameUtils.random.nextInt(MiniGames.names.length);
 		}
 		lastMini = ranNum;
-		return "pong";
+		
+		index++;
+		return MiniGames.names[index % 3];
+		
+		//return "pong";
 //		return "enter";
 		//return MiniGames.names[lastMini];
 	}
