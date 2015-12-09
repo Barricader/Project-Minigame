@@ -190,7 +190,6 @@ public class ClientApp extends JFrame {
 		setMinimumSize(SIZE);
 		setTitle(TITLE);
 		setLocationRelativeTo(null);
-//		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setVisible(true);
 		
@@ -258,7 +257,9 @@ public class ClientApp extends JFrame {
 	 */
 	public void reset() {
 		try {
-			client.terminate();
+			if (client.isConnected()) {
+				client.terminate();	
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -270,7 +271,7 @@ public class ClientApp extends JFrame {
 			dicePanel.setVisible(false);
 			leaderPanel.setVisible(false);
 			boardPanel.getPlayers().clear();
-			globalColor.setColor(Color.GRAY);	// back to default
+			globalColor.setColor(Color.LIGHT_GRAY);	// back to default
 			resetClient();
 			repaint();	
 		}
@@ -303,14 +304,32 @@ public class ClientApp extends JFrame {
 		minis.get(state).setKey(key);
 	}
 	
+	/**
+	 * Colorizes any JComponent with the styles of global color.
+	 * @param c - Component to colorize.
+	 */
 	public void colorize(JComponent c) {
 		globalColor.add(c);
 	}
 	
+	/**
+	 * Colorizes any JComponent with the styles of global color, and
+	 * the specified LineBorder.
+	 * @param c - Component to colorize.
+	 * @param border - LineBorder outline color to colorize
+	 */
 	public void colorize(JComponent c, LineBorder border) {
 		globalColor.add(c, border);
 	}
 	
+	/**
+	 * Utility method that colorizes a JComponent and LineBorder but also
+	 * applies the font we've been using, and allows to specify the desired
+	 * font size.
+	 * @param c - Component to colorize
+	 * @param border - LineBorder outline color to colorize
+	 * @param fontSize - fontSize to apply using the font defined in GameUtils.
+	 */
 	public void colorize(JComponent c, LineBorder border, int fontSize) {
 		GameUtils.customizeComp(c, null, globalColor.getColor(), fontSize);
 		globalColor.add(c, border);

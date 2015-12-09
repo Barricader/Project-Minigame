@@ -74,7 +74,7 @@ public class Client extends Thread {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+					System.out.println("Client interrupted. Should be terminated now!");
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -110,15 +110,15 @@ public class Client extends Thread {
 	 * @throws IOException
 	 */
 	public void close() throws IOException {
+//		if (streamIn != null) {
+//			streamIn.close();
+//		}
+//		if (streamOut != null) {
+//			streamOut.close();
+//		}
 		if (socket != null) {
 			socket.shutdownInput();
 			socket.shutdownOutput();
-		}
-		if (streamIn != null) {
-			streamIn.close();
-		}
-		if (streamOut != null) {
-			streamOut.close();
 		}
 	}
 	

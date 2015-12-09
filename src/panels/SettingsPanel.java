@@ -197,6 +197,7 @@ public class SettingsPanel extends JPanel {
 		// we're good. change up values!
 		app.setHost(address);
 		app.setPort(portNo);
+		applyBtn.repaint();
 		applyBtn.setEnabled(false);	// disable, until value changes again in the future!
 	}
 }

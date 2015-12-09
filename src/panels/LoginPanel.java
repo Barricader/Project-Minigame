@@ -156,7 +156,9 @@ public class LoginPanel extends JPanel {
 		nameField.addKeyListener(new KeyAdapter() {
 			
 			public void keyReleased(KeyEvent e) {
-				if (!nameField.getText().isEmpty()) {
+				String text = nameField.getText();
+				text = text.trim();	// don't allow whitespace for name!
+				if (!text.isEmpty()) {
 					joinBtn.setEnabled(true);
 				} else {
 					joinBtn.setEnabled(false);
@@ -165,14 +167,17 @@ public class LoginPanel extends JPanel {
 			
 			public void keyPressed(KeyEvent e) {
 				// if they hit back space, we can allow the msg field to be editable.
-				if (nameField.getText().length() >= ServerClient.MAX_NAME_LENGTH 
+				String text = nameField.getText();
+				text = text.trim();	// make sure whitespace is removed!
+				if (text.length() >= ServerClient.MAX_NAME_LENGTH 
 						&& e.getKeyCode() != KeyEvent.VK_BACK_SPACE) {
 					nameField.setEditable(false);
 				} else {
 					nameField.setEditable(true);
 				}
+				nameField.setText(text);
 				
-				if (!nameField.getText().isEmpty()) {
+				if (!text.isEmpty()) {
 					joinBtn.setEnabled(true);
 					if (e.getKeyChar() == '\n') {
 						controller.joinPlayer();
@@ -299,11 +304,14 @@ public class LoginPanel extends JPanel {
 		 * @param player - Player to remove
 		 */
 		public void removePlayer(NewPlayer player) {
-			if (player.getName().equals(app.getBoardPanel().getClientPlayer().getName())) {
-				Runnable r = () -> { app.reset(); };
-				new Thread(r).start();	// disconnect everything in background
-				ErrorUtils.showDisconnectMessage(app);
-				app.reset();
+			NewPlayer p = app.getBoardPanel().getClientPlayer();
+			if (p != null) {
+				if (player.getName().equals(p.getName())) {
+					Runnable r = () -> { app.reset(); };
+					new Thread(r).start();	// disconnect everything in background
+					ErrorUtils.showDisconnectMessage(app);
+					app.reset();
+				}	
 			}
 			app.getBoardPanel().getPlayers().remove(player.getName());
 			lobby.updateList();
@@ -314,13 +322,15 @@ public class LoginPanel extends JPanel {
 		 */
 		@SuppressWarnings("unchecked")
 		public void joinPlayer() {
-			if (!app.getClient().isConnected()) {
+			if (!app.getClient().isConnected() && !nameField.getText().isEmpty()) {
 				try {
 					app.connectClient();
 				} catch (ConnectException e) {
 					ErrorUtils.showConnectionError(app);
+					joinBtn.setEnabled(false);
 				} catch (IOException e) {
 					ErrorUtils.showConnectionError(app);
+					joinBtn.setEnabled(false);
 				}
 			}
 			
@@ -331,7 +341,7 @@ public class LoginPanel extends JPanel {
 			obj.put(Keys.PLAYER, clientPlayer.toJSONObject());
 			send(obj);
 			nameField.setText(""); 	// clear out
-			joinBtn.setEnabled(false);
+//			joinBtn.setEnabled(false);
 		}
 		
 		/**

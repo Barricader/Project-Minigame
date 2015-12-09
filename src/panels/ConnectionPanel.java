@@ -182,15 +182,9 @@ public class ConnectionPanel extends JPanel {
 			connectBtn.setText("Disconnect");
 			connectBtn.addActionListener( e -> {
 				if (app.getStatePanel().getLoginPanel().getController().disconnectPlayer()) {
-					try {
-						Client c = app.getClient();
-						c.terminate();
-					} catch (Exception e1) {
-						
-					} finally {
-						controller.updateStatus(STATUS_DISCONNECTED);
-						app.reset();
-					}	
+					Runnable r = () -> { app.reset(); };
+					new Thread(r).start();	// disconnect everything in background
+					controller.updateStatus(STATUS_DISCONNECTED);
 				}
 			});
 			return connectBtn;
@@ -201,27 +195,21 @@ public class ConnectionPanel extends JPanel {
 		 * @param statusCode - Connection status code
 		 */
 		public void updateStatus(int statusCode) {
-			Color statusColor = null;
 			String status = "Status: ";
 			switch (statusCode) {
 			case STATUS_ERROR:
-				statusColor = Color.RED;
 				status += "Error! Not connected.";
 				connectBtn = connect();
 				break;
 			case STATUS_DISCONNECTED:
-				statusColor = Color.GRAY;
 				status += "Disconnected.";
 				connectBtn = connect();
 				break;
 			case STATUS_CONNECTED:
-				statusColor = GameUtils.colorFromHex("#16A611");
 				status += "Connected!";
 				connectBtn = disconnect();
 				break;
 			}
-			
-			statusLabel.setForeground(statusColor);
 			statusLabel.setText(status);
 			app.getChatPanel().getController().toggleUI(app.getClient().isConnected());
 			repaint();

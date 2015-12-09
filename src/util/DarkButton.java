@@ -87,6 +87,7 @@ public class DarkButton extends JButton {
 			
 			// determine how to colorize button
 			if (!isEnabled()) {
+				isHovered = false;	// don't draw highlight!
 				borderColor = (new Color(0, 255, 255, 20));
 				bgColor = getBackground().darker().darker();
 				textColor = getForeground().darker().darker();
