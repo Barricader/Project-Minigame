@@ -15,8 +15,8 @@ public class PongBall extends GameObject {
 	private int yVel;
 	
 	public PongBall() {
-		xVel = 5;
-		yVel = 5;
+		xVel = 6;
+		yVel = 8;
 		width = WIDTH;
 		height = HEIGHT;
 	}

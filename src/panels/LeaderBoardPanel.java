@@ -19,6 +19,8 @@ import org.json.simple.JSONObject;
 
 import client.ClientApp;
 import gameobjects.NewPlayer;
+import screen.LBPlayerCellRenderer;
+import screen.LBScoreCellRenderer;
 import util.DisabledItemSelectionModel;
 import util.GameUtils;
 import util.Keys;
@@ -35,6 +37,8 @@ public class LeaderBoardPanel extends JPanel {
 	private DefaultListModel<String> nameListModel;
 	private DefaultListModel<Integer> scoreListModel;
 	private JList<String> nameList;
+	private LBPlayerCellRenderer playerRenderer;
+	private LBScoreCellRenderer scoreRenderer;
 	private JList<Integer> scoreList;
 	// header labels
 	private JLabel titleLabel;
@@ -117,34 +121,32 @@ public class LeaderBoardPanel extends JPanel {
 		
 		// name label
 		nameLabel = new JLabel(" Name");
-//		nameLabel.setFont(new Font("Courier New", Font.BOLD, 14));
-//		nameLabel.setBorder(new MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
 		app.colorize(nameLabel, new LineBorder(null), 14);
 		
 		// score label
 		scoreLabel = new JLabel("Score ");
-//		scoreLabel.setFont(new Font("Courier New", Font.BOLD, 14));
 		scoreLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		app.colorize(scoreLabel, new LineBorder(null), 14);
-//		scoreLabel.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
 		
 		// name list
 		nameListModel = new DefaultListModel<>();
 		nameList = new JList<>(nameListModel);
+		playerRenderer = new LBPlayerCellRenderer(app);
 		nameList.setSelectionModel(new DisabledItemSelectionModel());
 		nameList.setPreferredSize(new Dimension(100, 100));
 		nameList.setBackground(Color.BLACK);
+		nameList.setCellRenderer(playerRenderer);
 		app.colorize(nameList, new LineBorder(null), 11);
 
 		
 		// score list
 		scoreListModel = new DefaultListModel<>();
 		scoreList = new JList<>(scoreListModel);
+		scoreRenderer = new LBScoreCellRenderer(app, nameList);
 		scoreList.setSelectionModel(new DisabledItemSelectionModel());
 		scoreList.setPreferredSize(new Dimension(100, 100));
+		scoreList.setCellRenderer(scoreRenderer);
 		app.colorize(scoreList, new LineBorder(null), 11);
-//		scoreList.setForeground(Color.DARK_GRAY);
-//		scoreList.setBorder(new MatteBorder(1, 1, 0, 0, Color.LIGHT_GRAY));
 	}
 	
 	/**
@@ -170,6 +172,7 @@ public class LeaderBoardPanel extends JPanel {
 			scoreListModel.addElement(p.getScore());
 			repaint();
 		}
+		System.out.println("updating list");
 		app.repaint();
 	}
 	
