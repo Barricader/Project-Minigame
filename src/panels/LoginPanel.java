@@ -47,6 +47,7 @@ public class LoginPanel extends JPanel {
 	private JLabel nameLabel;
 	private JTextField nameField;
 	private DarkButton joinBtn;
+	private DarkButton startBtn;	// bypass countdown
 	private Lobby lobby;
 	private SettingsPanel settingsPanel;
 	
@@ -71,13 +72,18 @@ public class LoginPanel extends JPanel {
 		
 		// title label
 		c.anchor = GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.BOTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
+		c.gridwidth = 2;
 		c.weightx = 1.0;
-		c.gridwidth = 8;
 		c.gridy = 0;
 		c.gridheight = 1;
 		add(titleLabel, c);
+		
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 2;
+		c.gridy = 0;
+		add(startBtn, c);
 		
 		// settings panel
 		c.anchor = GridBagConstraints.NORTHEAST;
@@ -92,7 +98,7 @@ public class LoginPanel extends JPanel {
 		
 		// name label
 		c.anchor = GridBagConstraints.CENTER;
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
 		c.ipadx = 0;
 		c.weightx = 1.0;
@@ -137,7 +143,7 @@ public class LoginPanel extends JPanel {
 	 */
 	private void createComponents() {
 		titleLabel = new JLabel("<Project Mini-Game>");
-		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		titleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		app.colorize(titleLabel, null, 18);
 		
 		nameLabel = new JLabel("Name:");
@@ -197,10 +203,18 @@ public class LoginPanel extends JPanel {
 			controller.joinPlayer();
 		});
 		
+		startBtn = new DarkButton("Force Start");
+		startBtn.setVisible(false);
+		startBtn.addActionListener( e -> {
+			controller.forceStart();
+		});
+		app.colorize(startBtn, new LineBorder(app.getGlobalColor().getColor()), 20);
+		
 		lobby = new Lobby(app);
 		app.colorize(lobby, (LineBorder)lobby.getBorder());
 		settingsPanel = new SettingsPanel(app);
 	}
+	
 	
 	// accessor methods
 	
@@ -235,7 +249,6 @@ public class LoginPanel extends JPanel {
 		 * transitions.
 		 */
 		public void receive(JSONObject in) {
-			System.out.println("login panel received: " + in.toJSONString());
 			String cmd = (String) in.get(Keys.CMD);	
 			NewPlayer player = NewPlayer.fromJSON(in);
 			
@@ -297,6 +310,7 @@ public class LoginPanel extends JPanel {
 				app.getBoardPanel().addPlayer(newPlayer);
 				lobby.updateList();
 			}
+			startBtn.setVisible(players.size() >= 2);
 		}
 		
 		/**
@@ -313,8 +327,10 @@ public class LoginPanel extends JPanel {
 					app.reset();
 				}	
 			}
-			app.getBoardPanel().getPlayers().remove(player.getName());
+			ConcurrentHashMap<String, NewPlayer> players = app.getBoardPanel().getPlayers();
+			players.remove(player.getName());
 			lobby.updateList();
+			startBtn.setVisible(players.size() >= 2);
 		}
 		
 		/**
@@ -364,6 +380,15 @@ public class LoginPanel extends JPanel {
 				return true;
 			}
 			return false;
+		}
+		
+		/**
+		 * Sends message to the server to skip the countdown timer
+		 * and immediately enter the game.
+		 */
+		public void forceStart() {
+			NewJSONObject obj = new NewJSONObject(app.getClient().getID(), Keys.Commands.FORCE_START);
+			send(obj);
 		}
 		
 		/**

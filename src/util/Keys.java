@@ -153,6 +153,12 @@ public final class Keys {
 		public static final String TIMER = "timer";
 		
 		/**
+		 * Key indicating that we should force start the game and bypass 
+		 * the countdown timer.
+		 */
+		public static final String FORCE_START = "forceStart";
+		
+		/**
 		 * Key indicating an update of some sort.
 		 */
 		public static final String UPDATE = "update";

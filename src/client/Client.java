@@ -72,7 +72,7 @@ public class Client extends Thread {
 				try {
 					terminate();
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					System.out.println("an error occurred. " + e1.getMessage());
 				} catch (InterruptedException e1) {
 					System.out.println("Client interrupted. Should be terminated now!");
 				}
@@ -110,16 +110,17 @@ public class Client extends Thread {
 	 * @throws IOException
 	 */
 	public void close() throws IOException {
+		if (socket != null) {
+			socket.shutdownInput();
+			socket.shutdownOutput();
+			socket.close();
+		}
 //		if (streamIn != null) {
 //			streamIn.close();
 //		}
 //		if (streamOut != null) {
 //			streamOut.close();
 //		}
-		if (socket != null) {
-			socket.shutdownInput();
-			socket.shutdownOutput();
-		}
 	}
 	
 	/**
@@ -130,8 +131,8 @@ public class Client extends Thread {
 	public void terminate() throws IOException, InterruptedException {
 		running = false;
 		connected = false;
-		interrupt();
 		close();
+		interrupt();
 		join();
 	}
 	

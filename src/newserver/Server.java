@@ -163,8 +163,8 @@ public class Server extends Thread {
 	public void terminate() throws IOException, InterruptedException {
 		clients.clear();
 		running = false;
-		interrupt();
 		close();
+		interrupt();
 		join();
 	}
 	

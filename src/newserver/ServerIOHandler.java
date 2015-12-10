@@ -41,6 +41,7 @@ public class ServerIOHandler extends IOHandler {
 		ServerDirector dir = serverClient.getServer().getServerDirector();
 		actionMap.put(Keys.Commands.ADD_PLAYER, 	() -> dir.addPlayer(input));
 		actionMap.put(Keys.Commands.REM_PLAYER, 	() -> dir.removePlayer(input));
+		actionMap.put(Keys.Commands.FORCE_START,	() -> dir.forceStart());
 		actionMap.put(Keys.Commands.ROLLED, 		() -> dir.movePlayer(input));
 		actionMap.put(Keys.Commands.STOPPED, 		() -> dir.isStopped());
 		actionMap.put(Keys.Commands.MINI_STOPPED, 	() -> dir.getMiniMngr().isMinigameOver());
