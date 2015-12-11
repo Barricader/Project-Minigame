@@ -27,7 +27,9 @@ public class ServerDirector {
 	public static final int MINIGAME = 1;
 	
 	private static final int MAX_PLAYERS = 4;
-	private static final int WAIT_TIME = 15;	// countdown time, until we start game!
+
+	private static final int WAIT_TIME = 20;	// countdown time, until we start game!
+	
 	private Server server;
 	private ConcurrentHashMap<String, NewPlayer> players;	// thread safe!
 	private ConcurrentHashMap<String, NewPlayer> rolledPlayers;
@@ -65,7 +67,7 @@ public class ServerDirector {
 				echoAllPlayers();	// update to all players
 				server.getServerApp().getListPanel().getListModel().addElement(p.getName());
 			} else {
-				// TODO duplicate error!
+				resetCountdown();
 			}
 		} else {
 			// TODO max player error!
@@ -159,6 +161,14 @@ public class ServerDirector {
 		}
 		server.echoAll(k);
 		miniMngr.clearLeaderboard();
+	}
+	
+	/**
+	 * Skips the remaining time left on the countdown timer,
+	 * so that the state update packet can immediately be sent.
+	 */
+	public void forceStart() {
+		timeLeft = 0;
 	}
 	
 	/**
@@ -271,13 +281,22 @@ public class ServerDirector {
 				});
 				timer.start();	
 			} else {
-				GameUtils.resetTimer(timer);
-				timerObj.put(Keys.TIME, "reset");
-				hasStarted = false;
-				obj.put(Keys.Commands.TIMER, timerObj);
-				server.echoAll(obj);
+				resetCountdown();
 			}	
 		}
+	}
+	
+	/**
+	 * Sends a JSON command to reset the countdown timer.
+	 */
+	private void resetCountdown() {
+		NewJSONObject obj = new NewJSONObject(-1, Keys.Commands.TIMER);
+		JSONObject timerObj = new JSONObject();
+		GameUtils.resetTimer(timer);
+		timerObj.put(Keys.TIME, "reset");
+		hasStarted = false;
+		obj.put(Keys.Commands.TIMER, timerObj);
+		server.echoAll(obj);
 	}
 	
 	/**

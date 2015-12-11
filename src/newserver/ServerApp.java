@@ -531,15 +531,8 @@ public class ServerApp extends JFrame {
 	 */
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {
-		// change look and feel to nimbus
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-//		        if ("Nimbus".equals(info.getName())) {
-//		            UIManager.setLookAndFeel(info.getClassName());
-//		            break;
-//		        }
-//		    }
 		} catch (Exception e) {
 		    e.printStackTrace();
 		}
