@@ -4,11 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 
-import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.ListCellRenderer;
-import javax.swing.border.EmptyBorder;
-
 import client.ClientApp;
 import gameobjects.NewPlayer;
 import util.PlayerStyles;

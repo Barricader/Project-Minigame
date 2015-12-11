@@ -22,7 +22,6 @@ public class LBPlayerCellRenderer extends JLabel implements ListCellRenderer<Obj
 	private static final long serialVersionUID = 1L;
 	protected ClientApp app;
 	
-	@SuppressWarnings("unused")
 	protected LBPlayerCellRenderer() {}	// blank constructor
 	
 	public LBPlayerCellRenderer(ClientApp app) {

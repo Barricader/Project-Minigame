@@ -487,7 +487,7 @@ public class Pong extends BaseMiniPanel {
 		private Color color;
 		private String pName;	// name of player this rect belongs to
 		private int axis;
-		private int dirAxis;	// left, right, btm, top?
+		//private int dirAxis;	// left, right, btm, top?
 		
 		public PongRect() {}
 		
