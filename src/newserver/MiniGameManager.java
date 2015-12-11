@@ -32,7 +32,6 @@ public class MiniGameManager {
 	private int lastMini = -1;
 	private List<String> leaderboard;
 	private Map<String, Integer> temp;	// holds win values from mini-games
-	private int count = 0;	// TODO this is for counting packets. Remove me later!
 	private int index = -1;
 	
 	public MiniGameManager(ServerDirector serverDir) {
@@ -76,7 +75,6 @@ public class MiniGameManager {
 		over++;
 		if (over == serverDir.getPlayers().size()) {
 			over = 0;
-			count = 0;	// TODO remove this later. this is just counting pkts for pong.
 			serverDir.changeState(ServerDirector.BOARD);
 		}
 	}
@@ -95,10 +93,6 @@ public class MiniGameManager {
 		
 		index++;
 		return MiniGames.names[index % 3];
-		
-		//return "pong";
-//		return "enter";
-		//return MiniGames.names[lastMini];
 	}
 	
 	/**
@@ -142,18 +136,7 @@ public class MiniGameManager {
 	}
 
 	private void handlePong(JSONObject obj) {
-		//test
-//		if (serverPongBall == null) {
-//			serverPongBall = new ServerPongBall(this);
-//			serverPongBall.start();
-//		}
-		
-		//System.out.println("Pong stuff...");
-		System.out.println("Pong stuff: " + obj.toJSONString()); 		
-		
 		serverDir.getServer().echoAll(obj);
-		count++;
-		System.out.println("pong pkt count: " + count);
 	}
 	
 	private void handleRPS(JSONObject obj) {

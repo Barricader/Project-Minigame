@@ -32,16 +32,11 @@ public class PlayerListCellRenderer extends JLabel implements ListCellRenderer<O
 		setText(p.getName());
 		
 		setBorder(new EmptyBorder(10, 10, 10, 10));	// add some padding
-		
-		if (p.getName().length() > 15) {
-			setFont(new Font("Courier New", Font.BOLD, 24));
-		} else {
-			setFont(new Font("Courier New", Font.BOLD, 30));
-		}
+		setFont(new Font("Courier New", Font.BOLD, 24));
 		Color playerColor = PlayerStyles.colors[p.getStyleID()];	// based on assign StyleID
 		
 		/* isSelected no longer applies, as we're using the DisabledItemSelection
-		 * Model, which negates any selection. But if we weren't this, would would
+		 * Model, which negates any selection. But if we weren't, this would
 		 * swap out fg and bg colors on an element selection.
 		 */
 		if (isSelected) {

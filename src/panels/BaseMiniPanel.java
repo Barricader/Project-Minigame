@@ -1,9 +1,8 @@
 package panels;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -31,11 +30,11 @@ public abstract class BaseMiniPanel extends JPanel {
 //		init();
 		players = new ConcurrentHashMap<>();
 //		controller = new Controller(this);
-//		t = new Timer(16, e -> update());
+		t = new Timer(16, e -> update());
 		//t.start();
 		
 		// thread stuff
-		ex = Executors.newCachedThreadPool();
+//		ex = Executors.newCachedThreadPool();
 		r = () -> {
 			
 			long startTime;
@@ -81,9 +80,9 @@ public abstract class BaseMiniPanel extends JPanel {
 	 * Draws players.
 	 * @param g - Graphics context to draw to
 	 */
-	protected void drawPlayers(Graphics g) {
+	protected void drawPlayers(Graphics2D g2d) {
 		for (NewPlayer p : players.values()) {
-			p.draw(g);
+			p.draw(g2d);
 		}
 	}
 	
@@ -93,14 +92,14 @@ public abstract class BaseMiniPanel extends JPanel {
 	
 	public void setActive(boolean b) {
 		isActive = b;
-		ex = Executors.newCachedThreadPool();
-		ex.submit(r);
-//		t.start();
+//		ex = Executors.newCachedThreadPool();
+//		ex.submit(r);
+		t.start();
 	}
 	
 	public void exit() {
-//		t.stop();
-		ex.shutdown();
+		t.stop();
+//		ex.shutdown();
 	}
 	
 	public void setClientPlayer(NewPlayer player) {
