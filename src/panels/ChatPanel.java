@@ -27,6 +27,7 @@ import client.ClientApp;
 import client.IOHandler;
 import gameobjects.NewPlayer;
 import util.DarkButton;
+import util.GameUtils;
 import util.Keys;
 import util.NewJSONObject;
 import util.PlayerStyles;
@@ -48,7 +49,7 @@ public class ChatPanel extends JPanel {
 	private JTextPane chatArea;
 	private JTextField msgField;
 	private DarkButton sendBtn;
-	private Controller controller;
+	private Controller controller;	
 	
 	/**
 	 * Constructs a new ClientApp with a link to the main ClientApp.
@@ -157,10 +158,11 @@ public class ChatPanel extends JPanel {
 	 * Prints specified message to the chat area.
 	 * @param msg
 	 */
-	public void printMessage(String msg, Color c) {
+	public void printMessage(String name, String text, Color c) {
 		MutableAttributeSet attrs = chatArea.getInputAttributes();
 		StyleConstants.setForeground(attrs, c);
 		StyledDocument doc = chatArea.getStyledDocument();
+		String msg = name + " >: " + text;
 		
 		int offset = doc.getLength();
 		int length = msg.length();
@@ -169,7 +171,9 @@ public class ChatPanel extends JPanel {
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
-		
+		if (name.equals(app.getBoardPanel().getClientPlayer().getName())) {
+			GameUtils.playSound("res/ding.wav");	// play sound, if it's not this client player!	
+		}
 		chatArea.setCaretPosition(chatArea.getDocument().getLength());	// make sure we're always at btm
 		doc.setParagraphAttributes(offset, length, attrs, false);	// apply color style
 	}
@@ -233,8 +237,7 @@ public class ChatPanel extends JPanel {
 			String name = (String)in.get(Keys.NAME);
 			int styleID = app.getBoardPanel().getPlayers().get(name).getStyleID();
 			Color c = PlayerStyles.colors[styleID];
-			String msg = name + " >: " + text;
-			printMessage(msg, c);
+			printMessage(name, text, c);
 		}
 	}
 	

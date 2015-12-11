@@ -6,13 +6,14 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.swing.Timer;
 
 import org.json.simple.JSONObject;
 
@@ -29,7 +30,10 @@ import util.NewJSONObject;
 import util.PlayerStyles;
 
 public class Pong extends BaseMiniPanel {
-	private Rectangle boundRect = new Rectangle(720, 350);	// bound limits for pong game objects
+	// bound limits for pong game objects
+	public static final int BOUND_WIDTH = 720;
+	public static final int BOUND_HEIGHT = 350;
+	private Rectangle boundRect = new Rectangle(BOUND_WIDTH, BOUND_HEIGHT);
 	
 	private static final long serialVersionUID = 318748987007949296L;
 	public static final int ROUND_COUNT = 5;	// rounds before gameover
@@ -59,11 +63,13 @@ public class Pong extends BaseMiniPanel {
 	 */
 	public void init() {
 		playerRects = new ConcurrentHashMap<>();
+		players = app.getBoardPanel().getPlayers();
 		isActive = true;
 		didPressEnter = false;
-		roundsLeft = ROUND_COUNT;
+		roundsLeft = 0;
 		clientPlayer = app.getBoardPanel().getClientPlayer();
 		pArray = GameUtils.mapToArray(app.getBoardPanel().getPlayers(), NewPlayer.class);
+		GameUtils.sortPlayersByName(pArray);
 		
 		// initial bound rect x,y placement
 		boundRect.x = (app.getStatePanel().getWidth() - boundRect.width) / 2;
@@ -72,26 +78,32 @@ public class Pong extends BaseMiniPanel {
 		
 		// initial ball placement setup		
 		pongBall = new PongBall();
-		pongBall.x = (boundRect.width + PongBall.WIDTH) / 2;
-		pongBall.y = (boundRect.height + PongBall.HEIGHT) / 2;
+		resetBall();
 		
 		// paddle width and height
 		switch (id) {
 		case 0:
 			yAxis = true;
-			playerRect = new PongRect(boundRect.x + 5, (boundRect.height - 10) / 2, 10, 50);
+			playerRect = new PongRect(boundRect.x + 5, 
+					(boundRect.height - 10) / 2, 
+					10, 50, PongRect.Y_AXIS);
 			break;
 		case 1: 
 			yAxis = true;
-			playerRect = new PongRect((boundRect.width + boundRect.x) - 15, (boundRect.height - 10) / 2, 10, 50);
+			playerRect = new PongRect((boundRect.width + boundRect.x) - 15, 
+					(boundRect.height - 10) / 2, 
+					10, 50, PongRect.Y_AXIS);
 			break;
 		case 2:
 			xAxis = true;
-			playerRect = new PongRect(boundRect.width / 2, boundRect.y + 5, 50, 10);
+			playerRect = new PongRect(boundRect.width / 2,
+					boundRect.y + 5, 50, 10, PongRect.X_AXIS);
 			break;
 		case 3:
 			xAxis = true;
-			playerRect = new PongRect(boundRect.width / 2, boundRect.y + boundRect.height - 15, 50, 10);
+			playerRect = new PongRect(boundRect.width / 2, 
+					boundRect.y + boundRect.height - 15, 
+					50, 10, PongRect.X_AXIS);
 		}
 		
 		// set color of rectangle and assign name of this client player
@@ -101,7 +113,7 @@ public class Pong extends BaseMiniPanel {
 		
 		sendUpdate();	// be sure to send first update, when playerRect is created
 		
-		// use the mouse wheel for movement
+		// use the mouse wheel for movement for this player
 		addMouseWheelListener(new MouseWheelListener() {
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				if (xAxis) {
@@ -114,7 +126,52 @@ public class Pong extends BaseMiniPanel {
 				}
 			}
 		});
+		
+		// mouse movement for this player
+		addMouseMotionListener(new MouseMotionAdapter() {
+			public void mouseMoved(MouseEvent e) {
+				System.out.println("mouse moved!");
+				if (xAxis) {
+					playerRect.x = e.getPoint().x;
+				} else if (yAxis) {
+					playerRect.y = e.getPoint().y;
+				}
+				if (checkMovement()) {
+					sendUpdate();
+				}
+			}
+		});
+		
+		if (!t.isRunning()) {
+			t.start();
+		}
+	}
 	
+	public void resetBall() {
+		pongBall.x = (boundRect.width + PongBall.WIDTH) / 2;
+		pongBall.y = (boundRect.height + PongBall.HEIGHT) / 2;
+		pongBall.setXVel(5);
+		pongBall.setYVel(3);
+		pongBall.setLastHitPName(null);
+	}
+	
+	public void changeScore() {
+		if (pongBall.getLastHitPName() != null) {
+			NewPlayer hitPlayer = players.get(pongBall.getLastHitPName());
+			System.out.println("hit player:" + hitPlayer);
+			if (hitPlayer != null) {
+				hitPlayer.setScore(hitPlayer.getScore() + 1);
+				app.getLeaderPanel().updateList();
+			}
+		}
+//		GameUtils.resetTimer(t);
+//		System.out.println("CHANGE SCORE RESET!");
+//		t.stop();
+//		t.setInitialDelay(1200);
+//		t = new Timer(16, e -> {
+//			update();
+//		});
+//		t.start();
 	}
 	
 	/**
@@ -146,7 +203,6 @@ public class Pong extends BaseMiniPanel {
 				isAtBounds = true;
 			}	
 		}
-		System.out.println("is at bounds? " + isAtBounds);
 		if (!isAtBounds) {
 			// send location since we're within bounds
 			sentBoundUpdate = false;
@@ -163,57 +219,79 @@ public class Pong extends BaseMiniPanel {
 		}
 	}
 	
+	/**
+	 * Main timer loop that actively updates the ball and checks
+	 * for collision with the world and pong rects.
+	 */
 	public void update() {
 		pongBall.x += pongBall.getXVel();
 		pongBall.y += pongBall.getYVel();
 		
-		// check collision
+		boolean paddleCollide = false;
 		
-		for (PongRect p : playerRects.values()) {
-			if (p.intersects(pongBall)) {
-				NewPlayer player = app.getBoardPanel().getPlayers().get(p.getName());
-				pongBall.setXVel(pongBall.getXVel() * -1);
-				pongBall.setYVel(pongBall.getYVel() * -1);
-				player.setScore(player.getScore() + 1);
-				app.getLeaderPanel().updateList();
+		for (PongRect pr : playerRects.values()) {
+			if (pr.intersects(pongBall)) {
+				pongBall.x = pongBall.lastX;
+				
+				pongBall.reflectX();
+				pongBall.setLastHitPName(pr.getName());
+				GameUtils.playSound("res/doot.wav");
+				paddleCollide = true;
+				break;
 			}
 		}
 		
-		NewPlayer p = null;	// player whose score we will affect, if ball hits their wall
-		
-		if (pongBall.x <= boundRect.x + PongBall.WIDTH) {	// left y-axis wall collision
-			p = pArray[0];
-			pongBall.setXVel(pongBall.getXVel() * -1);
-			pongBall.x += pongBall.getXVel();
-		} else if (pongBall.x >= (boundRect.x + boundRect.width) - PongBall.WIDTH) {	// right y-axis wall collision
-			p = pArray[1];
-			pongBall.setXVel(pongBall.getXVel() * -1);
-			pongBall.x += pongBall.getXVel();
-		} else if (pongBall.y <= boundRect.y + PongBall.HEIGHT) {	// top x-axis wall collision
-			if (pArray.length > 2) {
-				p = pArray[2];	
+		if (!paddleCollide) {
+			if (pongBall.x <= (boundRect.x + pongBall.width) 
+					|| pongBall.x >= (boundRect.x + boundRect.width) - pongBall.width) {
+				pongBall.x = pongBall.lastX;
+				pongBall.reflectX();
+				checkShouldScore(PongRect.X_AXIS);
+			} else if (pongBall.y <= (boundRect.y + pongBall.width)
+					|| pongBall.y >= (boundRect.y + boundRect.height) - pongBall.height) {
+				pongBall.y = pongBall.lastY;
+				pongBall.reflectY();
+				if (pArray.length > 2) {
+					checkShouldScore(PongRect.Y_AXIS);	
+				}
 			}
-			pongBall.setYVel(pongBall.getYVel() * -1);
-			pongBall.y += pongBall.getYVel();
-		} else if (pongBall.y >= (boundRect.y + boundRect.height) - PongBall.HEIGHT) {	// btm x-axis wall collision
-			if (pArray.length > 2) {
-				p = pArray[3];	
-			}
-			pongBall.setYVel(pongBall.getYVel() * -1);
-			pongBall.y += pongBall.getYVel();
 		}
-		
-		// a ball has hit their wall, reduce their score
-		if (p != null) {
-			p.setScore(p.getScore() - 1);
-			app.getLeaderPanel().updateList();
-		}
+		pongBall.lastX = pongBall.x - pongBall.getXVel();
+		pongBall.lastY = pongBall.y - pongBall.getYVel();
 		repaint();
+	}
+	
+	private boolean checkShouldScore(int axis) {
+		if (pongBall.getLastHitPName() != null) {
+			PongRect pr = playerRects.get(pongBall.getLastHitPName());
+			System.out.println("last hit player: " + pongBall.getLastHitPName());
+			if (pr.getAxis() != axis) {
+				System.out.println(pongBall.getLastHitPName() + ", should score!");
+				int pScore = players.get(pongBall.getLastHitPName()).getScore();
+				players.get(pongBall.getLastHitPName()).setScore(++pScore);
+				app.getLeaderPanel().updateList();
+				updateRound();
+				resetBall();
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private void updateRound() {
+		roundsLeft++;
 		
-//		if (roundsLeft == 0) {
-//			sendExitRequest();
-//		}
-	}	
+		GameUtils.resetTimer(t);
+		t.setInitialDelay(1000);
+		if (roundsLeft == ROUND_COUNT) {
+			sendExitRequest();
+		} else {
+			t.addActionListener(e -> {
+				update();
+			});
+			t.start();
+		}
+	}
 	
 	/**
 	 * Sends a JSONObject update with the coordinates and size of this
@@ -228,8 +306,7 @@ public class Pong extends BaseMiniPanel {
 		obj.put(Keys.STYLE_ID, clientPlayer.getStyleID());
 		obj.put("x", playerRect.x);
 		obj.put("y", playerRect.y);
-		obj.put("width", playerRect.width);
-		obj.put("height", playerRect.height);
+		obj.put("axis", playerRect.getAxis());
 		playerRects.put(clientPlayer.getName(), playerRect);
 		controller.send(obj);
 	}
@@ -237,7 +314,6 @@ public class Pong extends BaseMiniPanel {
 	/**
 	 * Called whenever a key is pressed on the keyboard.
 	 */
-	@SuppressWarnings("unchecked")
 	public void playerPressed() {
 		if (isActive) {
 			if (xAxis) {
@@ -257,12 +333,17 @@ public class Pong extends BaseMiniPanel {
 	 * Sends a request to the server, letting it know that this client
 	 * is ready to leave.
 	 */
+	@SuppressWarnings("unchecked")
 	public void sendExitRequest() {
 		NewJSONObject k = new NewJSONObject(clientPlayer.getID(), Keys.Commands.MINI_STOPPED);
 		k.put(Keys.NAME, clientPlayer.getName());
 		controller.send(k);
 		isActive = false;	
 		didPressEnter = true;
+		GameUtils.resetTimer(t);
+		t = new Timer(16, e -> {
+			update();
+		});
 	}
 	
 	/**
@@ -302,6 +383,7 @@ public class Pong extends BaseMiniPanel {
 	public void paintComponent(Graphics g) {
 		final Graphics2D g2d = (Graphics2D)g.create();
 		try {
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g2d.setColor(GameUtils.colorFromHex("#2b2b2b"));
 			g2d.fillRect(0, 0, getWidth(), getHeight());
 			g2d.setColor(Color.WHITE);
@@ -320,13 +402,18 @@ public class Pong extends BaseMiniPanel {
 			}
 			pongBall.draw(g2d);
 			g2d.setColor(Color.CYAN);
-			drawPlayers(g2d);
 			drawScore(g2d);
+			drawRoundCount(g2d);
 		} finally {
 			g2d.dispose();
 		}
 	}
 	
+	/**
+	 * Draws the player scores in the corners of the screen
+	 * with their specified color.
+	 * @param g2d
+	 */
 	private void drawScore(Graphics2D g2d) {
 		final int pad = 20;
 		
@@ -340,7 +427,7 @@ public class Pong extends BaseMiniPanel {
 			if (i == 1) {
 				x = boundRect.width + boundRect.x - scoreWidth - pad;
 			} else if (i == 2) {
-				x = 50;
+				x = boundRect.x + (scoreWidth / 2) + pad;
 				y = boundRect.y + boundRect.height - 30;
 			} else if (i == 3) {
 				x = boundRect.width + boundRect.x - scoreWidth - pad;
@@ -351,8 +438,16 @@ public class Pong extends BaseMiniPanel {
 		}
 	}
 	
+	private void drawRoundCount(Graphics2D g2d) {
+		g2d.setFont(new Font("Courier New", Font.BOLD, 20));
+		g2d.setColor(Color.WHITE);
+		String rounds = "Round: " + roundsLeft + " of " + ROUND_COUNT;
+		int x = 375;
+		g2d.drawString(rounds, x, 50);
+	}
+	
 	/**
-	 * Simple helper class that just stores a color value for
+	 * Simple helper class that just stores a color value and name for
 	 * a rectangle, so that it can easily be set and drawn.
 	 * @author David Kramer
 	 *
@@ -362,13 +457,17 @@ public class Pong extends BaseMiniPanel {
 		 * 
 		 */
 		private static final long serialVersionUID = 1659495291668720826L;
+		public static final int X_AXIS = 0;
+		public static final int Y_AXIS = 1;
 		private Color color;
 		private String pName;	// name of player this rect belongs to
+		private int axis;
 		
 		public PongRect() {}
 		
-		public PongRect(int x, int y, int w, int h) {
+		public PongRect(int x, int y, int w, int h, int axis) {
 			super(x, y, w, h);
+			this.axis = axis;
 		}
 
 		public void setColor(Color color) {
@@ -379,8 +478,24 @@ public class Pong extends BaseMiniPanel {
 			this.pName = pName;
 		}
 		
+		public void setAxis(int axis) {
+			this.axis = axis;
+			// size up the rectangle depending on axis
+			if (axis == X_AXIS) {
+				width = 50;
+				height = 10;
+			} else if (axis == Y_AXIS) {
+				height = 50;
+				width = 10;
+			}
+		}
+		
 		public String getName() {
 			return pName;
+		}
+		
+		public int getAxis() {
+			return axis;
 		}
 		
 		public Color getColor() {
@@ -403,12 +518,7 @@ public class Pong extends BaseMiniPanel {
 			app.getClient().getIOHandler().send(out);
 		}
 
-		public void receive(JSONObject in) {
-			if (in.containsKey("objectOnlyUpdate")) {
-				updateBall(in);
-				return;
-			}
-			
+		public void receive(JSONObject in) {			
 			String pName = (String) in.get(Keys.PLAYER_NAME);
 			Color c = PlayerStyles.colors[(int) in.get(Keys.STYLE_ID)];	// color the rectangle
 			
@@ -421,22 +531,13 @@ public class Pong extends BaseMiniPanel {
 			}
 			r.x = (int) in.get("x");
 			r.y = (int) in.get("y");
-			r.width = (int) in.get("width");
-			r.height = (int) in.get("height");
+//			r.width = (int) in.get("width");
+//			r.height = (int) in.get("height");
 			r.setName(pName);
 			r.setColor(c);
+			r.setAxis((int) in.get("axis"));
 			playerRects.put(pName, r);
 			repaint();
-		}
-		
-		private void updateBall(JSONObject in) {
-			if (pongBall == null) {
-				pongBall = new PongBall();
-			}
-			
-			JSONObject ball = (JSONObject)in.get("ball");
-			pongBall.x = (int) ball.get("x");
-			pongBall.y = (int) ball.get("y");
 		}
 	}	
 }

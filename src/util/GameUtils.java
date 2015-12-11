@@ -14,7 +14,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -241,4 +247,39 @@ public class GameUtils {
 			}	
 		}
 	}
+	
+	/**
+	 * Utility method that clears out actions from a specified timer.
+	 * @param t - Timer to clear
+	 */
+	public static void clearTimer(Timer t) {
+		if (t != null) {
+			t.stop();
+			for (ActionListener a : t.getActionListeners()) {
+				t.removeActionListener(a);
+			}
+		}
+	}
+	
+	/**
+	 * Plays a sound from the specified string file path.
+	 * @param file - String to file
+	 */
+	public static void playSound(String file) {
+		File f = new File(file);
+		try {
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(f));
+			clip.start();
+			clip.addLineListener(new LineListener() {
+				public void update(LineEvent event) {
+					if (event.getType() == LineEvent.Type.STOP) {	// close out when finished playing
+						clip.close();
+					}
+				}
+			});
+		} catch (Exception e) {
+			System.out.println("an error occurred when playing sound!");
+		}	
+	};
 }

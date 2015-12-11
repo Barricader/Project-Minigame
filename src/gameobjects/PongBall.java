@@ -7,16 +7,19 @@ import org.json.simple.JSONObject;
 
 public class PongBall extends GameObject {
 	private static final long serialVersionUID = 7246226056305104239L;
-	public static final int WIDTH = 10;
-	public static final int HEIGHT = 10;
+	public static final int WIDTH = 12;
+	public static final int HEIGHT = 12;
 	public static final Color COLOR = Color.WHITE;
 	
 	private int xVel;
 	private int yVel;
+	public int lastX;	// previous x-pos
+	public int lastY;	// previous y-pos
+	private String lastHitPName;
 	
 	public PongBall() {
-		xVel = 6;
-		yVel = 8;
+		xVel = 5;
+		yVel = 5;
 		width = WIDTH;
 		height = HEIGHT;
 	}
@@ -26,12 +29,28 @@ public class PongBall extends GameObject {
 		g2d.fillOval(x, y, WIDTH, HEIGHT);
 	}
 	
+	public void setLastHitPName(String pName) {
+		this.lastHitPName = pName;
+	}
+	
+	public void reflectX() {
+		this.xVel *= -1;
+	}
+	
+	public void reflectY() {
+		this.yVel *= -1;
+	}
+	
 	public void setXVel(int xVel) {
 		this.xVel = xVel;
 	}
 	
 	public void setYVel(int yVel) {
 		this.yVel = yVel;
+	}
+	
+	public String getLastHitPName() {
+		return lastHitPName;
 	}
 	
 	public int getXVel() {
