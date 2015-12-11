@@ -36,7 +36,7 @@ public class Pong extends BaseMiniPanel {
 	private Rectangle boundRect = new Rectangle(BOUND_WIDTH, BOUND_HEIGHT);
 	
 	private static final long serialVersionUID = 318748987007949296L;
-	public static final int ROUND_COUNT = 5;	// rounds before gameover
+	public static final int ROUND_COUNT = 3;	// rounds before gameover
 	private PongRect playerRect;	// the pong rectangle that belongs to the player
 	private boolean xAxis;	// movement restricted to x-axis
 	private boolean yAxis;	// movement restricted to y-axis
@@ -66,7 +66,7 @@ public class Pong extends BaseMiniPanel {
 		players = app.getBoardPanel().getPlayers();
 		isActive = true;
 		didPressEnter = false;
-		roundsLeft = 0;
+		roundsLeft = 1;
 		clientPlayer = app.getBoardPanel().getClientPlayer();
 		pArray = GameUtils.mapToArray(app.getBoardPanel().getPlayers(), NewPlayer.class);
 		GameUtils.sortPlayersByName(pArray);
@@ -78,7 +78,7 @@ public class Pong extends BaseMiniPanel {
 		
 		// initial ball placement setup		
 		pongBall = new PongBall();
-		resetBall();
+		resetBall(1);
 		
 		// paddle width and height
 		switch (id) {
@@ -147,11 +147,11 @@ public class Pong extends BaseMiniPanel {
 		}
 	}
 	
-	public void resetBall() {
+	public void resetBall(int direction) {
 		pongBall.x = (boundRect.width + PongBall.WIDTH) / 2;
 		pongBall.y = (boundRect.height + PongBall.HEIGHT) / 2;
-		pongBall.setXVel(5);
-		pongBall.setYVel(3);
+		pongBall.setXVel(5 * direction);
+		pongBall.setYVel(3 * direction);
 		pongBall.setLastHitPName(null);
 	}
 	
@@ -242,26 +242,44 @@ public class Pong extends BaseMiniPanel {
 		}
 		
 		if (!paddleCollide) {
-			if (pongBall.x <= (boundRect.x + pongBall.width) 
-					|| pongBall.x >= (boundRect.x + boundRect.width) - pongBall.width) {
-				pongBall.x = pongBall.lastX;
+			if (pongBall.x <= (boundRect.x + pongBall.width)) {
 				pongBall.reflectX();
-				checkShouldScore(PongRect.X_AXIS);
-			} else if (pongBall.y <= (boundRect.y + pongBall.width)
-					|| pongBall.y >= (boundRect.y + boundRect.height) - pongBall.height) {
-				pongBall.y = pongBall.lastY;
+				checkShouldScore(PongRect.X_AXIS, PongRect.LEFT_Y_AXIS);
+			} else if (pongBall.x >= (boundRect.x + boundRect.width) - pongBall.width) {
+				pongBall.reflectX();
+				checkShouldScore(PongRect.X_AXIS, PongRect.RIGHT_Y_AXIS);
+			} else if (pongBall.y <= (boundRect.y + pongBall.width)) {
 				pongBall.reflectY();
 				if (pArray.length > 2) {
-					checkShouldScore(PongRect.Y_AXIS);	
+					checkShouldScore(PongRect.Y_AXIS, PongRect.TOP_X_AXIS);
+				}
+				
+			} else if (pongBall.y >= (boundRect.y + boundRect.height) - pongBall.height) {
+				pongBall.reflectY();
+				if (pArray.length > 2) {
+					checkShouldScore(PongRect.Y_AXIS, PongRect.BTM_X_AXIS);
 				}
 			}
+//			if (pongBall.x <= (boundRect.x + pongBall.width) 
+//					|| pongBall.x >= (boundRect.x + boundRect.width) - pongBall.width) {
+//				pongBall.x = pongBall.lastX;
+//				pongBall.reflectX();
+//				checkShouldScore(PongRect.X_AXIS);
+//			} else if (pongBall.y <= (boundRect.y + pongBall.width)
+//					|| pongBall.y >= (boundRect.y + boundRect.height) - pongBall.height) {
+//				pongBall.y = pongBall.lastY;
+//				pongBall.reflectY();
+//				if (pArray.length > 2) {
+//					checkShouldScore(PongRect.Y_AXIS);	
+//				}
+//			}
 		}
 		pongBall.lastX = pongBall.x - pongBall.getXVel();
 		pongBall.lastY = pongBall.y - pongBall.getYVel();
 		repaint();
 	}
 	
-	private boolean checkShouldScore(int axis) {
+	private void checkShouldScore(int axis, int side) {
 		if (pongBall.getLastHitPName() != null) {
 			PongRect pr = playerRects.get(pongBall.getLastHitPName());
 			System.out.println("last hit player: " + pongBall.getLastHitPName());
@@ -269,21 +287,24 @@ public class Pong extends BaseMiniPanel {
 				System.out.println(pongBall.getLastHitPName() + ", should score!");
 				int pScore = players.get(pongBall.getLastHitPName()).getScore();
 				players.get(pongBall.getLastHitPName()).setScore(++pScore);
-				app.getLeaderPanel().updateList();
-				updateRound();
-				resetBall();
-				return true;
 			}
 		}
-		return false;
+		updateRound();
+		if (side == PongRect.LEFT_Y_AXIS) {
+			resetBall(-1);
+		} else if (side == PongRect.RIGHT_Y_AXIS) {
+			resetBall(1);
+		} else {
+			resetBall(1);
+		}
 	}
 	
 	private void updateRound() {
 		roundsLeft++;
-		
+		app.getLeaderPanel().updateList();
 		GameUtils.resetTimer(t);
 		t.setInitialDelay(1000);
-		if (roundsLeft == ROUND_COUNT) {
+		if (roundsLeft > ROUND_COUNT) {
 			sendExitRequest();
 		} else {
 			t.addActionListener(e -> {
@@ -459,9 +480,14 @@ public class Pong extends BaseMiniPanel {
 		private static final long serialVersionUID = 1659495291668720826L;
 		public static final int X_AXIS = 0;
 		public static final int Y_AXIS = 1;
+		public static final int LEFT_Y_AXIS = 0;
+		public static final int RIGHT_Y_AXIS = 1;
+		public static final int TOP_X_AXIS = 2;
+		public static final int BTM_X_AXIS = 3;
 		private Color color;
 		private String pName;	// name of player this rect belongs to
 		private int axis;
+		private int dirAxis;	// left, right, btm, top?
 		
 		public PongRect() {}
 		

@@ -313,13 +313,10 @@ public class RPS extends BaseMiniPanel {
 		playerChoiceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		turnLabel = new JLabel("Turn: " + (turnCount + 1) + " of " + MAX_TURNS);
-		
-		turnLabel.setForeground(GameUtils.colorFromHex("58D168"));
-		turnLabel.setFont(new Font("Courier New", Font.BOLD, 20));
+		app.colorize(turnLabel, null, 20);
 		
 		statusLabel = new JLabel("Finished. Waiting for other clients!");
-		statusLabel.setFont(new Font("Courier New", Font.BOLD, 20));
-		statusLabel.setForeground(GameUtils.colorFromHex("#58D168"));
+		app.colorize(statusLabel, null, 20);
 		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		statusLabel.setVisible(false);
 		
